@@ -11,7 +11,8 @@
   --radius-xl: 20px;
 
   --font-sans: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "Unbounded", "Inter", system-ui, sans-serif;
+  --font-mono: "Inter", ui-monospace, monospace;
 
   --color-bg: var(--bg-primary);
   --color-bg-card: var(--bg-card);
@@ -49,19 +50,18 @@
   --accent-gold: #D4AF37;
   --accent-green: #2E7D32;
   --text-primary: #FFFFFF;
-  --text-secondary: #A0A8A0;
+  --text-secondary: #A0A89A;
   --border: #2A2E2A;
   --hover: #242624;
   --radius: 16px;
 }
 
 @layer base {
-  * {
-    border-color: var(--border);
-  }
+  * { border-color: var(--border); }
   html {
     scroll-behavior: smooth;
     background: var(--bg-primary);
+    overflow-x: hidden;
   }
   body {
     background: var(--bg-primary);
@@ -69,7 +69,7 @@
     font-family: var(--font-sans);
     font-size: 16px;
     -webkit-font-smoothing: antialiased;
-    font-feature-settings: "ss01", "cv11";
+    overflow-x: hidden;
   }
   input, select, textarea, button {
     font-family: inherit;
@@ -77,22 +77,22 @@
   }
 }
 
+.font-display { font-family: var(--font-display); letter-spacing: -0.02em; }
+
 /* Noise texture overlay */
 .noise-overlay {
   position: absolute; inset: 0; pointer-events: none; opacity: 0.04;
   background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--accent-gold); border-radius: 3px; }
 
 .hide-scrollbar::-webkit-scrollbar { display: none; }
-.hide-scrollbar { scrollbar-width: none; }
+.hide-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
 
-/* Reveal animation */
-.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.7s ease-out, transform 0.7s ease-out; }
+.reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
 .reveal.in { opacity: 1; transform: translateY(0); }
 
 @keyframes slide-up {
@@ -105,6 +105,17 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
-.animate-fade-in { animation: fade-in 0.2s ease-out; }
+.animate-fade-in { animation: fade-in 0.25s ease-out; }
 
 .tabular { font-variant-numeric: tabular-nums; }
+
+.press { transition: transform 150ms ease; }
+.press:active { transform: scale(0.97); }
+
+.dish-placeholder {
+  background: linear-gradient(135deg, #1C2A1C 0%, #162016 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}

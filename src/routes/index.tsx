@@ -132,15 +132,11 @@ const WEEK_MENU: Record<LineId, Dish[][]> = {
   ]),
 };
 
-// Generates 7 days of menus by lightly rotating/permuting the base 4-meal day
+// Generates 7 days of menus by lightly rotating the base 4-meal day.
+// Keep names clean — no "вариант N" suffixes that bloat the UI.
 function makeWeekFromBase(base: Dish[]): Dish[][] {
-  const dayNames = ["", " · вариант 2", " · вариант 3", " · вариант 4", " · вариант 5", " · вариант 6", " · вариант 7"];
-  return dayNames.map((suffix, i) =>
-    base.map((d) => ({
-      ...d,
-      name: i === 0 ? d.name : d.name + suffix,
-      kcal: d.kcal + (i * 5) - 10,
-    })),
+  return Array.from({ length: 7 }, (_, i) =>
+    base.map((d) => ({ ...d, kcal: d.kcal + i * 5 - 10 })),
   );
 }
 
@@ -597,28 +593,35 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
               onClick={() => onOpenDish(d)}
               className="press text-left"
               style={{
-                background: "#161816", padding: 18,
-                display: "flex", gap: 14, alignItems: "center",
+                background: "#161816", padding: 14,
+                display: "flex", gap: 12, alignItems: "center",
               }}
             >
               <div
                 className="shrink-0 grid place-items-center rounded-2xl overflow-hidden"
-                style={{ width: 72, height: 72, background: "#0E0F0E" }}
+                style={{ width: 60, height: 60, background: "#0E0F0E" }}
               >
-                <img src={line.image} alt="" loading="lazy" width={800} height={800} className="w-full h-full object-cover" />
+                <img src={line.image} alt="" loading="lazy" width={400} height={400} className="w-full h-full object-cover" />
               </div>
               <div className="min-w-0 flex-1">
                 <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 10, color: line.accent, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   {d.meal}
                 </div>
-                <div className="mt-1 truncate" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 15, color: "#FFFFFF", lineHeight: 1.3 }}>
+                <div
+                  className="mt-1"
+                  style={{
+                    fontFamily: "Inter", fontWeight: 700, fontSize: 14.5, color: "#FFFFFF", lineHeight: 1.3,
+                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                    overflow: "hidden", wordBreak: "break-word",
+                  }}
+                >
                   {d.name}
                 </div>
-                <div className="mt-1 tabular" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 12, color: "#A0A89A" }}>
-                  {d.kcal} ккал · Б {d.p} · Ж {d.f} · У {d.c}
+                <div className="mt-1 tabular" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 11.5, color: "#A0A89A" }}>
+                  {d.kcal} ккал · Б{d.p} · Ж{d.f} · У{d.c}
                 </div>
               </div>
-              <ChevronRight size={18} color="#A0A89A" className="shrink-0" />
+              <ChevronRight size={16} color="#A0A89A" className="shrink-0" />
             </button>
           ))}
         </div>
@@ -806,7 +809,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
             <label style={lbl}>Цель</label>
             <div className="flex" style={{ gap: 8 }}>
               {([
-                ["loss", "Снижение"], ["keep", "Поддержание"], ["gain", "Набор"],
+                ["loss", "Снижение"], ["keep", "Норма"], ["gain", "Набор"],
               ] as const).map(([k, l]) => {
                 const active = goal === k;
                 return (
@@ -815,7 +818,8 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                       flex: 1, height: 52, borderRadius: 14,
                       background: active ? "#0E0F0E" : "#F5F5F5",
                       color: active ? "#FFFFFF" : "#555",
-                      fontFamily: "Inter", fontWeight: 600, fontSize: 13,
+                      fontFamily: "Inter", fontWeight: 600, fontSize: 14,
+                      whiteSpace: "nowrap",
                     }}>{l}</button>
                 );
               })}
@@ -1075,90 +1079,88 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
   }
 
   const fieldStyle: React.CSSProperties = {
-    background: "#161816", border: "1px solid #2A2E2A", borderRadius: 14,
-    padding: "0 16px", fontFamily: "Inter", fontWeight: 500, fontSize: 16,
-    color: "#FFFFFF", height: 56, width: "100%", outline: "none",
-  };
-  const textareaStyle: React.CSSProperties = {
-    ...fieldStyle, height: "auto", padding: "16px",
-    minHeight: 96, resize: "vertical",
+    background: "#161816", border: "1px solid #2A2E2A", borderRadius: 12,
+    padding: "0 14px", fontFamily: "Inter", fontWeight: 500, fontSize: 15,
+    color: "#FFFFFF", height: 48, width: "100%", outline: "none",
   };
 
   return (
     <section id="order-form" style={{
       background: "linear-gradient(180deg, #0E0F0E 0%, #0F1A0F 100%)",
-      padding: "56px 16px",
+      padding: "40px 16px",
     }}>
-      <div className="mx-auto max-w-2xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+      <div className="mx-auto max-w-xl">
+        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
           Заявка
         </span>
-        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+        <h2 className="reveal mt-1.5" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(24px, 4vw, 32px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
           Оставь заявку
         </h2>
-        <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 15, color: "#A0A89A" }}>
+        <p className="reveal mt-1" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>
           Ответим в Telegram за 30 минут
         </p>
 
         {sent ? (
-          <div className="reveal in mt-6 animate-fade-in text-center" style={{
-            background: "#161816", border: "1px solid #2E7D32", borderRadius: 24, padding: 32,
+          <div className="reveal in mt-5 animate-fade-in text-center" style={{
+            background: "#161816", border: "1px solid #2E7D32", borderRadius: 20, padding: 28,
           }}>
             <div className="mx-auto grid place-items-center rounded-full"
-              style={{ width: 60, height: 60, background: "#2E7D32" }}>
-              <Check size={30} color="#FFFFFF" strokeWidth={3} />
+              style={{ width: 56, height: 56, background: "#2E7D32" }}>
+              <Check size={28} color="#FFFFFF" strokeWidth={3} />
             </div>
-            <div className="mt-4" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 24, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-              Заявка принята!
+            <div className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+              Заявка принята
             </div>
-            <p className="mt-2" style={{ fontFamily: "Inter", fontSize: 15, color: "#A0A89A", lineHeight: 1.6 }}>
-              Мы напишем вам в Telegram в течение 30 минут.
+            <p className="mt-1.5" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A", lineHeight: 1.5 }}>
+              Напишем в Telegram в течение 30 минут.
             </p>
           </div>
         ) : (
-          <form onSubmit={submit} className="reveal mt-6 space-y-3">
-            <input style={fieldStyle} placeholder="Ваше имя" value={state.name} onChange={(e) => set("name", e.target.value)} required
-              onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
-              onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
-            <input style={fieldStyle} type="tel" placeholder="+7 (000) 000-00-00" value={state.phone}
-              onChange={(e) => set("phone", maskPhone(e.target.value))} required
-              onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
-              onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
-            <input style={fieldStyle} placeholder="Telegram: @username" value={state.messenger}
-              onChange={(e) => set("messenger", e.target.value)}
-              onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
-              onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
+          <form onSubmit={submit} className="reveal mt-4 space-y-2.5">
+            <div className="grid grid-cols-2 gap-2.5">
+              <input style={fieldStyle} placeholder="Имя" value={state.name} onChange={(e) => set("name", e.target.value)} required
+                onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
+                onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
+              <input style={fieldStyle} type="tel" placeholder="+7 (000) 000-00-00" value={state.phone}
+                onChange={(e) => set("phone", maskPhone(e.target.value))} required
+                onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
+                onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
+            </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5">
               <select style={fieldStyle} value={state.line} onChange={(e) => set("line", e.target.value)}>
-                {LINES.map((l) => <option key={l.id} value={l.id}>{l.id}</option>)}
+                {LINES.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}
               </select>
               <select style={fieldStyle} value={state.period} onChange={(e) => set("period", e.target.value)}>
                 <option>1 день</option><option>3 дня</option><option>Месяц</option>
               </select>
             </div>
 
-            <input style={fieldStyle} placeholder="Улица, дом, квартира" value={state.address}
+            <input style={fieldStyle} placeholder="Адрес доставки" value={state.address}
               onChange={(e) => set("address", e.target.value)} required
               onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
               onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
 
-            <select style={fieldStyle} value={state.slot} onChange={(e) => set("slot", e.target.value)}>
-              <option>07:00–08:00</option><option>09:00–10:00</option><option>18:00–19:00</option>
-            </select>
+            <div className="grid grid-cols-2 gap-2.5">
+              <input style={fieldStyle} placeholder="Telegram" value={state.messenger}
+                onChange={(e) => set("messenger", e.target.value)}
+                onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
+                onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
+              <select style={fieldStyle} value={state.slot} onChange={(e) => set("slot", e.target.value)}>
+                <option>07:00–08:00</option><option>09:00–10:00</option><option>18:00–19:00</option>
+              </select>
+            </div>
 
-            <textarea style={textareaStyle} placeholder="Комментарий (необязательно)"
-              value={state.comment} onChange={(e) => set("comment", e.target.value)} />
-
-            <button type="submit" className="press mt-2"
+            <button type="submit" className="press"
               style={{
-                width: "100%", height: 56, borderRadius: 50,
+                marginTop: 6,
+                width: "100%", height: 52, borderRadius: 50,
                 background: "#D4AF37", color: "#0E0F0E",
-                fontFamily: "Unbounded", fontWeight: 700, fontSize: 16, letterSpacing: "-0.01em",
+                fontFamily: "Unbounded", fontWeight: 700, fontSize: 15, letterSpacing: "-0.01em",
               }}>
               Отправить заявку
             </button>
-            <p className="text-center mt-2" style={{ fontFamily: "Inter", fontSize: 12, color: "#A0A89A" }}>
+            <p className="text-center" style={{ marginTop: 6, fontFamily: "Inter", fontSize: 11, color: "#7A8278" }}>
               Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности
             </p>
           </form>

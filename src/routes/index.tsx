@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   X, Check, Phone, Leaf, Truck, Star, Sparkles, Send, Instagram, MapPin, Plus, Minus, ChevronRight, ArrowRight,
+  Flame, Heart, Crown, type LucideIcon,
 } from "lucide-react";
+
 
 import heroFood from "../assets/hero-food.jpg";
 import lineLight from "../assets/line-light.jpg";

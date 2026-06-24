@@ -1,8 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Menu, X, Check, Phone, Leaf, Truck, Star, Sparkles, Send, Instagram, MapPin, Plus, Minus,
+  X, Check, Phone, Leaf, Truck, Star, Sparkles, Send, Instagram, MapPin, Plus, Minus, ChevronRight, ArrowRight,
 } from "lucide-react";
+
+import heroFood from "../assets/hero-food.jpg";
+import lineLight from "../assets/line-light.jpg";
+import lineBalance from "../assets/line-balance.jpg";
+import linePower from "../assets/line-power.jpg";
+import lineMom from "../assets/line-mom.jpg";
+import linePro from "../assets/line-pro.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,18 +31,18 @@ type Line = {
   id: LineId;
   kcal: string;
   desc: string;
-  price: string;
+  priceFrom: string;
   popular?: boolean;
-  bg: string;
-  emoji: string;
+  accent: string;
+  image: string;
 };
 
 const LINES: Line[] = [
-  { id: "LIGHT",   kcal: "1200–1400 ккал", desc: "Для снижения веса",          price: "от 750 ₽/день", bg: "#E8F5E9", emoji: "🥗" },
-  { id: "BALANCE", kcal: "1500–1800 ккал", desc: "Для поддержания формы",      price: "от 850 ₽/день", bg: "#E3F2FD", emoji: "🥙" },
-  { id: "POWER",   kcal: "2000–2500 ккал", desc: "Для набора мышечной массы",  price: "от 950 ₽/день", popular: true, bg: "#FFF8E1", emoji: "🍖" },
-  { id: "MOM",     kcal: "1600–1900 ккал", desc: "Для молодых мам",            price: "от 900 ₽/день", bg: "#FCE4EC", emoji: "🍲" },
-  { id: "PRO",     kcal: "2200–2800 ккал", desc: "Для занятых людей",          price: "от 1100 ₽/день", bg: "#F3E5F5", emoji: "🥩" },
+  { id: "LIGHT",   kcal: "1200–1400 ккал", desc: "Для снижения веса",          priceFrom: "от 750 ₽",  accent: "#7CB342", image: lineLight },
+  { id: "BALANCE", kcal: "1500–1800 ккал", desc: "Поддержание формы",          priceFrom: "от 850 ₽",  accent: "#42A5F5", image: lineBalance },
+  { id: "POWER",   kcal: "2000–2500 ккал", desc: "Набор мышечной массы",       priceFrom: "от 950 ₽",  popular: true, accent: "#D4AF37", image: linePower },
+  { id: "MOM",     kcal: "1600–1900 ккал", desc: "Для молодых мам",            priceFrom: "от 900 ₽",  accent: "#EC8DA5", image: lineMom },
+  { id: "PRO",     kcal: "2200–2800 ккал", desc: "Для занятых людей",          priceFrom: "от 1 100 ₽", accent: "#8E7CC3", image: linePro },
 ];
 
 type Dish = {
@@ -47,30 +54,92 @@ type Dish = {
   ingredients: string;
 };
 
-const MONDAY: Dish[] = [
-  { name: "Овсянка с ягодами и миндалём", meal: "ЗАВТРАК", kcal: 320, p: 12, f: 8, c: 48, line: "LIGHT", ingredients: "Овсяные хлопья, миндаль, голубика, малина, мёд, корица" },
-  { name: "Греческий йогурт с яблоком", meal: "ПЕРЕКУС", kcal: 180, p: 14, f: 4, c: 22, line: "LIGHT", ingredients: "Греческий йогурт 2%, яблоко, корица" },
-  { name: "Курица гриль с овощами", meal: "ОБЕД", kcal: 420, p: 38, f: 12, c: 34, line: "LIGHT", ingredients: "Куриное филе, цукини, перец, томаты, оливковое масло, специи" },
-  { name: "Треска с брокколи на пару", meal: "УЖИН", kcal: 280, p: 32, f: 6, c: 18, line: "LIGHT", ingredients: "Треска, брокколи, лимон, оливковое масло, тимьян" },
-  { name: "Сырники со сметаной", meal: "ЗАВТРАК", kcal: 420, p: 24, f: 14, c: 48, line: "BALANCE", ingredients: "Творог 5%, яйцо, мука рисовая, сметана, ягодный соус" },
-  { name: "Орехи и сухофрукты", meal: "ПЕРЕКУС", kcal: 240, p: 8, f: 14, c: 22, line: "BALANCE", ingredients: "Миндаль, грецкий орех, курага, чернослив" },
-  { name: "Паста с курицей и песто", meal: "ОБЕД", kcal: 560, p: 34, f: 18, c: 64, line: "BALANCE", ingredients: "Паста дурум, куриное филе, песто, пармезан, томаты черри" },
-  { name: "Лосось с киноа и шпинатом", meal: "УЖИН", kcal: 480, p: 36, f: 20, c: 38, line: "BALANCE", ingredients: "Лосось, киноа, шпинат, лимон, оливковое масло" },
-  { name: "Омлет с индейкой и сыром", meal: "ЗАВТРАК", kcal: 540, p: 38, f: 28, c: 22, line: "POWER", ingredients: "3 яйца, индейка, сыр чеддер, шпинат, цельнозерновой хлеб" },
-  { name: "Протеиновый шейк + банан", meal: "ПЕРЕКУС", kcal: 360, p: 32, f: 6, c: 48, line: "POWER", ingredients: "Whey-протеин, молоко, банан, арахисовая паста" },
-  { name: "Говядина с гречкой и овощами", meal: "ОБЕД", kcal: 720, p: 52, f: 22, c: 68, line: "POWER", ingredients: "Говяжья вырезка, гречка, морковь, лук, чесночный соус" },
-  { name: "Курица с рисом басмати", meal: "УЖИН", kcal: 620, p: 48, f: 18, c: 62, line: "POWER", ingredients: "Куриное филе, рис басмати, спаржа, оливковое масло" },
-  { name: "Творожная запеканка с изюмом", meal: "ЗАВТРАК", kcal: 380, p: 26, f: 10, c: 42, line: "MOM", ingredients: "Творог 5%, яйцо, манная крупа, изюм, ваниль" },
-  { name: "Печёное яблоко с орехами", meal: "ПЕРЕКУС", kcal: 200, p: 4, f: 8, c: 30, line: "MOM", ingredients: "Яблоко, грецкий орех, мёд, корица" },
-  { name: "Куриные котлеты с пюре", meal: "ОБЕД", kcal: 520, p: 36, f: 16, c: 52, line: "MOM", ingredients: "Куриный фарш, картофель, молоко, сливочное масло, зелень" },
-  { name: "Рыбные тефтели с овощами", meal: "УЖИН", kcal: 400, p: 30, f: 12, c: 38, line: "MOM", ingredients: "Хек, рис, морковь, лук, томатный соус" },
-  { name: "Гранола с йогуртом и манго", meal: "ЗАВТРАК", kcal: 580, p: 22, f: 18, c: 78, line: "PRO", ingredients: "Гранола, греческий йогурт, манго, кокосовая стружка, мёд" },
-  { name: "Сэндвич с индейкой и авокадо", meal: "ПЕРЕКУС", kcal: 380, p: 26, f: 16, c: 36, line: "PRO", ingredients: "Цельнозерновой хлеб, индейка, авокадо, салат, томат" },
-  { name: "Стейк с печёным картофелем", meal: "ОБЕД", kcal: 780, p: 54, f: 28, c: 72, line: "PRO", ingredients: "Говяжий стейк, картофель, розмарин, чесночное масло, салат" },
-  { name: "Утиная грудка с овощами", meal: "УЖИН", kcal: 660, p: 44, f: 32, c: 42, line: "PRO", ingredients: "Утиная грудка, батат, брюссельская капуста, бальзамик" },
-];
+// 7 завтраков × 5 линеек и т.д. (компактно — варианты по линейке × дню)
+const WEEK_MENU: Record<LineId, Dish[][]> = {
+  LIGHT: [
+    [
+      { name: "Овсянка с ягодами и миндалём", meal: "ЗАВТРАК", kcal: 320, p: 12, f: 8, c: 48, line: "LIGHT", ingredients: "Овсяные хлопья, миндаль, голубика, малина, мёд, корица" },
+      { name: "Греческий йогурт с яблоком", meal: "ПЕРЕКУС", kcal: 180, p: 14, f: 4, c: 22, line: "LIGHT", ingredients: "Греческий йогурт 2%, яблоко, корица" },
+      { name: "Курица гриль с овощами", meal: "ОБЕД", kcal: 420, p: 38, f: 12, c: 34, line: "LIGHT", ingredients: "Куриное филе, цукини, перец, томаты, оливковое масло, специи" },
+      { name: "Треска с брокколи на пару", meal: "УЖИН", kcal: 280, p: 32, f: 6, c: 18, line: "LIGHT", ingredients: "Треска, брокколи, лимон, оливковое масло, тимьян" },
+    ],
+    [
+      { name: "Творожный мусс с малиной", meal: "ЗАВТРАК", kcal: 290, p: 22, f: 6, c: 32, line: "LIGHT", ingredients: "Творог 2%, малина, мёд, ванильный экстракт" },
+      { name: "Хумус с овощами", meal: "ПЕРЕКУС", kcal: 170, p: 7, f: 8, c: 18, line: "LIGHT", ingredients: "Нут, тахини, морковь, сельдерей, перец" },
+      { name: "Индейка с гречкой и шпинатом", meal: "ОБЕД", kcal: 410, p: 34, f: 10, c: 38, line: "LIGHT", ingredients: "Филе индейки, гречка, шпинат, лук, оливковое масло" },
+      { name: "Салат с тунцом и фасолью", meal: "УЖИН", kcal: 300, p: 30, f: 8, c: 22, line: "LIGHT", ingredients: "Тунец, фасоль, томаты, оливки, листья салата" },
+    ],
+    [
+      { name: "Гречневая каша с черникой", meal: "ЗАВТРАК", kcal: 310, p: 11, f: 6, c: 52, line: "LIGHT", ingredients: "Гречневые хлопья, черника, миндальное молоко, мёд" },
+      { name: "Творог с грушей", meal: "ПЕРЕКУС", kcal: 160, p: 16, f: 3, c: 18, line: "LIGHT", ingredients: "Творог 2%, груша, корица" },
+      { name: "Курица в йогурте с овощами", meal: "ОБЕД", kcal: 400, p: 36, f: 10, c: 30, line: "LIGHT", ingredients: "Куриное филе, йогурт, овощи гриль, специи" },
+      { name: "Хек с овощным рагу", meal: "УЖИН", kcal: 290, p: 28, f: 8, c: 22, line: "LIGHT", ingredients: "Хек, томаты, кабачок, перец, лук" },
+    ],
+    [
+      { name: "Омлет со шпинатом", meal: "ЗАВТРАК", kcal: 280, p: 22, f: 14, c: 8, line: "LIGHT", ingredients: "Яйца, шпинат, томаты черри, специи" },
+      { name: "Яблоко с миндалём", meal: "ПЕРЕКУС", kcal: 160, p: 4, f: 8, c: 18, line: "LIGHT", ingredients: "Яблоко, миндаль" },
+      { name: "Тёплый салат с курицей", meal: "ОБЕД", kcal: 410, p: 36, f: 12, c: 28, line: "LIGHT", ingredients: "Куриное филе, киноа, шпинат, томаты, оливковое масло" },
+      { name: "Минтай с овощами", meal: "УЖИН", kcal: 270, p: 30, f: 6, c: 18, line: "LIGHT", ingredients: "Минтай, цветная капуста, морковь, лук" },
+    ],
+    [
+      { name: "Сырники запечённые", meal: "ЗАВТРАК", kcal: 330, p: 24, f: 10, c: 30, line: "LIGHT", ingredients: "Творог 2%, яйцо, рисовая мука, ягоды" },
+      { name: "Огуречный смузи", meal: "ПЕРЕКУС", kcal: 120, p: 4, f: 2, c: 22, line: "LIGHT", ingredients: "Огурец, мята, лимон, яблоко" },
+      { name: "Запечённая индейка с овощами", meal: "ОБЕД", kcal: 420, p: 40, f: 10, c: 32, line: "LIGHT", ingredients: "Индейка, баклажан, перец, специи" },
+      { name: "Креветки с салатом", meal: "УЖИН", kcal: 280, p: 28, f: 8, c: 18, line: "LIGHT", ingredients: "Креветки, листья салата, авокадо, лимон" },
+    ],
+    [
+      { name: "Овсянка с грушей и корицей", meal: "ЗАВТРАК", kcal: 310, p: 11, f: 7, c: 48, line: "LIGHT", ingredients: "Овсяные хлопья, груша, корица, мёд" },
+      { name: "Кефир с ягодами", meal: "ПЕРЕКУС", kcal: 150, p: 10, f: 3, c: 18, line: "LIGHT", ingredients: "Кефир 1%, малина, голубика" },
+      { name: "Куриные шашлычки с булгуром", meal: "ОБЕД", kcal: 430, p: 38, f: 10, c: 38, line: "LIGHT", ingredients: "Куриное филе, булгур, лук, специи" },
+      { name: "Лосось с овощами на пару", meal: "УЖИН", kcal: 320, p: 32, f: 14, c: 14, line: "LIGHT", ingredients: "Лосось, брокколи, цветная капуста, лимон" },
+    ],
+    [
+      { name: "Каша киноа с ягодами", meal: "ЗАВТРАК", kcal: 300, p: 10, f: 6, c: 50, line: "LIGHT", ingredients: "Киноа, миндальное молоко, малина, мёд" },
+      { name: "Греческий йогурт с орехами", meal: "ПЕРЕКУС", kcal: 170, p: 13, f: 8, c: 14, line: "LIGHT", ingredients: "Греческий йогурт 2%, грецкий орех, мёд" },
+      { name: "Курица с овощным микс", meal: "ОБЕД", kcal: 400, p: 36, f: 10, c: 30, line: "LIGHT", ingredients: "Куриное филе, перец, лук, цукини" },
+      { name: "Тилапия с зелёной фасолью", meal: "УЖИН", kcal: 270, p: 30, f: 6, c: 16, line: "LIGHT", ingredients: "Тилапия, зелёная фасоль, лимон, чеснок" },
+    ],
+  ],
+  BALANCE: makeWeekFromBase([
+    { name: "Сырники со сметаной", meal: "ЗАВТРАК", kcal: 420, p: 24, f: 14, c: 48, line: "BALANCE", ingredients: "Творог 5%, яйцо, мука рисовая, сметана, ягодный соус" },
+    { name: "Орехи и сухофрукты", meal: "ПЕРЕКУС", kcal: 240, p: 8, f: 14, c: 22, line: "BALANCE", ingredients: "Миндаль, грецкий орех, курага, чернослив" },
+    { name: "Паста с курицей и песто", meal: "ОБЕД", kcal: 560, p: 34, f: 18, c: 64, line: "BALANCE", ingredients: "Паста дурум, куриное филе, песто, пармезан, томаты черри" },
+    { name: "Лосось с киноа и шпинатом", meal: "УЖИН", kcal: 480, p: 36, f: 20, c: 38, line: "BALANCE", ingredients: "Лосось, киноа, шпинат, лимон, оливковое масло" },
+  ]),
+  POWER: makeWeekFromBase([
+    { name: "Омлет с индейкой и сыром", meal: "ЗАВТРАК", kcal: 540, p: 38, f: 28, c: 22, line: "POWER", ingredients: "3 яйца, индейка, сыр чеддер, шпинат, цельнозерновой хлеб" },
+    { name: "Протеиновый шейк + банан", meal: "ПЕРЕКУС", kcal: 360, p: 32, f: 6, c: 48, line: "POWER", ingredients: "Whey-протеин, молоко, банан, арахисовая паста" },
+    { name: "Говядина с гречкой и овощами", meal: "ОБЕД", kcal: 720, p: 52, f: 22, c: 68, line: "POWER", ingredients: "Говяжья вырезка, гречка, морковь, лук, чесночный соус" },
+    { name: "Курица с рисом басмати", meal: "УЖИН", kcal: 620, p: 48, f: 18, c: 62, line: "POWER", ingredients: "Куриное филе, рис басмати, спаржа, оливковое масло" },
+  ]),
+  MOM: makeWeekFromBase([
+    { name: "Творожная запеканка с изюмом", meal: "ЗАВТРАК", kcal: 380, p: 26, f: 10, c: 42, line: "MOM", ingredients: "Творог 5%, яйцо, манная крупа, изюм, ваниль" },
+    { name: "Печёное яблоко с орехами", meal: "ПЕРЕКУС", kcal: 200, p: 4, f: 8, c: 30, line: "MOM", ingredients: "Яблоко, грецкий орех, мёд, корица" },
+    { name: "Куриные котлеты с пюре", meal: "ОБЕД", kcal: 520, p: 36, f: 16, c: 52, line: "MOM", ingredients: "Куриный фарш, картофель, молоко, сливочное масло, зелень" },
+    { name: "Рыбные тефтели с овощами", meal: "УЖИН", kcal: 400, p: 30, f: 12, c: 38, line: "MOM", ingredients: "Хек, рис, морковь, лук, томатный соус" },
+  ]),
+  PRO: makeWeekFromBase([
+    { name: "Гранола с йогуртом и манго", meal: "ЗАВТРАК", kcal: 580, p: 22, f: 18, c: 78, line: "PRO", ingredients: "Гранола, греческий йогурт, манго, кокосовая стружка, мёд" },
+    { name: "Сэндвич с индейкой и авокадо", meal: "ПЕРЕКУС", kcal: 380, p: 26, f: 16, c: 36, line: "PRO", ingredients: "Цельнозерновой хлеб, индейка, авокадо, салат, томат" },
+    { name: "Стейк с печёным картофелем", meal: "ОБЕД", kcal: 780, p: 54, f: 28, c: 72, line: "PRO", ingredients: "Говяжий стейк, картофель, розмарин, чесночное масло, салат" },
+    { name: "Утиная грудка с овощами", meal: "УЖИН", kcal: 660, p: 44, f: 32, c: 42, line: "PRO", ingredients: "Утиная грудка, батат, брюссельская капуста, бальзамик" },
+  ]),
+};
+
+// Generates 7 days of menus by lightly rotating/permuting the base 4-meal day
+function makeWeekFromBase(base: Dish[]): Dish[][] {
+  const dayNames = ["", " · вариант 2", " · вариант 3", " · вариант 4", " · вариант 5", " · вариант 6", " · вариант 7"];
+  return dayNames.map((suffix, i) =>
+    base.map((d) => ({
+      ...d,
+      name: i === 0 ? d.name : d.name + suffix,
+      kcal: d.kcal + (i * 5) - 10,
+    })),
+  );
+}
 
 const DAYS = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
+const DAYS_FULL = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
 
 const FAQ = [
   { q: "Как происходит доставка?", a: "Доставляем ежедневно по Ростову-на-Дону бесплатно. Выбираете удобный временной слот при оформлении заявки. Менеджер подтверждает заказ в Telegram." },
@@ -96,17 +165,17 @@ function useReveal() {
 
 /* ────────── Navbar ────────── */
 
-function Logo({ dark = false }: { dark?: boolean }) {
+function Logo({ light = true }: { light?: boolean }) {
   return (
     <a href="#top" className="flex items-center gap-2.5 select-none">
       <div
-        className="grid place-items-center rounded-[10px] text-white"
+        className="grid place-items-center rounded-[10px] text-white shrink-0"
         style={{ background: "#2E7D32", width: 36, height: 36, fontFamily: "Unbounded", fontWeight: 900, fontSize: 18 }}
       >
         F
       </div>
       <span
-        style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, letterSpacing: "-0.02em", color: dark ? "#0E0F0E" : "#FFFFFF" }}
+        style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, letterSpacing: "-0.02em", color: light ? "#FFFFFF" : "#0E0F0E" }}
       >
         FITERA
       </span>
@@ -124,7 +193,7 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
   return (
     <header
       className="sticky top-0 z-40 backdrop-blur-xl"
-      style={{ background: "rgba(14,15,14,0.85)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      style={{ background: "rgba(14,15,14,0.78)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
     >
       <div className="mx-auto max-w-6xl px-4 flex items-center justify-between" style={{ height: 64 }}>
         <Logo />
@@ -134,6 +203,9 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          <a href="tel:+79991234567" className="hidden md:inline-block text-sm font-semibold" style={{ color: "#FFFFFF", letterSpacing: "0.01em" }}>
+            +7 (999) 123-45-67
+          </a>
           <button
             onClick={onOrder}
             className="press rounded-full"
@@ -173,7 +245,7 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
   );
 }
 
-/* ────────── Hero ────────── */
+/* ────────── Hero (Level Kitchen-inspired) ────────── */
 
 function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) {
   const chips = [
@@ -183,156 +255,257 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
     { Icon: Truck, l: "Ежедневно" },
   ];
   return (
-    <section id="top" className="relative overflow-hidden" style={{ background: "#0E0F0E", paddingTop: 20, paddingBottom: 40 }}>
-      <div className="noise-overlay" />
-      <div className="relative mx-auto max-w-6xl px-4">
-        <div className="reveal">
+    <section id="top" className="relative" style={{ background: "#0E0F0E" }}>
+      {/* Background photo */}
+      <div className="absolute inset-0 overflow-hidden">
+        <img
+          src={heroFood}
+          alt=""
+          width={1600}
+          height={1200}
+          className="w-full h-full object-cover"
+          style={{ objectPosition: "right center" }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(14,15,14,0.55) 0%, rgba(14,15,14,0.35) 40%, rgba(14,15,14,0.92) 100%)",
+          }}
+        />
+        {/* Desktop: side gradient to support white card */}
+        <div
+          className="hidden md:block absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(90deg, rgba(14,15,14,0.85) 0%, rgba(14,15,14,0.35) 50%, rgba(14,15,14,0) 100%)",
+          }}
+        />
+      </div>
+
+      <div className="relative mx-auto max-w-6xl px-4" style={{ paddingTop: 32, paddingBottom: 40, minHeight: "min(640px, 90vh)" }}>
+        <div className="reveal in" style={{ maxWidth: 560 }}>
           <span
-            className="inline-flex items-center gap-1.5 rounded-full"
+            className="inline-flex items-center gap-1.5 rounded-full backdrop-blur"
             style={{
-              padding: "6px 14px", border: "1px solid #2E7D32",
-              background: "rgba(46,125,50,0.12)", color: "#9FD89F",
+              padding: "6px 14px", border: "1px solid rgba(46,125,50,0.6)",
+              background: "rgba(46,125,50,0.18)", color: "#C8E6C9",
               fontFamily: "Inter", fontSize: 13, fontWeight: 500,
             }}
           >
             <MapPin size={13} /> Доставка по Ростову-на-Дону
           </span>
 
-          <h1
-            className="mt-5 font-display"
+          {/* White overlay card (Level Kitchen style) */}
+          <div
+            className="mt-6 backdrop-blur-md"
             style={{
-              fontFamily: "Unbounded", fontWeight: 900,
-              fontSize: 40, lineHeight: 1.1, letterSpacing: "-0.02em",
+              background: "rgba(255,255,255,0.97)",
+              borderRadius: 28,
+              padding: "28px 24px",
+              boxShadow: "0 30px 80px -20px rgba(0,0,0,0.6)",
             }}
           >
-            <span style={{ color: "#FFFFFF" }}>Умное питание</span><br />
-            <span style={{ color: "#D4AF37" }}>под твою цель</span>
-          </h1>
+            <h1
+              className="font-display"
+              style={{
+                fontFamily: "Unbounded", fontWeight: 900,
+                fontSize: "clamp(34px, 7vw, 56px)", lineHeight: 1.05, letterSpacing: "-0.03em",
+                color: "#0E0F0E",
+              }}
+            >
+              Готовое питание
+              <br />
+              <span style={{
+                background: "linear-gradient(90deg, #2E7D32 0%, #D4AF37 100%)",
+                WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent",
+              }}>с доставкой</span>
+            </h1>
 
-          <p className="mt-5" style={{ color: "#A0A89A", fontFamily: "Inter", fontSize: 16, lineHeight: 1.6, maxWidth: 460 }}>
-            Готовые рационы с точным расчётом КБЖУ. Без готовки и без лишнего.
-          </p>
+            <p className="mt-4" style={{ color: "#555", fontFamily: "Inter", fontSize: 15, lineHeight: 1.55 }}>
+              5 линеек рационов с точным расчётом КБЖУ. Свежее, без готовки, каждый день.
+            </p>
 
-          <div className="mt-6 flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4">
+            <div className="mt-5 flex flex-wrap gap-2">
+              <button onClick={onOrder} className="press rounded-full inline-flex items-center gap-2"
+                style={{ background: "#0E0F0E", color: "#FFFFFF", height: 52, padding: "0 24px", fontFamily: "Inter", fontWeight: 700, fontSize: 15 }}>
+                Выбрать рацион <ArrowRight size={18} />
+              </button>
+              <button onClick={onCalc} className="press rounded-full"
+                style={{ background: "transparent", border: "1.5px solid #0E0F0E", color: "#0E0F0E", height: 52, padding: "0 22px", fontFamily: "Inter", fontWeight: 600, fontSize: 15 }}>
+                Рассчитать калории
+              </button>
+            </div>
+
+            <div className="mt-4 flex items-center gap-3 flex-wrap" style={{ fontFamily: "Inter", fontSize: 12, color: "#555" }}>
+              <span className="inline-flex items-center gap-1.5">
+                <Check size={14} color="#2E7D32" /> Бесплатная доставка
+              </span>
+              <span style={{ width: 3, height: 3, borderRadius: 99, background: "#CCC" }} />
+              <span className="inline-flex items-center gap-1.5">
+                <Check size={14} color="#2E7D32" /> Первая неделя −15%
+              </span>
+            </div>
+          </div>
+
+          {/* Chips */}
+          <div className="mt-5 flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4">
             {chips.map(({ Icon, l }) => (
-              <div key={l} className="shrink-0 inline-flex items-center rounded-full"
-                style={{ background: "#1A1E1A", padding: "8px 14px", gap: 6 }}>
+              <div key={l} className="shrink-0 inline-flex items-center rounded-full backdrop-blur"
+                style={{ background: "rgba(28,30,28,0.7)", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 14px", gap: 6 }}>
                 <Icon size={16} color="#D4AF37" />
                 <span style={{ color: "#FFFFFF", fontFamily: "Inter", fontSize: 13 }}>{l}</span>
               </div>
             ))}
           </div>
-
-          <div className="mt-8 flex flex-col gap-2.5 max-w-md">
-            <button onClick={onOrder} className="press rounded-full w-full"
-              style={{ background: "#D4AF37", color: "#0E0F0E", height: 52, fontFamily: "Inter", fontWeight: 700, fontSize: 16, letterSpacing: "0.01em" }}>
-              Выбрать рацион
-            </button>
-            <button onClick={onCalc} className="press rounded-full w-full"
-              style={{ background: "transparent", border: "1.5px solid #2E7D32", color: "#FFFFFF", height: 52, fontFamily: "Inter", fontWeight: 600, fontSize: 16 }}>
-              Рассчитать калории
-            </button>
-          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* ────────── Lines ────────── */
+/* ────────── Lines (compact row, drives menu) ────────── */
 
-function LinesSection({ onSelect }: { onSelect: (line: Line) => void }) {
+function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id: LineId) => void }) {
   return (
-    <section id="lines" style={{ background: "#FFFFFF", padding: "40px 16px" }}>
-      <div className="mx-auto max-w-6xl">
-        <h2 className="reveal" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 30, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
-          Наши линейки
-        </h2>
-        <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 15, color: "#555" }}>
-          5 готовых программ под любую цель
-        </p>
+    <section id="lines" style={{ background: "#FFFFFF", padding: "56px 0 32px" }}>
+      <div className="mx-auto max-w-6xl px-4">
+        <div className="flex items-end justify-between flex-wrap gap-3">
+          <div>
+            <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              Наши рационы
+            </span>
+            <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
+              Выбери линейку
+            </h2>
+          </div>
+          <p className="reveal" style={{ fontFamily: "Inter", fontSize: 14, color: "#777", maxWidth: 280 }}>
+            Нажми на карточку — меню ниже соберётся под выбранный рацион
+          </p>
+        </div>
+      </div>
 
-        <div className="mt-6 flex flex-col" style={{ gap: 12 }}>
-          {LINES.map((line) => (
-            <button
-              key={line.id}
-              onClick={() => onSelect(line)}
-              className="reveal press text-left relative overflow-hidden w-full"
-              style={{
-                background: line.bg, borderRadius: 20, padding: 20, minHeight: 200,
-                display: "flex", gap: 16, alignItems: "stretch",
-              }}
-            >
-              {line.popular && (
-                <span className="absolute" style={{
-                  top: 14, right: 14, background: "#D4AF37", color: "#0E0F0E",
-                  borderRadius: 50, padding: "4px 10px",
-                  fontFamily: "Inter", fontWeight: 700, fontSize: 11, letterSpacing: "0.04em",
-                }}>
-                  ХИТ
-                </span>
-              )}
-
-              <div className="flex flex-col" style={{ flex: "0 0 70%", minWidth: 0 }}>
-                <div style={{
-                  fontFamily: "Unbounded", fontWeight: 900, fontSize: 26,
-                  letterSpacing: "-0.02em", color: "#0E0F0E", textTransform: "uppercase",
-                }}>
-                  {line.id}
+      {/* Horizontal compact cards */}
+      <div className="mt-6 reveal">
+        <div
+          className="flex overflow-x-auto hide-scrollbar"
+          style={{ gap: 12, padding: "4px 16px", scrollSnapType: "x mandatory" }}
+        >
+          {LINES.map((line) => {
+            const active = line.id === selected;
+            return (
+              <button
+                key={line.id}
+                onClick={() => onSelect(line.id)}
+                className="press shrink-0 relative text-left overflow-hidden"
+                style={{
+                  width: 168,
+                  borderRadius: 20,
+                  background: "#FFFFFF",
+                  border: `2px solid ${active ? line.accent : "#EEE"}`,
+                  boxShadow: active ? `0 18px 40px -16px ${line.accent}66` : "0 2px 8px rgba(0,0,0,0.04)",
+                  transition: "border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease",
+                  transform: active ? "translateY(-4px)" : "none",
+                  scrollSnapAlign: "start",
+                }}
+              >
+                {line.popular && (
+                  <span className="absolute z-10" style={{
+                    top: 10, left: 10, background: "#D4AF37", color: "#0E0F0E",
+                    borderRadius: 50, padding: "3px 8px",
+                    fontFamily: "Inter", fontWeight: 700, fontSize: 10, letterSpacing: "0.06em",
+                  }}>
+                    ХИТ
+                  </span>
+                )}
+                <div style={{ aspectRatio: "1 / 1", background: "#F7F7F5", overflow: "hidden" }}>
+                  <img
+                    src={line.image} alt={line.id} loading="lazy" width={800} height={800}
+                    className="w-full h-full object-cover"
+                    style={{ transform: active ? "scale(1.06)" : "scale(1)", transition: "transform 400ms ease" }}
+                  />
                 </div>
-                <div className="mt-1.5 tabular" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 14, color: "#555" }}>
-                  {line.kcal}
+                <div style={{ padding: "12px 14px 14px" }}>
+                  <div style={{
+                    fontFamily: "Unbounded", fontWeight: 900, fontSize: 18,
+                    letterSpacing: "-0.02em", color: "#0E0F0E",
+                  }}>
+                    {line.id}
+                  </div>
+                  <div className="tabular mt-0.5" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 12, color: "#888" }}>
+                    {line.kcal}
+                  </div>
+                  <div className="mt-1.5" style={{ fontFamily: "Inter", fontSize: 12, color: "#555", lineHeight: 1.35, minHeight: 30 }}>
+                    {line.desc}
+                  </div>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="tabular" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 14, color: "#0E0F0E" }}>
+                      {line.priceFrom}
+                    </span>
+                    <span
+                      className="grid place-items-center rounded-full"
+                      style={{ width: 26, height: 26, background: active ? line.accent : "#F0F0F0", color: active ? "#FFFFFF" : "#0E0F0E", transition: "background 200ms ease" }}
+                    >
+                      {active ? <Check size={14} strokeWidth={3} /> : <ChevronRight size={14} />}
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 14, color: "#555", lineHeight: 1.5 }}>
-                  {line.desc}
-                </div>
-                <div className="tabular mt-2" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 16, color: "#0E0F0E" }}>
-                  {line.price}
-                </div>
-                <div className="mt-auto pt-3" style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 14, color: "#0E0F0E" }}>
-                  Подробнее →
-                </div>
-              </div>
-
-              <div className="rounded-xl flex items-center justify-center" style={{
-                flex: "1 1 0", background: "rgba(0,0,0,0.08)", fontSize: 38,
-              }}>
-                {line.emoji}
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-/* ────────── Menu ────────── */
+/* ────────── Menu (auto-filtered by selected line) ────────── */
 
-function MenuSection({ onOpenDish }: { onOpenDish: (d: Dish) => void }) {
+function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDish: (d: Dish) => void; onOrder: () => void }) {
   const [day, setDay] = useState(0);
-  const [filter, setFilter] = useState<LineId | "ALL">("ALL");
   const [fade, setFade] = useState(true);
+  const line = LINES.find((l) => l.id === lineId)!;
+  const dayMeals = WEEK_MENU[lineId][day];
 
-  const filtered = useMemo(() => {
-    if (filter === "ALL") return MONDAY;
-    return MONDAY.filter((d) => d.line === filter);
-  }, [filter]);
+  // re-trigger fade when line changes
+  const prevLine = useRef<LineId>(lineId);
+  useEffect(() => {
+    if (prevLine.current !== lineId) {
+      setFade(false);
+      const t = setTimeout(() => setFade(true), 180);
+      prevLine.current = lineId;
+      return () => clearTimeout(t);
+    }
+  }, [lineId]);
 
   function pickDay(i: number) {
+    if (i === day) return;
     setFade(false);
-    setTimeout(() => { setDay(i); setFade(true); }, 200);
+    setTimeout(() => { setDay(i); setFade(true); }, 180);
   }
 
+  const totalKcal = dayMeals.reduce((s, d) => s + d.kcal, 0);
+  const totalP = dayMeals.reduce((s, d) => s + d.p, 0);
+  const totalF = dayMeals.reduce((s, d) => s + d.f, 0);
+  const totalC = dayMeals.reduce((s, d) => s + d.c, 0);
+
   return (
-    <section id="menu" style={{ background: "#0E0F0E", padding: "40px 16px" }}>
+    <section id="menu" style={{ background: "#0E0F0E", padding: "56px 16px" }}>
       <div className="mx-auto max-w-6xl">
-        <h2 className="reveal" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 30, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-          Меню на неделю
-        </h2>
-        <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 15, color: "#A0A89A" }}>
-          Свежие блюда каждый день. Меняем еженедельно.
-        </p>
+        <div className="flex items-end justify-between flex-wrap gap-3">
+          <div>
+            <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+              Меню недели
+            </span>
+            <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+              Рацион{" "}
+              <span style={{ color: line.accent, transition: "color 250ms ease" }}>{line.id}</span>
+            </h2>
+            <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A" }}>
+              {line.desc} · {line.kcal}
+            </p>
+          </div>
+        </div>
 
         {/* Day circles */}
         <div className="reveal mt-6 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 8 }}>
@@ -342,85 +515,86 @@ function MenuSection({ onOpenDish }: { onOpenDish: (d: Dish) => void }) {
               <button
                 key={d}
                 onClick={() => pickDay(i)}
-                className="press shrink-0 grid place-items-center rounded-full"
+                className="press shrink-0 flex flex-col items-center justify-center rounded-2xl"
                 style={{
-                  width: 44, height: 44,
-                  background: active ? "#D4AF37" : "#1A1E1A",
+                  width: 56, height: 64,
+                  background: active ? "#D4AF37" : "#161816",
                   color: active ? "#0E0F0E" : "#A0A89A",
                   border: active ? "none" : "1px solid #2A2E2A",
-                  fontFamily: "Inter", fontWeight: 700, fontSize: 12,
+                  fontFamily: "Inter", fontWeight: 700,
+                  transition: "all 200ms ease",
                 }}
               >
-                {d}
+                <span style={{ fontSize: 12, opacity: 0.7 }}>{d}</span>
+                <span style={{ fontSize: 16, fontWeight: 800 }}>{i + 1}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Line filter */}
-        <div className="reveal mt-3 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 8 }}>
-          {(["ALL", ...LINES.map((l) => l.id)] as const).map((f) => {
-            const active = filter === f;
-            return (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className="press shrink-0 rounded-full"
-                style={{
-                  background: active ? "#2E7D32" : "#1A1E1A",
-                  color: active ? "#FFFFFF" : "#A0A89A",
-                  border: active ? "1px solid #2E7D32" : "1px solid #2A2E2A",
-                  padding: "6px 14px",
-                  fontFamily: "Inter", fontWeight: 600, fontSize: 13,
-                }}
-              >
-                {f === "ALL" ? "Все" : f}
-              </button>
-            );
-          })}
+        <div className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 13, color: "#7A8278" }}>
+          {DAYS_FULL[day]}
         </div>
 
         {/* Dishes */}
-        {day === 0 ? (
-          <div
-            className="reveal mt-6 flex flex-col"
-            style={{ gap: 1, opacity: fade ? 1 : 0, transition: "opacity 200ms ease" }}
-          >
-            {filtered.length === 0 && (
-              <div style={{ background: "#161816", borderRadius: 20, padding: 32, textAlign: "center", color: "#A0A89A" }}>
-                Нет блюд в этой линейке
+        <div
+          className="mt-5 grid"
+          style={{
+            gridTemplateColumns: "1fr",
+            gap: 1,
+            opacity: fade ? 1 : 0,
+            transition: "opacity 200ms ease",
+            borderRadius: 24,
+            overflow: "hidden",
+            background: "#2A2E2A",
+          }}
+        >
+          {dayMeals.map((d) => (
+            <button
+              key={d.meal + d.name}
+              onClick={() => onOpenDish(d)}
+              className="press text-left"
+              style={{
+                background: "#161816", padding: 18,
+                display: "flex", gap: 14, alignItems: "center",
+              }}
+            >
+              <div
+                className="shrink-0 grid place-items-center rounded-2xl overflow-hidden"
+                style={{ width: 72, height: 72, background: "#0E0F0E" }}
+              >
+                <img src={line.image} alt="" loading="lazy" width={800} height={800} className="w-full h-full object-cover" />
               </div>
-            )}
-            {filtered.map((d, idx) => {
-              const isFirst = idx === 0;
-              const isLast = idx === filtered.length - 1;
-              const radius = `${isFirst ? 20 : 0}px ${isFirst ? 20 : 0}px ${isLast ? 20 : 0}px ${isLast ? 20 : 0}px`;
-              return (
-                <div key={d.name} style={{ background: "#161816", padding: 16, borderRadius: radius }}>
-                  <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11, color: "#A0A89A", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                    {d.meal}
-                  </div>
-                  <div className="mt-1" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 16, color: "#FFFFFF", lineHeight: 1.3 }}>
-                    {d.name}
-                  </div>
-                  <div className="mt-1 tabular" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 13, color: "#A0A89A" }}>
-                    {d.kcal} ккал · Б {d.p}г · Ж {d.f}г · У {d.c}г
-                  </div>
-                  <div className="mt-2 flex justify-end">
-                    <button onClick={() => onOpenDish(d)}
-                      style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", padding: 0, background: "transparent" }}>
-                      Состав →
-                    </button>
-                  </div>
+              <div className="min-w-0 flex-1">
+                <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 10, color: line.accent, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                  {d.meal}
                 </div>
-              );
-            })}
+                <div className="mt-1 truncate" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 15, color: "#FFFFFF", lineHeight: 1.3 }}>
+                  {d.name}
+                </div>
+                <div className="mt-1 tabular" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 12, color: "#A0A89A" }}>
+                  {d.kcal} ккал · Б {d.p} · Ж {d.f} · У {d.c}
+                </div>
+              </div>
+              <ChevronRight size={18} color="#A0A89A" className="shrink-0" />
+            </button>
+          ))}
+        </div>
+
+        {/* Totals + CTA */}
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl"
+          style={{ background: "#161816", border: "1px solid #2A2E2A", padding: 18 }}>
+          <div className="tabular" style={{ fontFamily: "Inter", color: "#A0A89A", fontSize: 13 }}>
+            ИТОГО ЗА ДЕНЬ
+            <div className="mt-1" style={{ color: "#FFFFFF", fontFamily: "Unbounded", fontWeight: 800, fontSize: 22 }}>
+              {totalKcal} <span style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A", fontWeight: 500 }}>ккал · Б {totalP} · Ж {totalF} · У {totalC}</span>
+            </div>
           </div>
-        ) : (
-          <div className="reveal mt-6" style={{ background: "#161816", borderRadius: 20, padding: 48, textAlign: "center", color: "#A0A89A" }}>
-            [Меню обновляется]
-          </div>
-        )}
+          <button onClick={onOrder} className="press rounded-full inline-flex items-center gap-2"
+            style={{ background: "#D4AF37", color: "#0E0F0E", height: 48, padding: "0 22px", fontFamily: "Inter", fontWeight: 700, fontSize: 14 }}>
+            Заказать {line.id} <ArrowRight size={16} />
+          </button>
+        </div>
       </div>
     </section>
   );
@@ -429,6 +603,7 @@ function MenuSection({ onOpenDish }: { onOpenDish: (d: Dish) => void }) {
 /* ────────── Dish Modal ────────── */
 
 function DishModal({ dish, onClose }: { dish: Dish; onClose: () => void }) {
+  const line = LINES.find((l) => l.id === dish.line)!;
   useEffect(() => {
     const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", h);
@@ -446,11 +621,13 @@ function DishModal({ dish, onClose }: { dish: Dish; onClose: () => void }) {
           style={{ background: "rgba(0,0,0,0.6)", color: "#FFFFFF" }} aria-label="Закрыть">
           <X size={20} />
         </button>
-        <div className="dish-placeholder" style={{ height: 200, borderRadius: "24px 24px 0 0", fontSize: 56 }}>🥗</div>
+        <div style={{ height: 220, overflow: "hidden", borderRadius: "24px 24px 0 0", background: "#0E0F0E" }}>
+          <img src={line.image} alt={dish.name} className="w-full h-full object-cover" />
+        </div>
 
         <div className="p-5 space-y-5">
           <div>
-            <span style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 11, padding: "4px 10px", borderRadius: 50 }}>
+            <span style={{ background: line.accent, color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 11, padding: "4px 10px", borderRadius: 50 }}>
               {dish.line}
             </span>
             <h3 className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, lineHeight: 1.2, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
@@ -482,25 +659,6 @@ function DishModal({ dish, onClose }: { dish: Dish; onClose: () => void }) {
                 </li>
               ))}
             </ul>
-          </div>
-
-          <div>
-            <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11, color: "#A0A89A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>На 100 г</div>
-            <table className="w-full tabular" style={{ fontFamily: "Inter", fontSize: 14 }}>
-              <tbody>
-                {[
-                  ["Калорийность", `${Math.round(dish.kcal / 3)} ккал`],
-                  ["Белки", `${(dish.p / 3).toFixed(1)} г`],
-                  ["Жиры", `${(dish.f / 3).toFixed(1)} г`],
-                  ["Углеводы", `${(dish.c / 3).toFixed(1)} г`],
-                ].map(([k, v]) => (
-                  <tr key={k} style={{ borderBottom: "1px solid #2A2E2A" }}>
-                    <td className="py-2" style={{ color: "#A0A89A" }}>{k}</td>
-                    <td className="py-2 text-right" style={{ color: "#FFFFFF", fontWeight: 600 }}>{v}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </div>
       </div>
@@ -534,9 +692,9 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   }
 
   const inputStyle: React.CSSProperties = {
-    background: "#F5F5F5", border: "none", borderRadius: 12,
+    background: "#F5F5F5", border: "1px solid transparent", borderRadius: 14,
     padding: "14px 16px", fontFamily: "Inter", fontWeight: 500, fontSize: 16,
-    color: "#0E0F0E", height: 52, width: "100%", outline: "none",
+    color: "#0E0F0E", height: 56, width: "100%", outline: "none",
   };
   const lbl: React.CSSProperties = {
     fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#555",
@@ -544,16 +702,19 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   };
 
   return (
-    <section id="calc" style={{ background: "#FFFFFF", padding: "40px 16px" }}>
+    <section id="calc" style={{ background: "#F7F7F5", padding: "56px 16px" }}>
       <div className="mx-auto max-w-2xl">
-        <h2 className="reveal" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 28, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
+        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          Калькулятор КБЖУ
+        </span>
+        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
           Рассчитай норму
         </h2>
         <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 15, color: "#555" }}>
           Подберём рацион под твои параметры
         </p>
 
-        <div className="reveal mt-6 space-y-5">
+        <div className="reveal mt-6 space-y-5 rounded-3xl" style={{ background: "#FFFFFF", padding: 24, boxShadow: "0 24px 60px -30px rgba(0,0,0,0.25)" }}>
           <div>
             <label style={lbl}>Пол</label>
             <div className="flex" style={{ gap: 8 }}>
@@ -562,10 +723,11 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 return (
                   <button key={s} onClick={() => setSex(s)} className="press"
                     style={{
-                      flex: 1, height: 52, borderRadius: 12,
+                      flex: 1, height: 52, borderRadius: 14,
                       background: active ? "#0E0F0E" : "#F5F5F5",
                       color: active ? "#FFFFFF" : "#555",
                       fontFamily: "Inter", fontWeight: 600, fontSize: 15,
+                      transition: "all 180ms ease",
                     }}>{s === "M" ? "Мужчина" : "Женщина"}</button>
                 );
               })}
@@ -608,7 +770,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 return (
                   <button key={k} onClick={() => setGoal(k)} className="press"
                     style={{
-                      flex: 1, height: 52, borderRadius: 12,
+                      flex: 1, height: 52, borderRadius: 14,
                       background: active ? "#0E0F0E" : "#F5F5F5",
                       color: active ? "#FFFFFF" : "#555",
                       fontFamily: "Inter", fontWeight: 600, fontSize: 13,
@@ -652,67 +814,64 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   );
 }
 
-/* ────────── Subscription ────────── */
+/* ────────── Subscription (compact horizontal cards) ────────── */
 
 function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
   const plans = [
-    { id: "1 день", price: "от 750 ₽", old: null as string | null, badge: null as string | null,
-      features: ["4 приёма пищи", "Доставка сегодня", "Выбор линейки"], primary: false },
-    { id: "3 дня", price: "от 2 100 ₽", old: "2 400 ₽", badge: "ПОПУЛЯРНО",
-      features: ["12 приёмов пищи", "Скидка 12%", "Выбор линейки"], primary: true, discount: "Скидка 12%" },
-    { id: "Месяц", price: "от 19 500 ₽", old: "24 000 ₽", badge: null,
-      features: ["Скидка 20%", "Приоритетная доставка", "Заморозка дней"], primary: false },
+    { id: "1 день", price: "от 750 ₽", per: "за день", old: null as string | null, badge: null as string | null,
+      features: ["4 приёма пищи", "Доставка сегодня"], primary: false },
+    { id: "3 дня", price: "от 2 100 ₽", per: "−12%", old: "2 400 ₽", badge: "ПОПУЛЯРНО",
+      features: ["12 приёмов пищи", "Выбор линейки", "Скидка 12%"], primary: true },
+    { id: "Месяц", price: "от 19 500 ₽", per: "−20%", old: "24 000 ₽", badge: null,
+      features: ["Заморозка дней", "Приоритет", "Скидка 20%"], primary: false },
   ];
 
   return (
-    <section style={{ background: "#0E0F0E", padding: "40px 16px" }}>
+    <section style={{ background: "#0E0F0E", padding: "56px 16px" }}>
       <div className="mx-auto max-w-6xl">
-        <h2 className="reveal" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 28, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          Подписки
+        </span>
+        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
           Выбери формат
         </h2>
-        <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 15, color: "#A0A89A" }}>
+        <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A" }}>
           Чем длиннее период — тем выгоднее
         </p>
 
-        <div className="mt-6 flex flex-col" style={{ gap: 12 }}>
+        <div className="mt-6 grid sm:grid-cols-3" style={{ gap: 12 }}>
           {plans.map((p) => (
-            <div key={p.id} className="reveal relative"
+            <div key={p.id} className="reveal relative flex flex-col"
               style={{
-                background: p.primary ? "#1C2A1C" : "#161816",
+                background: p.primary ? "linear-gradient(180deg, #1C2A1C 0%, #162016 100%)" : "#161816",
                 border: p.primary ? "1.5px solid #2E7D32" : "1px solid #2A2E2A",
                 borderRadius: 20, padding: 20,
               }}>
               {p.badge && (
                 <span className="absolute" style={{
-                  top: 14, right: 14, background: "#D4AF37", color: "#0E0F0E",
-                  borderRadius: 50, padding: "4px 10px",
-                  fontFamily: "Inter", fontWeight: 700, fontSize: 11, letterSpacing: "0.04em",
+                  top: -10, right: 16, background: "#D4AF37", color: "#0E0F0E",
+                  borderRadius: 50, padding: "4px 12px",
+                  fontFamily: "Inter", fontWeight: 700, fontSize: 10, letterSpacing: "0.06em",
                 }}>
                   {p.badge}
                 </span>
               )}
-              <div style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, letterSpacing: "-0.02em", color: "#FFFFFF", textTransform: "uppercase" }}>
+              <div style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em", color: "#FFFFFF", textTransform: "uppercase" }}>
                 {p.id}
               </div>
 
-              <div className="mt-3 flex items-baseline gap-2 flex-wrap">
-                <span className="tabular" style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 28, color: "#D4AF37" }}>{p.price}</span>
+              <div className="mt-2 flex items-baseline gap-2 flex-wrap">
+                <span className="tabular" style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 24, color: "#D4AF37" }}>{p.price}</span>
                 {p.old && (
-                  <span className="tabular" style={{ fontFamily: "Inter", fontSize: 16, color: "#A0A89A", textDecoration: "line-through" }}>{p.old}</span>
+                  <span className="tabular" style={{ fontFamily: "Inter", fontSize: 13, color: "#777", textDecoration: "line-through" }}>{p.old}</span>
                 )}
               </div>
+              <div style={{ fontFamily: "Inter", fontSize: 12, color: "#9FD89F", marginTop: 2 }}>{p.per}</div>
 
-              {"discount" in p && p.discount && (
-                <span className="inline-block mt-2" style={{
-                  background: "#2E7D32", color: "#FFFFFF", borderRadius: 50,
-                  padding: "3px 10px", fontFamily: "Inter", fontWeight: 600, fontSize: 12,
-                }}>{p.discount}</span>
-              )}
-
-              <ul className="mt-4 space-y-2">
+              <ul className="mt-4 space-y-1.5 flex-1">
                 {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A" }}>
-                    <Check size={16} color="#9FD89F" style={{ marginTop: 2, flexShrink: 0 }} />
+                  <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>
+                    <Check size={14} color="#9FD89F" style={{ marginTop: 3, flexShrink: 0 }} />
                     {f}
                   </li>
                 ))}
@@ -720,11 +879,11 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
 
               <button onClick={() => onSelect(p.id)} className="press mt-5 w-full"
                 style={{
-                  height: p.primary ? 52 : 48, borderRadius: 50,
+                  height: 46, borderRadius: 50,
                   background: p.primary ? "#D4AF37" : "transparent",
                   border: p.primary ? "none" : "1.5px solid #2A2E2A",
                   color: p.primary ? "#0E0F0E" : "#FFFFFF",
-                  fontFamily: "Inter", fontWeight: p.primary ? 700 : 600, fontSize: p.primary ? 15 : 14,
+                  fontFamily: "Inter", fontWeight: p.primary ? 700 : 600, fontSize: 14,
                 }}>
                 Выбрать
               </button>
@@ -740,45 +899,52 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
 
 function Delivery({ onAsk }: { onAsk: () => void }) {
   return (
-    <section id="delivery" style={{ background: "#FFFFFF", padding: "40px 16px" }}>
+    <section id="delivery" style={{ background: "#FFFFFF", padding: "56px 16px" }}>
       <div className="mx-auto max-w-6xl">
-        <h2 className="reveal" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 26, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
+        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.12em", textTransform: "uppercase" }}>
           Доставка
+        </span>
+        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(26px, 3.5vw, 34px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
+          Привезём свежее
         </h2>
 
-        <div className="mt-5 grid grid-cols-2" style={{ gap: 12 }}>
-          <div className="reveal" style={{ background: "#E8F5E9", borderRadius: 16, padding: 16 }}>
-            <Check size={20} color="#2E7D32" />
-            <div className="mt-2" style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
-              Бесплатно
+        <div className="mt-6 grid sm:grid-cols-2" style={{ gap: 12 }}>
+          <div className="reveal" style={{ background: "#E8F5E9", borderRadius: 20, padding: 20 }}>
+            <div className="grid place-items-center rounded-full" style={{ width: 40, height: 40, background: "#2E7D32" }}>
+              <Truck size={20} color="#FFFFFF" />
             </div>
-            <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 13, color: "#555", lineHeight: 1.4 }}>
-              По всему Ростову
+            <div className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 20, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
+              Бесплатно по Ростову
             </div>
-            <div className="mt-3 flex flex-wrap" style={{ gap: 4 }}>
-              {["07:00–08:00", "09:00–10:00", "18:00–19:00"].map((s) => (
+            <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 14, color: "#555", lineHeight: 1.5 }}>
+              Выбирайте удобный временной слот при оформлении
+            </div>
+            <div className="mt-3 flex flex-wrap" style={{ gap: 6 }}>
+              {["07:00–08:00", "09:00–10:00", "18:00–19:00", "20:00–21:00"].map((s) => (
                 <span key={s} className="tabular" style={{
-                  background: "#2E7D32", color: "#FFFFFF", borderRadius: 50,
-                  padding: "3px 8px", fontFamily: "Inter", fontSize: 11, fontWeight: 500,
+                  background: "#FFFFFF", color: "#0E0F0E", borderRadius: 50,
+                  padding: "5px 10px", fontFamily: "Inter", fontSize: 12, fontWeight: 600,
                 }}>{s}</span>
               ))}
             </div>
           </div>
 
-          <div className="reveal" style={{ background: "#FFF8E1", borderRadius: 16, padding: 16 }}>
-            <Phone size={20} color="#D4AF37" />
-            <div className="mt-2" style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
-              Индивидуально
+          <div className="reveal" style={{ background: "#FFF8E1", borderRadius: 20, padding: 20 }}>
+            <div className="grid place-items-center rounded-full" style={{ width: 40, height: 40, background: "#D4AF37" }}>
+              <Phone size={20} color="#0E0F0E" />
             </div>
-            <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 13, color: "#555", lineHeight: 1.4 }}>
-              Батайск, Аксай и другие
+            <div className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 20, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
+              Пригороды
             </div>
-            <button onClick={onAsk} className="press mt-3"
+            <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 14, color: "#555", lineHeight: 1.5 }}>
+              Батайск, Аксай, Чалтырь — уточняйте стоимость у менеджера
+            </div>
+            <button onClick={onAsk} className="press mt-4 inline-flex items-center gap-1.5"
               style={{
-                background: "#D4AF37", color: "#0E0F0E", borderRadius: 50,
-                padding: "8px 16px", fontFamily: "Inter", fontWeight: 600, fontSize: 13,
+                background: "#0E0F0E", color: "#D4AF37", borderRadius: 50,
+                padding: "10px 18px", fontFamily: "Inter", fontWeight: 600, fontSize: 13,
               }}>
-              Уточнить
+              Уточнить <ArrowRight size={14} />
             </button>
           </div>
         </div>
@@ -793,9 +959,12 @@ function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" style={{ background: "#0E0F0E", padding: "40px 16px" }}>
+    <section id="faq" style={{ background: "#0E0F0E", padding: "56px 16px" }}>
       <div className="mx-auto max-w-2xl">
-        <h2 className="reveal" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 28, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          FAQ
+        </span>
+        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
           Частые вопросы
         </h2>
 
@@ -876,10 +1045,13 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
   return (
     <section id="order-form" style={{
       background: "linear-gradient(180deg, #0E0F0E 0%, #0F1A0F 100%)",
-      padding: "40px 16px",
+      padding: "56px 16px",
     }}>
       <div className="mx-auto max-w-2xl">
-        <h2 className="reveal" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 28, lineHeight: 1.15, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+          Заявка
+        </span>
+        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
           Оставь заявку
         </h2>
         <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 15, color: "#A0A89A" }}>
@@ -888,7 +1060,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
 
         {sent ? (
           <div className="reveal in mt-6 animate-fade-in text-center" style={{
-            background: "#161816", border: "1px solid #2E7D32", borderRadius: 20, padding: 32,
+            background: "#161816", border: "1px solid #2E7D32", borderRadius: 24, padding: 32,
           }}>
             <div className="mx-auto grid place-items-center rounded-full"
               style={{ width: 60, height: 60, background: "#2E7D32" }}>
@@ -965,7 +1137,7 @@ function Footer() {
     { l: "FAQ", h: "#faq" },
   ];
   return (
-    <footer id="footer" style={{ background: "#0A0B0A", borderTop: "1px solid #1A1E1A", padding: "32px 16px 40px" }}>
+    <footer id="footer" style={{ background: "#0A0B0A", borderTop: "1px solid #1A1E1A", padding: "40px 16px 48px" }}>
       <div className="mx-auto max-w-6xl">
         <Logo />
         <p className="mt-3" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A", maxWidth: 320, lineHeight: 1.6 }}>
@@ -994,7 +1166,7 @@ function Footer() {
           ].map(({ Icon, href, label }) => (
             <a key={label} href={href} aria-label={label}
               className="grid place-items-center rounded-full"
-              style={{ width: 32, height: 32, background: "#1A1E1A", color: "#D4AF37" }}>
+              style={{ width: 36, height: 36, background: "#1A1E1A", color: "#D4AF37" }}>
               <Icon size={16} />
             </a>
           ))}
@@ -1013,8 +1185,9 @@ function Footer() {
 function Landing() {
   useReveal();
   const [dish, setDish] = useState<Dish | null>(null);
+  const [selectedLine, setSelectedLine] = useState<LineId>("POWER");
   const [order, setOrder] = useState<OrderState>({
-    name: "", phone: "", messenger: "", line: "BALANCE", period: "1 день",
+    name: "", phone: "", messenger: "", line: "POWER", period: "3 дня",
     address: "", slot: "09:00–10:00", comment: "",
   });
 
@@ -1022,9 +1195,11 @@ function Landing() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   }
 
-  function chooseLine(line: Line) {
-    setOrder((s) => ({ ...s, line: line.id }));
-    scrollTo("order-form");
+  function chooseLine(id: LineId) {
+    setSelectedLine(id);
+    setOrder((s) => ({ ...s, line: id }));
+    // Scroll to menu so user sees the bound menu
+    setTimeout(() => scrollTo("menu"), 100);
   }
 
   function choosePeriod(period: string) {
@@ -1042,9 +1217,9 @@ function Landing() {
       <Navbar onOrder={() => scrollTo("order-form")} />
       <main>
         <Hero onOrder={() => scrollTo("lines")} onCalc={() => scrollTo("calc")} />
-        <LinesSection onSelect={chooseLine} />
-        <MenuSection onOpenDish={setDish} />
-        <Calculator onOrder={(line) => { setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />
+        <LinesSection selected={selectedLine} onSelect={chooseLine} />
+        <MenuSection lineId={selectedLine} onOpenDish={setDish} onOrder={() => scrollTo("order-form")} />
+        <Calculator onOrder={(line) => { setSelectedLine(line); setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />
         <Subscription onSelect={choosePeriod} />
         <Delivery onAsk={askOutOfCity} />
         <FAQSection />

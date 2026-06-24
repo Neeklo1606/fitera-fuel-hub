@@ -1105,19 +1105,57 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
         </p>
 
         {sent ? (
-          <div className="reveal in mt-5 animate-fade-in text-center" style={{
-            background: "#161816", border: "1px solid #2E7D32", borderRadius: 20, padding: 28,
+          <div className="reveal in mt-5 animate-fade-in" style={{
+            background: "#161816", border: "1px solid #2A2E2A", borderRadius: 20, padding: 22,
           }}>
-            <div className="mx-auto grid place-items-center rounded-full"
-              style={{ width: 56, height: 56, background: "#2E7D32" }}>
-              <Check size={28} color="#FFFFFF" strokeWidth={3} />
+            <div className="flex items-center gap-3">
+              <div className="grid place-items-center rounded-full shrink-0"
+                style={{ width: 44, height: 44, background: "#2E7D32" }}>
+                <Check size={22} color="#FFFFFF" strokeWidth={3} />
+              </div>
+              <div className="min-w-0">
+                <div style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 18, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+                  Заявка принята
+                </div>
+                <div className="mt-0.5" style={{ fontFamily: "Inter", fontSize: 12.5, color: "#A0A89A" }}>
+                  Напишем в Telegram за 30 минут
+                </div>
+              </div>
             </div>
-            <div className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-              Заявка принята
+
+            <div className="mt-4 rounded-2xl" style={{ background: "#0E0F0E", border: "1px solid #2A2E2A", padding: 14 }}>
+              <div style={{ fontFamily: "Inter", fontSize: 10.5, color: "#7A8278", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                Ваш заказ
+              </div>
+              <dl className="mt-2 space-y-1.5" style={{ fontFamily: "Inter", fontSize: 13 }}>
+                {[
+                  ["Имя", state.name || "—"],
+                  ["Телефон", state.phone || "—"],
+                  ["Рацион", LINES.find((l) => l.id === state.line)?.title ?? state.line],
+                  ["Период", state.period],
+                  ["Адрес", state.address || "—"],
+                  ["Слот", state.slot],
+                  ...(state.messenger ? [["Telegram", state.messenger]] as const : [] as const),
+                ].map(([k, v]) => (
+                  <div key={k} className="flex gap-3 justify-between">
+                    <dt style={{ color: "#7A8278" }}>{k}</dt>
+                    <dd className="text-right min-w-0" style={{ color: "#FFFFFF", fontWeight: 500, wordBreak: "break-word" }}>{v}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
-            <p className="mt-1.5" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A", lineHeight: 1.5 }}>
-              Напишем в Telegram в течение 30 минут.
-            </p>
+
+            <button
+              onClick={() => setSent(false)}
+              className="press mt-4 w-full"
+              style={{
+                height: 48, borderRadius: 50,
+                background: "transparent", border: "1px solid #2A2E2A",
+                color: "#FFFFFF", fontFamily: "Inter", fontWeight: 600, fontSize: 14,
+              }}
+            >
+              Изменить заявку
+            </button>
           </div>
         ) : (
           <form onSubmit={submit} className="reveal mt-4 space-y-2.5">

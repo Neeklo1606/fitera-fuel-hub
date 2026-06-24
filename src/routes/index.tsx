@@ -642,12 +642,13 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
                 display: "flex", gap: 12, alignItems: "center",
               }}
             >
-              <div
-                className="shrink-0 grid place-items-center rounded-2xl overflow-hidden"
+              <SmartImage
+                src={line.image}
+                alt={d.name}
+                className="shrink-0 rounded-2xl"
                 style={{ width: 60, height: 60, background: "#0E0F0E" }}
-              >
-                <img src={line.image} alt="" loading="lazy" width={400} height={400} className="w-full h-full object-cover" />
-              </div>
+                aspectRatio="1 / 1"
+              />
               <div className="min-w-0 flex-1">
                 <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 10, color: line.accent, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   {d.meal}

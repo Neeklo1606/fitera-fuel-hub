@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   X, Check, Phone, Leaf, Truck, Star, Sparkles, Send, Instagram, MapPin, Plus, Minus, ChevronRight, ArrowRight,
   Flame, Heart, Crown, type LucideIcon,
@@ -407,17 +407,17 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                 key={line.id}
                 onClick={() => onSelect(line.id)}
                 aria-pressed={active}
-                className="press relative text-left"
+                className={`press relative text-left ${active ? "tile-active" : ""}`}
                 style={{
                   background: active ? line.tint : "#FFFFFF",
                   border: `1.5px solid ${active ? line.accent : "rgba(0,0,0,0.06)"}`,
                   borderRadius: 22,
                   padding: 14,
+                  ["--tile-accent" as never]: `${line.accent}66`,
                   boxShadow: active
                     ? `0 14px 32px -14px ${line.accent}80, inset 0 0 0 1px ${line.accent}33`
                     : "0 2px 6px rgba(0,0,0,0.03)",
-                  transition: "all 220ms cubic-bezier(.2,.7,.2,1)",
-                  transform: active ? "translateY(-2px)" : "none",
+                  transition: "background 240ms ease, border-color 240ms ease, box-shadow 240ms ease",
                   minHeight: 132,
                   display: "flex",
                   flexDirection: "column",
@@ -519,25 +519,12 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
 
 function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDish: (d: Dish) => void; onOrder: () => void }) {
   const [day, setDay] = useState(0);
-  const [fade, setFade] = useState(true);
   const line = LINES.find((l) => l.id === lineId)!;
   const dayMeals = WEEK_MENU[lineId][day];
 
-  // re-trigger fade when line changes
-  const prevLine = useRef<LineId>(lineId);
-  useEffect(() => {
-    if (prevLine.current !== lineId) {
-      setFade(false);
-      const t = setTimeout(() => setFade(true), 180);
-      prevLine.current = lineId;
-      return () => clearTimeout(t);
-    }
-  }, [lineId]);
-
   function pickDay(i: number) {
     if (i === day) return;
-    setFade(false);
-    setTimeout(() => { setDay(i); setFade(true); }, 180);
+    setDay(i);
   }
 
   const totalKcal = dayMeals.reduce((s, d) => s + d.kcal, 0);
@@ -592,14 +579,13 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
           {DAYS_FULL[day]}
         </div>
 
-        {/* Dishes */}
+        {/* Dishes — re-mount on line/day change to retrigger animation */}
         <div
-          className="mt-5 grid"
+          key={`${lineId}-${day}`}
+          className="mt-5 grid menu-anim"
           style={{
             gridTemplateColumns: "1fr",
             gap: 1,
-            opacity: fade ? 1 : 0,
-            transition: "opacity 200ms ease",
             borderRadius: 24,
             overflow: "hidden",
             background: "#2A2E2A",
@@ -1236,6 +1222,77 @@ function Footer() {
   );
 }
 
+/* ────────── Mobile Bottom Bar (app-style dock) ────────── */
+
+
+function MobileBottomBar({
+  selectedLine,
+  onMenu,
+  onCalc,
+  onOrder,
+}: {
+  selectedLine: LineId;
+  onMenu: () => void;
+  onCalc: () => void;
+  onOrder: () => void;
+}) {
+  const line = LINES.find((l) => l.id === selectedLine)!;
+  return (
+    <div
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 pb-safe"
+      style={{
+        background: "rgba(14,15,14,0.92)",
+        backdropFilter: "blur(16px)",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+        paddingTop: 10,
+        paddingLeft: 12,
+        paddingRight: 12,
+      }}
+    >
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onMenu}
+          className="press flex flex-col items-center justify-center rounded-2xl shrink-0"
+          style={{ width: 56, height: 52, background: "#161816", color: "#FFFFFF", border: "1px solid #2A2E2A" }}
+          aria-label="Меню"
+        >
+          <line.Icon size={18} color={line.accent} />
+          <span style={{ fontFamily: "Inter", fontSize: 9, marginTop: 2, color: "#A0A89A", letterSpacing: "0.04em" }}>
+            {line.id}
+          </span>
+        </button>
+        <button
+          onClick={onCalc}
+          className="press flex flex-col items-center justify-center rounded-2xl shrink-0"
+          style={{ width: 56, height: 52, background: "#161816", color: "#FFFFFF", border: "1px solid #2A2E2A" }}
+          aria-label="Калькулятор"
+        >
+          <Sparkles size={18} color="#D4AF37" />
+          <span style={{ fontFamily: "Inter", fontSize: 9, marginTop: 2, color: "#A0A89A", letterSpacing: "0.04em" }}>
+            КБЖУ
+          </span>
+        </button>
+        <button
+          onClick={onOrder}
+          className="press flex-1 inline-flex items-center justify-center gap-1.5 rounded-2xl"
+          style={{
+            height: 52,
+            background: "#D4AF37",
+            color: "#0E0F0E",
+            fontFamily: "Inter",
+            fontWeight: 700,
+            fontSize: 15,
+          }}
+        >
+          Заказать <ArrowRight size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
 /* ────────── Root ────────── */
 
 function Landing() {
@@ -1269,7 +1326,7 @@ function Landing() {
   }
 
   return (
-    <div style={{ background: "#0E0F0E", minHeight: "100vh" }}>
+    <div className="has-bottom-bar" style={{ background: "#0E0F0E", minHeight: "100vh" }}>
       <Navbar onOrder={() => scrollTo("order-form")} />
       <main>
         <Hero onOrder={() => scrollTo("lines")} onCalc={() => scrollTo("calc")} />
@@ -1283,6 +1340,12 @@ function Landing() {
       </main>
       <Footer />
       {dish && <DishModal dish={dish} onClose={() => setDish(null)} />}
+      <MobileBottomBar
+        selectedLine={selectedLine}
+        onMenu={() => scrollTo("menu")}
+        onCalc={() => scrollTo("calc")}
+        onOrder={() => scrollTo("order-form")}
+      />
     </div>
   );
 }

@@ -433,18 +433,13 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
   return (
     <section id="lines" style={{ background: "#F7F7F5", padding: "56px 16px 32px" }}>
       <div className="mx-auto max-w-6xl">
-        {/* Centered header */}
-        <div className="text-center reveal">
-          <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.14em", textTransform: "uppercase" }}>
-            Наши рационы
-          </span>
-          <h2 className="mt-2 mx-auto" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 5vw, 42px)", lineHeight: 1.05, letterSpacing: "-0.03em", color: "#0E0F0E", maxWidth: 720 }}>
-            Выбери линейку
-          </h2>
-          <p className="mt-3 mx-auto" style={{ fontFamily: "Inter", fontSize: 14, color: "#777", maxWidth: 420, lineHeight: 1.5 }}>
-            Меню ниже автоматически собирается под выбранный рацион
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="Наши рационы"
+          title="Выбери линейку"
+          desc="Меню ниже автоматически собирается под выбранный рацион"
+          accent="#2E7D32"
+          center
+        />
 
         {/* Reference-style cards: header + kcal + desc + large image */}
         <style>{`

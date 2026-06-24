@@ -809,7 +809,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
             <label style={lbl}>Цель</label>
             <div className="flex" style={{ gap: 8 }}>
               {([
-                ["loss", "Снижение"], ["keep", "Поддержание"], ["gain", "Набор"],
+                ["loss", "Снижение"], ["keep", "Норма"], ["gain", "Набор"],
               ] as const).map(([k, l]) => {
                 const active = goal === k;
                 return (
@@ -818,7 +818,8 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                       flex: 1, height: 52, borderRadius: 14,
                       background: active ? "#0E0F0E" : "#F5F5F5",
                       color: active ? "#FFFFFF" : "#555",
-                      fontFamily: "Inter", fontWeight: 600, fontSize: 13,
+                      fontFamily: "Inter", fontWeight: 600, fontSize: 14,
+                      whiteSpace: "nowrap",
                     }}>{l}</button>
                 );
               })}

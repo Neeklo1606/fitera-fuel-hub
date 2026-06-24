@@ -387,81 +387,65 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
           </p>
         </div>
 
-        {/* Banking-app style tile grid */}
+        {/* Reference-style cards: header + kcal + desc + large image */}
         <style>{`
-          #lines-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0,1fr)); }
-          @media (min-width: 560px) { #lines-grid { grid-template-columns: repeat(3, minmax(0,1fr)); } }
-          @media (min-width: 900px) { #lines-grid { grid-template-columns: repeat(5, minmax(0,1fr)); } }
+          #lines-grid {
+            display: grid; gap: 12px;
+            grid-template-columns: repeat(2, minmax(0,1fr));
+          }
+          @media (min-width: 640px) { #lines-grid { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+          @media (min-width: 960px) { #lines-grid { grid-template-columns: repeat(5, minmax(0,1fr)); gap: 16px; } }
         `}</style>
-        <div id="lines-grid" className="reveal mt-7">
 
+        <div id="lines-grid" className="reveal mt-7">
           {LINES.map((line) => {
             const active = line.id === selected;
-            const Icon = line.Icon;
             return (
               <button
                 key={line.id}
                 onClick={() => onSelect(line.id)}
                 aria-pressed={active}
-                className={`press relative text-left ${active ? "tile-active" : ""}`}
+                className="press relative text-left overflow-hidden"
                 style={{
                   background: "#FFFFFF",
-                  border: `1px solid ${active ? line.accent : "rgba(15,17,15,0.08)"}`,
-                  borderRadius: 20,
-                  padding: 14,
-                  ["--tile-accent" as never]: `${line.accent}55`,
+                  border: `1.5px solid ${active ? line.accent : "rgba(15,17,15,0.08)"}`,
+                  borderRadius: 18,
+                  transition: "border-color 220ms ease, transform 220ms ease, box-shadow 220ms ease",
                   boxShadow: active
-                    ? `inset 0 0 0 1px ${line.accent}`
-                    : "none",
-                  transition: "border-color 220ms ease, box-shadow 220ms ease",
-                  minHeight: 128,
+                    ? `0 12px 28px -12px ${line.accent}66`
+                    : "0 2px 8px rgba(0,0,0,0.03)",
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "space-between",
                 }}
               >
-                {/* Top row: icon + badge */}
-                <div className="flex items-start justify-between">
-                  <div
-                    className="grid place-items-center rounded-2xl shrink-0"
-                    style={{
-                      width: 40, height: 40,
-                      background: line.tint,
-                      color: line.accent,
-                    }}
-                  >
-                    <Icon size={20} strokeWidth={2.2} />
+                <div style={{ padding: "14px 14px 10px" }}>
+                  <div className="flex items-center justify-between gap-2">
+                    <div style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, letterSpacing: "0.04em", color: "#0E0F0E", lineHeight: 1 }}>
+                      {line.id}
+                    </div>
+                    {line.popular ? (
+                      <span style={{ background: "#0E0F0E", color: "#D4AF37", borderRadius: 50, padding: "3px 7px", fontFamily: "Inter", fontWeight: 700, fontSize: 9, letterSpacing: "0.08em" }}>ХИТ</span>
+                    ) : active ? (
+                      <span className="grid place-items-center rounded-full" style={{ width: 20, height: 20, background: line.accent, color: "#FFFFFF" }}>
+                        <Check size={12} strokeWidth={3} />
+                      </span>
+                    ) : null}
                   </div>
-                  {line.popular ? (
-                    <span style={{
-                      background: "#0E0F0E", color: "#D4AF37",
-                      borderRadius: 50, padding: "3px 8px",
-                      fontFamily: "Inter", fontWeight: 700, fontSize: 9, letterSpacing: "0.08em",
-                    }}>
-                      ХИТ
-                    </span>
-                  ) : active ? (
-                    <span
-                      className="grid place-items-center rounded-full"
-                      style={{ width: 20, height: 20, background: line.accent, color: "#FFFFFF" }}
-                    >
-                      <Check size={12} strokeWidth={3} />
-                    </span>
-                  ) : null}
-                </div>
-
-                {/* Bottom: title + meta */}
-                <div className="mt-3">
-                  <div style={{
-                    fontFamily: "Unbounded", fontWeight: 700, fontSize: 15,
-                    letterSpacing: "-0.02em", color: "#0E0F0E", lineHeight: 1.15,
-                  }}>
-                    {line.title}
-                  </div>
-                  <div className="tabular mt-1" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 11, color: "#888", letterSpacing: "0.01em" }}>
+                  <div className="tabular mt-1.5" style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11.5, color: "#0E0F0E", letterSpacing: "0.01em" }}>
                     {line.kcal} ккал
                   </div>
+                  <div className="mt-0.5" style={{
+                    fontFamily: "Inter", fontSize: 11, color: "#888", lineHeight: 1.35,
+                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                    overflow: "hidden", minHeight: 30,
+                  }}>
+                    {line.desc}
+                  </div>
                 </div>
+                <div style={{
+                  marginTop: "auto", width: "100%", aspectRatio: "1 / 1",
+                  background: `url(${line.image}) center/cover no-repeat`,
+                }} />
               </button>
             );
           })}
@@ -479,11 +463,9 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
           }}
         >
           <span
-            className="grid place-items-center rounded-full shrink-0"
-            style={{ width: 36, height: 36, background: selectedLine.accent, color: "#FFFFFF" }}
-          >
-            <selectedLine.Icon size={18} strokeWidth={2.4} />
-          </span>
+            className="rounded-full shrink-0 overflow-hidden block"
+            style={{ width: 36, height: 36, background: `url(${selectedLine.image}) center/cover` }}
+          />
           <div className="min-w-0 flex-1">
             <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 13, color: "#0E0F0E", lineHeight: 1.1 }}>
               Выбран рацион <span style={{ color: selectedLine.accent }}>{selectedLine.title}</span>

@@ -392,18 +392,13 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
         </div>
 
         {/* Banking-app style tile grid */}
-        <div
-          className="reveal mt-7 grid"
-          style={{
-            gap: 10,
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-          }}
-        >
-          <style>{`
-            @media (min-width: 560px) { #lines-grid { grid-template-columns: repeat(3, minmax(0,1fr)) !important; } }
-            @media (min-width: 900px) { #lines-grid { grid-template-columns: repeat(5, minmax(0,1fr)) !important; } }
-          `}</style>
-          <div id="lines-grid" className="contents" />
+        <style>{`
+          #lines-grid { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0,1fr)); }
+          @media (min-width: 560px) { #lines-grid { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+          @media (min-width: 900px) { #lines-grid { grid-template-columns: repeat(5, minmax(0,1fr)); } }
+        `}</style>
+        <div id="lines-grid" className="reveal mt-7">
+
           {LINES.map((line) => {
             const active = line.id === selected;
             const Icon = line.Icon;

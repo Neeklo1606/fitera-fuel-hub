@@ -1326,7 +1326,7 @@ function Landing() {
   }
 
   return (
-    <div style={{ background: "#0E0F0E", minHeight: "100vh" }}>
+    <div className="has-bottom-bar" style={{ background: "#0E0F0E", minHeight: "100vh" }}>
       <Navbar onOrder={() => scrollTo("order-form")} />
       <main>
         <Hero onOrder={() => scrollTo("lines")} onCalc={() => scrollTo("calc")} />
@@ -1340,6 +1340,12 @@ function Landing() {
       </main>
       <Footer />
       {dish && <DishModal dish={dish} onClose={() => setDish(null)} />}
+      <MobileBottomBar
+        selectedLine={selectedLine}
+        onMenu={() => scrollTo("menu")}
+        onCalc={() => scrollTo("calc")}
+        onOrder={() => scrollTo("order-form")}
+      />
     </div>
   );
 }

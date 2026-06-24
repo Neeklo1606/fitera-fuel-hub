@@ -165,6 +165,65 @@ function useReveal() {
   }, []);
 }
 
+/* Image with skeleton placeholder — fixed aspect, fade-in on load */
+function SmartImage({
+  src, alt = "", className = "", style, light = false, aspectRatio = "1 / 1",
+}: {
+  src: string; alt?: string; className?: string; style?: React.CSSProperties;
+  light?: boolean; aspectRatio?: string;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div
+      className={`${loaded ? "" : `img-skel ${light ? "light" : ""}`} ${className}`}
+      style={{ position: "relative", aspectRatio, overflow: "hidden", ...style }}
+    >
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        className={`img-fade ${loaded ? "loaded" : ""}`}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+      />
+    </div>
+  );
+}
+
+/* Unified section header — eyebrow + title + optional description */
+function SectionHeader({
+  eyebrow, title, desc, dark = false, accent = "#2E7D32", center = false, titleAccent,
+}: {
+  eyebrow: string; title: React.ReactNode; desc?: string;
+  dark?: boolean; accent?: string; center?: boolean; titleAccent?: React.ReactNode;
+}) {
+  const titleColor = dark ? "#FFFFFF" : "#0E0F0E";
+  const descColor = dark ? "#A0A89A" : "#6A6F68";
+  return (
+    <div className={`reveal ${center ? "text-center mx-auto" : ""}`} style={{ maxWidth: center ? 640 : undefined }}>
+      <span style={{
+        fontFamily: "Inter", fontWeight: 600, fontSize: 12,
+        color: accent, letterSpacing: "0.14em", textTransform: "uppercase",
+      }}>
+        {eyebrow}
+      </span>
+      <h2 className="mt-2" style={{
+        fontFamily: "Unbounded", fontWeight: 800,
+        fontSize: "clamp(26px, 4.2vw, 38px)",
+        lineHeight: 1.08, letterSpacing: "-0.025em", color: titleColor,
+      }}>
+        {title}{titleAccent ? <> <span style={{ transition: "color 240ms ease" }}>{titleAccent}</span></> : null}
+      </h2>
+      {desc && (
+        <p className="mt-2" style={{ fontFamily: "Inter", fontSize: 14, color: descColor, lineHeight: 1.5 }}>
+          {desc}
+        </p>
+      )}
+    </div>
+  );
+}
+
 /* ────────── Navbar ────────── */
 
 function Logo({ light = true }: { light?: boolean }) {

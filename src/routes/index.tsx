@@ -712,9 +712,12 @@ function DishModal({ dish, onClose }: { dish: Dish; onClose: () => void }) {
           style={{ background: "rgba(0,0,0,0.6)", color: "#FFFFFF" }} aria-label="Закрыть">
           <X size={20} />
         </button>
-        <div style={{ height: 220, overflow: "hidden", borderRadius: "24px 24px 0 0", background: "#0E0F0E" }}>
-          <img src={line.image} alt={dish.name} className="w-full h-full object-cover" />
-        </div>
+        <SmartImage
+          src={line.image}
+          alt={dish.name}
+          style={{ height: 220, borderRadius: "24px 24px 0 0", background: "#0E0F0E" }}
+          aspectRatio="auto"
+        />
 
         <div className="p-5 space-y-5">
           <div>

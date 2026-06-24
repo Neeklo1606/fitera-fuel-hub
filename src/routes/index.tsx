@@ -373,97 +373,152 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
 /* ────────── Lines (compact row, drives menu) ────────── */
 
 function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id: LineId) => void }) {
+  const selectedLine = LINES.find((l) => l.id === selected)!;
+
   return (
-    <section id="lines" style={{ background: "#FFFFFF", padding: "56px 0 32px" }}>
-      <div className="mx-auto max-w-6xl px-4">
-        <div className="flex items-end justify-between flex-wrap gap-3">
-          <div>
-            <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-              Наши рационы
-            </span>
-            <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
-              Выбери линейку
-            </h2>
-          </div>
-          <p className="reveal" style={{ fontFamily: "Inter", fontSize: 14, color: "#777", maxWidth: 280 }}>
-            Нажми на карточку — меню ниже соберётся под выбранный рацион
+    <section id="lines" style={{ background: "#F7F7F5", padding: "56px 16px 32px" }}>
+      <div className="mx-auto max-w-6xl">
+        {/* Centered header */}
+        <div className="text-center reveal">
+          <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.14em", textTransform: "uppercase" }}>
+            Наши рационы
+          </span>
+          <h2 className="mt-2 mx-auto" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 5vw, 42px)", lineHeight: 1.05, letterSpacing: "-0.03em", color: "#0E0F0E", maxWidth: 720 }}>
+            Выбери линейку
+          </h2>
+          <p className="mt-3 mx-auto" style={{ fontFamily: "Inter", fontSize: 14, color: "#777", maxWidth: 420, lineHeight: 1.5 }}>
+            Меню ниже автоматически собирается под выбранный рацион
           </p>
         </div>
-      </div>
 
-      {/* Horizontal compact cards */}
-      <div className="mt-6 reveal">
+        {/* Banking-app style tile grid */}
         <div
-          className="flex overflow-x-auto hide-scrollbar"
-          style={{ gap: 12, padding: "4px 16px", scrollSnapType: "x mandatory" }}
+          className="reveal mt-7 grid"
+          style={{
+            gap: 10,
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          }}
         >
+          <style>{`
+            @media (min-width: 560px) { #lines-grid { grid-template-columns: repeat(3, minmax(0,1fr)) !important; } }
+            @media (min-width: 900px) { #lines-grid { grid-template-columns: repeat(5, minmax(0,1fr)) !important; } }
+          `}</style>
+          <div id="lines-grid" className="contents" />
           {LINES.map((line) => {
             const active = line.id === selected;
+            const Icon = line.Icon;
             return (
               <button
                 key={line.id}
                 onClick={() => onSelect(line.id)}
-                className="press shrink-0 relative text-left overflow-hidden"
+                aria-pressed={active}
+                className="press relative text-left"
                 style={{
-                  width: 168,
-                  borderRadius: 20,
-                  background: "#FFFFFF",
-                  border: `2px solid ${active ? line.accent : "#EEE"}`,
-                  boxShadow: active ? `0 18px 40px -16px ${line.accent}66` : "0 2px 8px rgba(0,0,0,0.04)",
-                  transition: "border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease",
-                  transform: active ? "translateY(-4px)" : "none",
-                  scrollSnapAlign: "start",
+                  background: active ? line.tint : "#FFFFFF",
+                  border: `1.5px solid ${active ? line.accent : "rgba(0,0,0,0.06)"}`,
+                  borderRadius: 22,
+                  padding: 14,
+                  boxShadow: active
+                    ? `0 14px 32px -14px ${line.accent}80, inset 0 0 0 1px ${line.accent}33`
+                    : "0 2px 6px rgba(0,0,0,0.03)",
+                  transition: "all 220ms cubic-bezier(.2,.7,.2,1)",
+                  transform: active ? "translateY(-2px)" : "none",
+                  minHeight: 132,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
                 }}
               >
-                {line.popular && (
-                  <span className="absolute z-10" style={{
-                    top: 10, left: 10, background: "#D4AF37", color: "#0E0F0E",
-                    borderRadius: 50, padding: "3px 8px",
-                    fontFamily: "Inter", fontWeight: 700, fontSize: 10, letterSpacing: "0.06em",
-                  }}>
-                    ХИТ
-                  </span>
-                )}
-                <div style={{ aspectRatio: "1 / 1", background: "#F7F7F5", overflow: "hidden" }}>
-                  <img
-                    src={line.image} alt={line.id} loading="lazy" width={800} height={800}
-                    className="w-full h-full object-cover"
-                    style={{ transform: active ? "scale(1.06)" : "scale(1)", transition: "transform 400ms ease" }}
-                  />
-                </div>
-                <div style={{ padding: "12px 14px 14px" }}>
-                  <div style={{
-                    fontFamily: "Unbounded", fontWeight: 900, fontSize: 18,
-                    letterSpacing: "-0.02em", color: "#0E0F0E",
-                  }}>
-                    {line.id}
+                {/* Top row: icon + badge */}
+                <div className="flex items-start justify-between">
+                  <div
+                    className="grid place-items-center rounded-2xl shrink-0"
+                    style={{
+                      width: 44, height: 44,
+                      background: active ? line.accent : line.tint,
+                      color: active ? "#FFFFFF" : line.accent,
+                      transition: "all 220ms ease",
+                    }}
+                  >
+                    <Icon size={22} strokeWidth={2.2} />
                   </div>
-                  <div className="tabular mt-0.5" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 12, color: "#888" }}>
-                    {line.kcal}
-                  </div>
-                  <div className="mt-1.5" style={{ fontFamily: "Inter", fontSize: 12, color: "#555", lineHeight: 1.35, minHeight: 30 }}>
-                    {line.desc}
-                  </div>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="tabular" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 14, color: "#0E0F0E" }}>
-                      {line.priceFrom}
+                  {line.popular ? (
+                    <span style={{
+                      background: "#0E0F0E", color: "#D4AF37",
+                      borderRadius: 50, padding: "3px 8px",
+                      fontFamily: "Inter", fontWeight: 700, fontSize: 9, letterSpacing: "0.08em",
+                    }}>
+                      ХИТ
                     </span>
+                  ) : active ? (
                     <span
                       className="grid place-items-center rounded-full"
-                      style={{ width: 26, height: 26, background: active ? line.accent : "#F0F0F0", color: active ? "#FFFFFF" : "#0E0F0E", transition: "background 200ms ease" }}
+                      style={{ width: 22, height: 22, background: line.accent, color: "#FFFFFF" }}
                     >
-                      {active ? <Check size={14} strokeWidth={3} /> : <ChevronRight size={14} />}
+                      <Check size={13} strokeWidth={3} />
                     </span>
+                  ) : null}
+                </div>
+
+                {/* Bottom: title + meta */}
+                <div className="mt-3">
+                  <div style={{
+                    fontFamily: "Unbounded", fontWeight: 800, fontSize: 16,
+                    letterSpacing: "-0.02em", color: "#0E0F0E", lineHeight: 1.1,
+                  }}>
+                    {line.title}
+                  </div>
+                  <div className="tabular mt-1" style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11, color: active ? line.accent : "#888", letterSpacing: "0.02em" }}>
+                    {line.kcal} ккал
+                  </div>
+                  <div className="mt-0.5" style={{ fontFamily: "Inter", fontSize: 11, color: "#888", lineHeight: 1.35 }}>
+                    {line.desc}
                   </div>
                 </div>
               </button>
             );
           })}
         </div>
+
+        {/* Selected line summary pill — anchors the choice */}
+        <div
+          className="reveal mt-5 mx-auto flex items-center gap-3 rounded-full"
+          style={{
+            background: "#FFFFFF",
+            border: `1px solid ${selectedLine.accent}33`,
+            padding: "8px 14px 8px 8px",
+            maxWidth: 420,
+            boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
+          }}
+        >
+          <span
+            className="grid place-items-center rounded-full shrink-0"
+            style={{ width: 36, height: 36, background: selectedLine.accent, color: "#FFFFFF" }}
+          >
+            <selectedLine.Icon size={18} strokeWidth={2.4} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 13, color: "#0E0F0E", lineHeight: 1.1 }}>
+              Выбран рацион <span style={{ color: selectedLine.accent }}>{selectedLine.title}</span>
+            </div>
+            <div className="truncate" style={{ fontFamily: "Inter", fontSize: 11, color: "#888", marginTop: 2 }}>
+              {selectedLine.kcal} ккал · {selectedLine.desc}
+            </div>
+          </div>
+          <a
+            href="#menu"
+            className="press grid place-items-center rounded-full shrink-0"
+            style={{ width: 36, height: 36, background: "#0E0F0E", color: "#FFFFFF" }}
+            aria-label="К меню"
+          >
+            <ChevronRight size={18} />
+          </a>
+        </div>
       </div>
     </section>
   );
 }
+
 
 /* ────────── Menu (auto-filtered by selected line) ────────── */
 

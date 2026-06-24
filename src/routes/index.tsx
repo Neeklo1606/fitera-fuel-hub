@@ -31,21 +31,25 @@ type LineId = "LIGHT" | "BALANCE" | "POWER" | "MOM" | "PRO";
 
 type Line = {
   id: LineId;
+  title: string;
   kcal: string;
   desc: string;
   priceFrom: string;
   popular?: boolean;
   accent: string;
+  tint: string;
   image: string;
+  Icon: LucideIcon;
 };
 
 const LINES: Line[] = [
-  { id: "LIGHT",   kcal: "1200–1400 ккал", desc: "Для снижения веса",          priceFrom: "от 750 ₽",  accent: "#7CB342", image: lineLight },
-  { id: "BALANCE", kcal: "1500–1800 ккал", desc: "Поддержание формы",          priceFrom: "от 850 ₽",  accent: "#42A5F5", image: lineBalance },
-  { id: "POWER",   kcal: "2000–2500 ккал", desc: "Набор мышечной массы",       priceFrom: "от 950 ₽",  popular: true, accent: "#D4AF37", image: linePower },
-  { id: "MOM",     kcal: "1600–1900 ккал", desc: "Для молодых мам",            priceFrom: "от 900 ₽",  accent: "#EC8DA5", image: lineMom },
-  { id: "PRO",     kcal: "2200–2800 ккал", desc: "Для занятых людей",          priceFrom: "от 1 100 ₽", accent: "#8E7CC3", image: linePro },
+  { id: "LIGHT",   title: "Лёгкий",  kcal: "1200–1400", desc: "Снижение веса",        priceFrom: "от 750 ₽",  accent: "#7CB342", tint: "#EEF7E4", image: lineLight,   Icon: Leaf },
+  { id: "BALANCE", title: "Баланс",  kcal: "1500–1800", desc: "Поддержание формы",    priceFrom: "от 850 ₽",  accent: "#42A5F5", tint: "#E5F1FB", image: lineBalance, Icon: Sparkles },
+  { id: "POWER",   title: "Сила",    kcal: "2000–2500", desc: "Набор массы",          priceFrom: "от 950 ₽",  popular: true, accent: "#D4AF37", tint: "#FBF3DC", image: linePower, Icon: Flame },
+  { id: "MOM",     title: "Мама",    kcal: "1600–1900", desc: "Для молодых мам",      priceFrom: "от 900 ₽",  accent: "#EC8DA5", tint: "#FBEAF0", image: lineMom,     Icon: Heart },
+  { id: "PRO",     title: "Премиум", kcal: "2200–2800", desc: "Для занятых людей",    priceFrom: "от 1 100 ₽", accent: "#8E7CC3", tint: "#EFEAF8", image: linePro,    Icon: Crown },
 ];
+
 
 type Dish = {
   name: string;

@@ -578,20 +578,14 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
   return (
     <section id="menu" style={{ background: "#0E0F0E", padding: "56px 16px" }}>
       <div className="mx-auto max-w-6xl">
-        <div className="flex items-end justify-between flex-wrap gap-3">
-          <div>
-            <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-              Меню недели
-            </span>
-            <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-              Рацион{" "}
-              <span style={{ color: line.accent, transition: "color 250ms ease" }}>{line.id}</span>
-            </h2>
-            <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A" }}>
-              {line.desc} · {line.kcal} ккал
-            </p>
-          </div>
-        </div>
+        <SectionHeader
+          eyebrow="Меню недели"
+          title="Рацион"
+          titleAccent={<span style={{ color: line.accent }}>{line.id}</span>}
+          desc={`${line.desc} · ${line.kcal} ккал`}
+          dark
+          accent="#D4AF37"
+        />
 
         {/* Day pills — horizontal scroll, premium */}
         <div className="reveal mt-6 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 8, scrollSnapType: "x mandatory" }}>

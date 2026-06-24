@@ -995,12 +995,12 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
   return (
     <section id="delivery" style={{ background: "#FFFFFF", padding: "56px 16px" }}>
       <div className="mx-auto max-w-6xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Доставка
-        </span>
-        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(26px, 3.5vw, 34px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
-          Привезём свежее
-        </h2>
+        <SectionHeader
+          eyebrow="Доставка"
+          title="Привезём свежее"
+          desc="Ежедневно по Ростову, бесплатно — выберите удобный слот"
+          accent="#2E7D32"
+        />
 
         <div className="mt-6 grid sm:grid-cols-2" style={{ gap: 12 }}>
           <div className="reveal" style={{ background: "#E8F5E9", borderRadius: 20, padding: 20 }}>

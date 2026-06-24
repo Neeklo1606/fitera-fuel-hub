@@ -459,47 +459,62 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                 key={line.id}
                 onClick={() => onSelect(line.id)}
                 aria-pressed={active}
-                className="press relative text-left overflow-hidden"
+                className="press tile-trans relative text-left overflow-hidden flex flex-col"
                 style={{
                   background: "#FFFFFF",
                   border: `1.5px solid ${active ? line.accent : "rgba(15,17,15,0.08)"}`,
                   borderRadius: 18,
-                  transition: "border-color 220ms ease, transform 220ms ease, box-shadow 220ms ease",
                   boxShadow: active
-                    ? `0 12px 28px -12px ${line.accent}66`
+                    ? `0 14px 30px -14px ${line.accent}80`
                     : "0 2px 8px rgba(0,0,0,0.03)",
-                  display: "flex",
-                  flexDirection: "column",
                 }}
               >
-                <div style={{ padding: "14px 14px 10px" }}>
-                  <div className="flex items-center justify-between gap-2">
-                    <div style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, letterSpacing: "0.04em", color: "#0E0F0E", lineHeight: 1 }}>
+                <div style={{ padding: "12px 12px 10px" }}>
+                  <div className="flex items-center justify-between gap-2" style={{ minHeight: 20 }}>
+                    <div style={{
+                      fontFamily: "Unbounded", fontWeight: 800,
+                      fontSize: 15, letterSpacing: "0.04em",
+                      color: "#0E0F0E", lineHeight: 1,
+                    }}>
                       {line.id}
                     </div>
                     {line.popular ? (
-                      <span style={{ background: "#0E0F0E", color: "#D4AF37", borderRadius: 50, padding: "3px 7px", fontFamily: "Inter", fontWeight: 700, fontSize: 9, letterSpacing: "0.08em" }}>ХИТ</span>
+                      <span style={{
+                        background: "#0E0F0E", color: "#D4AF37",
+                        borderRadius: 50, padding: "3px 7px",
+                        fontFamily: "Inter", fontWeight: 700, fontSize: 9, letterSpacing: "0.08em",
+                      }}>ХИТ</span>
                     ) : active ? (
-                      <span className="grid place-items-center rounded-full" style={{ width: 20, height: 20, background: line.accent, color: "#FFFFFF" }}>
+                      <span
+                        key="check"
+                        className="grid place-items-center rounded-full check-pop"
+                        style={{ width: 20, height: 20, background: line.accent, color: "#FFFFFF" }}
+                      >
                         <Check size={12} strokeWidth={3} />
                       </span>
                     ) : null}
                   </div>
-                  <div className="tabular mt-1.5" style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11.5, color: "#0E0F0E", letterSpacing: "0.01em" }}>
+                  <div className="tabular mt-1.5" style={{
+                    fontFamily: "Inter", fontWeight: 600, fontSize: 11,
+                    color: "#0E0F0E", letterSpacing: "0.01em",
+                  }}>
                     {line.kcal} ккал
                   </div>
-                  <div className="mt-0.5" style={{
-                    fontFamily: "Inter", fontSize: 11, color: "#888", lineHeight: 1.35,
+                  <div className="mt-1" style={{
+                    fontFamily: "Inter", fontSize: 11, color: "#8A8E88", lineHeight: 1.3,
                     display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
-                    overflow: "hidden", minHeight: 30,
+                    overflow: "hidden", minHeight: 28,
                   }}>
                     {line.desc}
                   </div>
                 </div>
-                <div style={{
-                  marginTop: "auto", width: "100%", aspectRatio: "1 / 1",
-                  background: `url(${line.image}) center/cover no-repeat`,
-                }} />
+                <SmartImage
+                  src={line.image}
+                  alt={line.title}
+                  light
+                  aspectRatio="1 / 1"
+                  style={{ marginTop: "auto", width: "100%" }}
+                />
               </button>
             );
           })}

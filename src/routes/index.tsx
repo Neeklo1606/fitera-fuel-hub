@@ -798,15 +798,12 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   return (
     <section id="calc" style={{ background: "#F7F7F5", padding: "56px 16px" }}>
       <div className="mx-auto max-w-2xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Калькулятор КБЖУ
-        </span>
-        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
-          Рассчитай норму
-        </h2>
-        <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 15, color: "#555" }}>
-          Подберём рацион под твои параметры
-        </p>
+        <SectionHeader
+          eyebrow="Калькулятор КБЖУ"
+          title="Рассчитай норму"
+          desc="Подберём рацион под твои параметры"
+          accent="#2E7D32"
+        />
 
         <div className="reveal mt-6 space-y-5 rounded-3xl" style={{ background: "#FFFFFF", padding: 24, boxShadow: "0 24px 60px -30px rgba(0,0,0,0.25)" }}>
           <div>

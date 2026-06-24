@@ -768,10 +768,12 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 return (
                   <button key={s} onClick={() => setSex(s)} className="press"
                     style={{
-                      flex: 1, height: 52, borderRadius: 14,
+                      flex: 1, minWidth: 0, height: 52, borderRadius: 14,
                       background: active ? "#0E0F0E" : "#F5F5F5",
                       color: active ? "#FFFFFF" : "#555",
-                      fontFamily: "Inter", fontWeight: 600, fontSize: 15,
+                      fontFamily: "Inter", fontWeight: 600,
+                      fontSize: "clamp(13px, 3.6vw, 15px)",
+                      whiteSpace: "nowrap", padding: "0 8px",
                       transition: "all 180ms ease",
                     }}>{s === "M" ? "Мужчина" : "Женщина"}</button>
                 );

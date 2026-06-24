@@ -1214,13 +1214,75 @@ function Footer() {
           ))}
         </div>
 
-        <div className="mt-6" style={{ fontFamily: "Inter", fontSize: 12, color: "#555" }}>
-          © 2026 FITERA. Доставка рационов питания по Ростову-на-Дону
-        </div>
+/* ────────── Mobile Bottom Bar (app-style dock) ────────── */
+
+function MobileBottomBar({
+  selectedLine,
+  onMenu,
+  onCalc,
+  onOrder,
+}: {
+  selectedLine: LineId;
+  onMenu: () => void;
+  onCalc: () => void;
+  onOrder: () => void;
+}) {
+  const line = LINES.find((l) => l.id === selectedLine)!;
+  return (
+    <div
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 pb-safe"
+      style={{
+        background: "rgba(14,15,14,0.92)",
+        backdropFilter: "blur(16px)",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+        paddingTop: 10,
+        paddingLeft: 12,
+        paddingRight: 12,
+      }}
+    >
+      <div className="flex items-center gap-2">
+        <button
+          onClick={onMenu}
+          className="press flex flex-col items-center justify-center rounded-2xl shrink-0"
+          style={{ width: 56, height: 52, background: "#161816", color: "#FFFFFF", border: "1px solid #2A2E2A" }}
+          aria-label="Меню"
+        >
+          <line.Icon size={18} color={line.accent} />
+          <span style={{ fontFamily: "Inter", fontSize: 9, marginTop: 2, color: "#A0A89A", letterSpacing: "0.04em" }}>
+            {line.id}
+          </span>
+        </button>
+        <button
+          onClick={onCalc}
+          className="press flex flex-col items-center justify-center rounded-2xl shrink-0"
+          style={{ width: 56, height: 52, background: "#161816", color: "#FFFFFF", border: "1px solid #2A2E2A" }}
+          aria-label="Калькулятор"
+        >
+          <Sparkles size={18} color="#D4AF37" />
+          <span style={{ fontFamily: "Inter", fontSize: 9, marginTop: 2, color: "#A0A89A", letterSpacing: "0.04em" }}>
+            КБЖУ
+          </span>
+        </button>
+        <button
+          onClick={onOrder}
+          className="press flex-1 inline-flex items-center justify-center gap-1.5 rounded-2xl"
+          style={{
+            height: 52,
+            background: "#D4AF37",
+            color: "#0E0F0E",
+            fontFamily: "Inter",
+            fontWeight: 700,
+            fontSize: 15,
+          }}
+        >
+          Заказать <ArrowRight size={16} />
+        </button>
       </div>
-    </footer>
+    </div>
   );
 }
+
+
 
 /* ────────── Root ────────── */
 

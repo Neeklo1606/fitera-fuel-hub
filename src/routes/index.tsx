@@ -405,16 +405,16 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                 aria-pressed={active}
                 className={`press relative text-left ${active ? "tile-active" : ""}`}
                 style={{
-                  background: active ? line.tint : "#FFFFFF",
-                  border: `1.5px solid ${active ? line.accent : "rgba(0,0,0,0.06)"}`,
-                  borderRadius: 22,
+                  background: "#FFFFFF",
+                  border: `1px solid ${active ? line.accent : "rgba(15,17,15,0.08)"}`,
+                  borderRadius: 20,
                   padding: 14,
-                  ["--tile-accent" as never]: `${line.accent}66`,
+                  ["--tile-accent" as never]: `${line.accent}55`,
                   boxShadow: active
-                    ? `0 14px 32px -14px ${line.accent}80, inset 0 0 0 1px ${line.accent}33`
-                    : "0 2px 6px rgba(0,0,0,0.03)",
-                  transition: "background 240ms ease, border-color 240ms ease, box-shadow 240ms ease",
-                  minHeight: 132,
+                    ? `inset 0 0 0 1px ${line.accent}`
+                    : "none",
+                  transition: "border-color 220ms ease, box-shadow 220ms ease",
+                  minHeight: 128,
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
@@ -425,13 +425,12 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                   <div
                     className="grid place-items-center rounded-2xl shrink-0"
                     style={{
-                      width: 44, height: 44,
-                      background: active ? line.accent : line.tint,
-                      color: active ? "#FFFFFF" : line.accent,
-                      transition: "all 220ms ease",
+                      width: 40, height: 40,
+                      background: line.tint,
+                      color: line.accent,
                     }}
                   >
-                    <Icon size={22} strokeWidth={2.2} />
+                    <Icon size={20} strokeWidth={2.2} />
                   </div>
                   {line.popular ? (
                     <span style={{
@@ -444,9 +443,9 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                   ) : active ? (
                     <span
                       className="grid place-items-center rounded-full"
-                      style={{ width: 22, height: 22, background: line.accent, color: "#FFFFFF" }}
+                      style={{ width: 20, height: 20, background: line.accent, color: "#FFFFFF" }}
                     >
-                      <Check size={13} strokeWidth={3} />
+                      <Check size={12} strokeWidth={3} />
                     </span>
                   ) : null}
                 </div>
@@ -454,16 +453,13 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                 {/* Bottom: title + meta */}
                 <div className="mt-3">
                   <div style={{
-                    fontFamily: "Unbounded", fontWeight: 800, fontSize: 16,
-                    letterSpacing: "-0.02em", color: "#0E0F0E", lineHeight: 1.1,
+                    fontFamily: "Unbounded", fontWeight: 700, fontSize: 15,
+                    letterSpacing: "-0.02em", color: "#0E0F0E", lineHeight: 1.15,
                   }}>
                     {line.title}
                   </div>
-                  <div className="tabular mt-1" style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11, color: active ? line.accent : "#888", letterSpacing: "0.02em" }}>
+                  <div className="tabular mt-1" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 11, color: "#888", letterSpacing: "0.01em" }}>
                     {line.kcal} ккал
-                  </div>
-                  <div className="mt-0.5" style={{ fontFamily: "Inter", fontSize: 11, color: "#888", lineHeight: 1.35 }}>
-                    {line.desc}
                   </div>
                 </div>
               </button>

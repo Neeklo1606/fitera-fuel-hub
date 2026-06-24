@@ -1139,15 +1139,13 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
       padding: "40px 16px",
     }}>
       <div className="mx-auto max-w-xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Заявка
-        </span>
-        <h2 className="reveal mt-1.5" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(24px, 4vw, 32px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-          Оставь заявку
-        </h2>
-        <p className="reveal mt-1" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>
-          Ответим в Telegram за 30 минут
-        </p>
+        <SectionHeader
+          eyebrow="Заявка"
+          title="Оставь заявку"
+          desc="Ответим в Telegram за 30 минут"
+          dark
+          accent="#D4AF37"
+        />
 
         {sent ? (
           <div className="reveal in mt-5 animate-fade-in" style={{

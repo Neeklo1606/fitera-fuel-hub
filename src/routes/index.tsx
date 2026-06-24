@@ -593,28 +593,35 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
               onClick={() => onOpenDish(d)}
               className="press text-left"
               style={{
-                background: "#161816", padding: 18,
-                display: "flex", gap: 14, alignItems: "center",
+                background: "#161816", padding: 14,
+                display: "flex", gap: 12, alignItems: "center",
               }}
             >
               <div
                 className="shrink-0 grid place-items-center rounded-2xl overflow-hidden"
-                style={{ width: 72, height: 72, background: "#0E0F0E" }}
+                style={{ width: 60, height: 60, background: "#0E0F0E" }}
               >
-                <img src={line.image} alt="" loading="lazy" width={800} height={800} className="w-full h-full object-cover" />
+                <img src={line.image} alt="" loading="lazy" width={400} height={400} className="w-full h-full object-cover" />
               </div>
               <div className="min-w-0 flex-1">
                 <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 10, color: line.accent, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   {d.meal}
                 </div>
-                <div className="mt-1 truncate" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 15, color: "#FFFFFF", lineHeight: 1.3 }}>
+                <div
+                  className="mt-1"
+                  style={{
+                    fontFamily: "Inter", fontWeight: 700, fontSize: 14.5, color: "#FFFFFF", lineHeight: 1.3,
+                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                    overflow: "hidden", wordBreak: "break-word",
+                  }}
+                >
                   {d.name}
                 </div>
-                <div className="mt-1 tabular" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 12, color: "#A0A89A" }}>
-                  {d.kcal} ккал · Б {d.p} · Ж {d.f} · У {d.c}
+                <div className="mt-1 tabular" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 11.5, color: "#A0A89A" }}>
+                  {d.kcal} ккал · Б{d.p} · Ж{d.f} · У{d.c}
                 </div>
               </div>
-              <ChevronRight size={18} color="#A0A89A" className="shrink-0" />
+              <ChevronRight size={16} color="#A0A89A" className="shrink-0" />
             </button>
           ))}
         </div>

@@ -133,8 +133,32 @@
 
 .dish-placeholder {
   background: linear-gradient(135deg, #1C2A1C 0%, #162016 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
+  display: flex; align-items: center; justify-content: center; font-size: 28px;
 }
+
+/* Premium skeleton shimmer for images */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.img-skel {
+  position: relative; overflow: hidden;
+  background: linear-gradient(110deg, #1a1c1a 8%, #232523 18%, #1a1c1a 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+.img-skel.light {
+  background: linear-gradient(110deg, #ececec 8%, #f6f6f6 18%, #ececec 33%);
+  background-size: 200% 100%;
+}
+.img-fade { opacity: 0; transition: opacity 320ms ease; }
+.img-fade.loaded { opacity: 1; }
+
+/* Selected-state pop for checks/badges — no layout shift */
+@keyframes check-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.check-pop { animation: check-in 220ms cubic-bezier(.2,.8,.2,1.2); }
+.tile-trans { transition: border-color 240ms ease, box-shadow 240ms ease, transform 240ms ease; }
+

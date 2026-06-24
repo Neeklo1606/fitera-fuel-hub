@@ -1055,12 +1055,13 @@ function FAQSection() {
   return (
     <section id="faq" style={{ background: "#0E0F0E", padding: "56px 16px" }}>
       <div className="mx-auto max-w-2xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          FAQ
-        </span>
-        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-          Частые вопросы
-        </h2>
+        <SectionHeader
+          eyebrow="FAQ"
+          title="Частые вопросы"
+          desc="Коротко о доставке, меню и оформлении заявки"
+          dark
+          accent="#D4AF37"
+        />
 
         <div className="reveal mt-6">
           {FAQ.map((item, i) => {

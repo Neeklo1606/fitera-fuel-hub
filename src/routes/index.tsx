@@ -1214,7 +1214,16 @@ function Footer() {
           ))}
         </div>
 
+        <div className="mt-6" style={{ fontFamily: "Inter", fontSize: 12, color: "#555" }}>
+          © 2026 FITERA. Доставка рационов питания по Ростову-на-Дону
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 /* ────────── Mobile Bottom Bar (app-style dock) ────────── */
+
 
 function MobileBottomBar({
   selectedLine,

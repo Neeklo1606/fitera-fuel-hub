@@ -165,6 +165,65 @@ function useReveal() {
   }, []);
 }
 
+/* Image with skeleton placeholder — fixed aspect, fade-in on load */
+function SmartImage({
+  src, alt = "", className = "", style, light = false, aspectRatio = "1 / 1",
+}: {
+  src: string; alt?: string; className?: string; style?: React.CSSProperties;
+  light?: boolean; aspectRatio?: string;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div
+      className={`${loaded ? "" : `img-skel ${light ? "light" : ""}`} ${className}`}
+      style={{ position: "relative", aspectRatio, overflow: "hidden", ...style }}
+    >
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        className={`img-fade ${loaded ? "loaded" : ""}`}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+      />
+    </div>
+  );
+}
+
+/* Unified section header — eyebrow + title + optional description */
+function SectionHeader({
+  eyebrow, title, desc, dark = false, accent = "#2E7D32", center = false, titleAccent,
+}: {
+  eyebrow: string; title: React.ReactNode; desc?: string;
+  dark?: boolean; accent?: string; center?: boolean; titleAccent?: React.ReactNode;
+}) {
+  const titleColor = dark ? "#FFFFFF" : "#0E0F0E";
+  const descColor = dark ? "#A0A89A" : "#6A6F68";
+  return (
+    <div className={`reveal ${center ? "text-center mx-auto" : ""}`} style={{ maxWidth: center ? 640 : undefined }}>
+      <span style={{
+        fontFamily: "Inter", fontWeight: 600, fontSize: 12,
+        color: accent, letterSpacing: "0.14em", textTransform: "uppercase",
+      }}>
+        {eyebrow}
+      </span>
+      <h2 className="mt-2" style={{
+        fontFamily: "Unbounded", fontWeight: 800,
+        fontSize: "clamp(26px, 4.2vw, 38px)",
+        lineHeight: 1.08, letterSpacing: "-0.025em", color: titleColor,
+      }}>
+        {title}{titleAccent ? <> <span style={{ transition: "color 240ms ease" }}>{titleAccent}</span></> : null}
+      </h2>
+      {desc && (
+        <p className="mt-2" style={{ fontFamily: "Inter", fontSize: 14, color: descColor, lineHeight: 1.5 }}>
+          {desc}
+        </p>
+      )}
+    </div>
+  );
+}
+
 /* ────────── Navbar ────────── */
 
 function Logo({ light = true }: { light?: boolean }) {
@@ -374,18 +433,13 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
   return (
     <section id="lines" style={{ background: "#F7F7F5", padding: "56px 16px 32px" }}>
       <div className="mx-auto max-w-6xl">
-        {/* Centered header */}
-        <div className="text-center reveal">
-          <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.14em", textTransform: "uppercase" }}>
-            Наши рационы
-          </span>
-          <h2 className="mt-2 mx-auto" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 5vw, 42px)", lineHeight: 1.05, letterSpacing: "-0.03em", color: "#0E0F0E", maxWidth: 720 }}>
-            Выбери линейку
-          </h2>
-          <p className="mt-3 mx-auto" style={{ fontFamily: "Inter", fontSize: 14, color: "#777", maxWidth: 420, lineHeight: 1.5 }}>
-            Меню ниже автоматически собирается под выбранный рацион
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="Наши рационы"
+          title="Выбери линейку"
+          desc="Меню ниже автоматически собирается под выбранный рацион"
+          accent="#2E7D32"
+          center
+        />
 
         {/* Reference-style cards: header + kcal + desc + large image */}
         <style>{`
@@ -405,47 +459,62 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                 key={line.id}
                 onClick={() => onSelect(line.id)}
                 aria-pressed={active}
-                className="press relative text-left overflow-hidden"
+                className="press tile-trans relative text-left overflow-hidden flex flex-col"
                 style={{
                   background: "#FFFFFF",
                   border: `1.5px solid ${active ? line.accent : "rgba(15,17,15,0.08)"}`,
                   borderRadius: 18,
-                  transition: "border-color 220ms ease, transform 220ms ease, box-shadow 220ms ease",
                   boxShadow: active
-                    ? `0 12px 28px -12px ${line.accent}66`
+                    ? `0 14px 30px -14px ${line.accent}80`
                     : "0 2px 8px rgba(0,0,0,0.03)",
-                  display: "flex",
-                  flexDirection: "column",
                 }}
               >
-                <div style={{ padding: "14px 14px 10px" }}>
-                  <div className="flex items-center justify-between gap-2">
-                    <div style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, letterSpacing: "0.04em", color: "#0E0F0E", lineHeight: 1 }}>
+                <div style={{ padding: "12px 12px 10px" }}>
+                  <div className="flex items-center justify-between gap-2" style={{ minHeight: 20 }}>
+                    <div style={{
+                      fontFamily: "Unbounded", fontWeight: 800,
+                      fontSize: 15, letterSpacing: "0.04em",
+                      color: "#0E0F0E", lineHeight: 1,
+                    }}>
                       {line.id}
                     </div>
                     {line.popular ? (
-                      <span style={{ background: "#0E0F0E", color: "#D4AF37", borderRadius: 50, padding: "3px 7px", fontFamily: "Inter", fontWeight: 700, fontSize: 9, letterSpacing: "0.08em" }}>ХИТ</span>
+                      <span style={{
+                        background: "#0E0F0E", color: "#D4AF37",
+                        borderRadius: 50, padding: "3px 7px",
+                        fontFamily: "Inter", fontWeight: 700, fontSize: 9, letterSpacing: "0.08em",
+                      }}>ХИТ</span>
                     ) : active ? (
-                      <span className="grid place-items-center rounded-full" style={{ width: 20, height: 20, background: line.accent, color: "#FFFFFF" }}>
+                      <span
+                        key="check"
+                        className="grid place-items-center rounded-full check-pop"
+                        style={{ width: 20, height: 20, background: line.accent, color: "#FFFFFF" }}
+                      >
                         <Check size={12} strokeWidth={3} />
                       </span>
                     ) : null}
                   </div>
-                  <div className="tabular mt-1.5" style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11.5, color: "#0E0F0E", letterSpacing: "0.01em" }}>
+                  <div className="tabular mt-1.5" style={{
+                    fontFamily: "Inter", fontWeight: 600, fontSize: 11,
+                    color: "#0E0F0E", letterSpacing: "0.01em",
+                  }}>
                     {line.kcal} ккал
                   </div>
-                  <div className="mt-0.5" style={{
-                    fontFamily: "Inter", fontSize: 11, color: "#888", lineHeight: 1.35,
+                  <div className="mt-1" style={{
+                    fontFamily: "Inter", fontSize: 11, color: "#8A8E88", lineHeight: 1.3,
                     display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
-                    overflow: "hidden", minHeight: 30,
+                    overflow: "hidden", minHeight: 28,
                   }}>
                     {line.desc}
                   </div>
                 </div>
-                <div style={{
-                  marginTop: "auto", width: "100%", aspectRatio: "1 / 1",
-                  background: `url(${line.image}) center/cover no-repeat`,
-                }} />
+                <SmartImage
+                  src={line.image}
+                  alt={line.title}
+                  light
+                  aspectRatio="1 / 1"
+                  style={{ marginTop: "auto", width: "100%" }}
+                />
               </button>
             );
           })}
@@ -509,20 +578,14 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
   return (
     <section id="menu" style={{ background: "#0E0F0E", padding: "56px 16px" }}>
       <div className="mx-auto max-w-6xl">
-        <div className="flex items-end justify-between flex-wrap gap-3">
-          <div>
-            <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-              Меню недели
-            </span>
-            <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 40px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-              Рацион{" "}
-              <span style={{ color: line.accent, transition: "color 250ms ease" }}>{line.id}</span>
-            </h2>
-            <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A" }}>
-              {line.desc} · {line.kcal} ккал
-            </p>
-          </div>
-        </div>
+        <SectionHeader
+          eyebrow="Меню недели"
+          title="Рацион"
+          titleAccent={<span style={{ color: line.accent }}>{line.id}</span>}
+          desc={`${line.desc} · ${line.kcal} ккал`}
+          dark
+          accent="#D4AF37"
+        />
 
         {/* Day pills — horizontal scroll, premium */}
         <div className="reveal mt-6 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 8, scrollSnapType: "x mandatory" }}>
@@ -579,12 +642,13 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
                 display: "flex", gap: 12, alignItems: "center",
               }}
             >
-              <div
-                className="shrink-0 grid place-items-center rounded-2xl overflow-hidden"
+              <SmartImage
+                src={line.image}
+                alt={d.name}
+                className="shrink-0 rounded-2xl"
                 style={{ width: 60, height: 60, background: "#0E0F0E" }}
-              >
-                <img src={line.image} alt="" loading="lazy" width={400} height={400} className="w-full h-full object-cover" />
-              </div>
+                aspectRatio="1 / 1"
+              />
               <div className="min-w-0 flex-1">
                 <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 10, color: line.accent, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   {d.meal}
@@ -648,9 +712,12 @@ function DishModal({ dish, onClose }: { dish: Dish; onClose: () => void }) {
           style={{ background: "rgba(0,0,0,0.6)", color: "#FFFFFF" }} aria-label="Закрыть">
           <X size={20} />
         </button>
-        <div style={{ height: 220, overflow: "hidden", borderRadius: "24px 24px 0 0", background: "#0E0F0E" }}>
-          <img src={line.image} alt={dish.name} className="w-full h-full object-cover" />
-        </div>
+        <SmartImage
+          src={line.image}
+          alt={dish.name}
+          style={{ height: 220, borderRadius: "24px 24px 0 0", background: "#0E0F0E" }}
+          aspectRatio="auto"
+        />
 
         <div className="p-5 space-y-5">
           <div>
@@ -731,15 +798,12 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   return (
     <section id="calc" style={{ background: "#F7F7F5", padding: "56px 16px" }}>
       <div className="mx-auto max-w-2xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Калькулятор КБЖУ
-        </span>
-        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
-          Рассчитай норму
-        </h2>
-        <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 15, color: "#555" }}>
-          Подберём рацион под твои параметры
-        </p>
+        <SectionHeader
+          eyebrow="Калькулятор КБЖУ"
+          title="Рассчитай норму"
+          desc="Подберём рацион под твои параметры"
+          accent="#2E7D32"
+        />
 
         <div className="reveal mt-6 space-y-5 rounded-3xl" style={{ background: "#FFFFFF", padding: 24, boxShadow: "0 24px 60px -30px rgba(0,0,0,0.25)" }}>
           <div>
@@ -861,15 +925,13 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
   return (
     <section style={{ background: "#0E0F0E", padding: "56px 16px" }}>
       <div className="mx-auto max-w-6xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Подписки
-        </span>
-        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-          Выбери формат
-        </h2>
-        <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A" }}>
-          Чем длиннее период — тем выгоднее
-        </p>
+        <SectionHeader
+          eyebrow="Подписки"
+          title="Выбери формат"
+          desc="Чем длиннее период — тем выгоднее"
+          dark
+          accent="#D4AF37"
+        />
 
         <div className="mt-6 grid sm:grid-cols-3" style={{ gap: 12 }}>
           {plans.map((p) => (
@@ -933,12 +995,12 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
   return (
     <section id="delivery" style={{ background: "#FFFFFF", padding: "56px 16px" }}>
       <div className="mx-auto max-w-6xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#2E7D32", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Доставка
-        </span>
-        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(26px, 3.5vw, 34px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
-          Привезём свежее
-        </h2>
+        <SectionHeader
+          eyebrow="Доставка"
+          title="Привезём свежее"
+          desc="Ежедневно по Ростову, бесплатно — выберите удобный слот"
+          accent="#2E7D32"
+        />
 
         <div className="mt-6 grid sm:grid-cols-2" style={{ gap: 12 }}>
           <div className="reveal" style={{ background: "#E8F5E9", borderRadius: 20, padding: 20 }}>
@@ -993,12 +1055,13 @@ function FAQSection() {
   return (
     <section id="faq" style={{ background: "#0E0F0E", padding: "56px 16px" }}>
       <div className="mx-auto max-w-2xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          FAQ
-        </span>
-        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-          Частые вопросы
-        </h2>
+        <SectionHeader
+          eyebrow="FAQ"
+          title="Частые вопросы"
+          desc="Коротко о доставке, меню и оформлении заявки"
+          dark
+          accent="#D4AF37"
+        />
 
         <div className="reveal mt-6">
           {FAQ.map((item, i) => {
@@ -1076,15 +1139,13 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
       padding: "40px 16px",
     }}>
       <div className="mx-auto max-w-xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Заявка
-        </span>
-        <h2 className="reveal mt-1.5" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(24px, 4vw, 32px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-          Оставь заявку
-        </h2>
-        <p className="reveal mt-1" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>
-          Ответим в Telegram за 30 минут
-        </p>
+        <SectionHeader
+          eyebrow="Заявка"
+          title="Оставь заявку"
+          desc="Ответим в Telegram за 30 минут"
+          dark
+          accent="#D4AF37"
+        />
 
         {sent ? (
           <div className="reveal in mt-5 animate-fade-in" style={{

@@ -508,7 +508,7 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
               <span style={{ color: line.accent, transition: "color 250ms ease" }}>{line.id}</span>
             </h2>
             <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A" }}>
-              {line.desc} · {line.kcal}
+              {line.desc} · {line.kcal} ккал
             </p>
           </div>
         </div>

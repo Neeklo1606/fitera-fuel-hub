@@ -542,30 +542,34 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
           </div>
         </div>
 
-        {/* Day circles */}
-        <div className="reveal mt-6 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 8 }}>
+        {/* Day pills — horizontal scroll, premium */}
+        <div className="reveal mt-6 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 8, scrollSnapType: "x mandatory" }}>
           {DAYS.map((d, i) => {
             const active = i === day;
             return (
               <button
                 key={d}
                 onClick={() => pickDay(i)}
-                className="press shrink-0 flex flex-col items-center justify-center rounded-2xl"
+                className="press shrink-0 inline-flex items-center justify-center rounded-full"
                 style={{
-                  width: 56, height: 64,
-                  background: active ? "#D4AF37" : "#161816",
+                  height: 44, padding: "0 16px", minWidth: 64,
+                  scrollSnapAlign: "start",
+                  background: active ? "#D4AF37" : "transparent",
                   color: active ? "#0E0F0E" : "#A0A89A",
-                  border: active ? "none" : "1px solid #2A2E2A",
-                  fontFamily: "Inter", fontWeight: 700,
-                  transition: "all 200ms ease",
+                  border: `1px solid ${active ? "#D4AF37" : "#2A2E2A"}`,
+                  fontFamily: "Inter", fontWeight: 700, fontSize: 13,
+                  letterSpacing: "0.02em",
+                  transition: "background 200ms ease, color 200ms ease, border-color 200ms ease",
+                  whiteSpace: "nowrap",
                 }}
               >
-                <span style={{ fontSize: 12, opacity: 0.7 }}>{d}</span>
-                <span style={{ fontSize: 16, fontWeight: 800 }}>{i + 1}</span>
+                <span style={{ opacity: active ? 0.65 : 0.7, marginRight: 6 }}>{d}</span>
+                <span className="tabular" style={{ fontWeight: 800 }}>{i + 1}</span>
               </button>
             );
           })}
         </div>
+
 
         <div className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 13, color: "#7A8278" }}>
           {DAYS_FULL[day]}

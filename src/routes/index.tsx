@@ -925,15 +925,13 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
   return (
     <section style={{ background: "#0E0F0E", padding: "56px 16px" }}>
       <div className="mx-auto max-w-6xl">
-        <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 12, color: "#D4AF37", letterSpacing: "0.12em", textTransform: "uppercase" }}>
-          Подписки
-        </span>
-        <h2 className="reveal mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: "clamp(28px, 4vw, 38px)", lineHeight: 1.1, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-          Выбери формат
-        </h2>
-        <p className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A" }}>
-          Чем длиннее период — тем выгоднее
-        </p>
+        <SectionHeader
+          eyebrow="Подписки"
+          title="Выбери формат"
+          desc="Чем длиннее период — тем выгоднее"
+          dark
+          accent="#D4AF37"
+        />
 
         <div className="mt-6 grid sm:grid-cols-3" style={{ gap: 12 }}>
           {plans.map((p) => (

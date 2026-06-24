@@ -407,17 +407,17 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                 key={line.id}
                 onClick={() => onSelect(line.id)}
                 aria-pressed={active}
-                className="press relative text-left"
+                className={`press relative text-left ${active ? "tile-active" : ""}`}
                 style={{
                   background: active ? line.tint : "#FFFFFF",
                   border: `1.5px solid ${active ? line.accent : "rgba(0,0,0,0.06)"}`,
                   borderRadius: 22,
                   padding: 14,
+                  ["--tile-accent" as never]: `${line.accent}66`,
                   boxShadow: active
                     ? `0 14px 32px -14px ${line.accent}80, inset 0 0 0 1px ${line.accent}33`
                     : "0 2px 6px rgba(0,0,0,0.03)",
-                  transition: "all 220ms cubic-bezier(.2,.7,.2,1)",
-                  transform: active ? "translateY(-2px)" : "none",
+                  transition: "background 240ms ease, border-color 240ms ease, box-shadow 240ms ease",
                   minHeight: 132,
                   display: "flex",
                   flexDirection: "column",

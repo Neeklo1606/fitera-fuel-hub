@@ -405,16 +405,16 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                 aria-pressed={active}
                 className={`press relative text-left ${active ? "tile-active" : ""}`}
                 style={{
-                  background: active ? line.tint : "#FFFFFF",
-                  border: `1.5px solid ${active ? line.accent : "rgba(0,0,0,0.06)"}`,
-                  borderRadius: 22,
+                  background: "#FFFFFF",
+                  border: `1px solid ${active ? line.accent : "rgba(15,17,15,0.08)"}`,
+                  borderRadius: 20,
                   padding: 14,
-                  ["--tile-accent" as never]: `${line.accent}66`,
+                  ["--tile-accent" as never]: `${line.accent}55`,
                   boxShadow: active
-                    ? `0 14px 32px -14px ${line.accent}80, inset 0 0 0 1px ${line.accent}33`
-                    : "0 2px 6px rgba(0,0,0,0.03)",
-                  transition: "background 240ms ease, border-color 240ms ease, box-shadow 240ms ease",
-                  minHeight: 132,
+                    ? `inset 0 0 0 1px ${line.accent}`
+                    : "none",
+                  transition: "border-color 220ms ease, box-shadow 220ms ease",
+                  minHeight: 128,
                   display: "flex",
                   flexDirection: "column",
                   justifyContent: "space-between",
@@ -425,13 +425,12 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                   <div
                     className="grid place-items-center rounded-2xl shrink-0"
                     style={{
-                      width: 44, height: 44,
-                      background: active ? line.accent : line.tint,
-                      color: active ? "#FFFFFF" : line.accent,
-                      transition: "all 220ms ease",
+                      width: 40, height: 40,
+                      background: line.tint,
+                      color: line.accent,
                     }}
                   >
-                    <Icon size={22} strokeWidth={2.2} />
+                    <Icon size={20} strokeWidth={2.2} />
                   </div>
                   {line.popular ? (
                     <span style={{
@@ -444,9 +443,9 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                   ) : active ? (
                     <span
                       className="grid place-items-center rounded-full"
-                      style={{ width: 22, height: 22, background: line.accent, color: "#FFFFFF" }}
+                      style={{ width: 20, height: 20, background: line.accent, color: "#FFFFFF" }}
                     >
-                      <Check size={13} strokeWidth={3} />
+                      <Check size={12} strokeWidth={3} />
                     </span>
                   ) : null}
                 </div>
@@ -454,16 +453,13 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
                 {/* Bottom: title + meta */}
                 <div className="mt-3">
                   <div style={{
-                    fontFamily: "Unbounded", fontWeight: 800, fontSize: 16,
-                    letterSpacing: "-0.02em", color: "#0E0F0E", lineHeight: 1.1,
+                    fontFamily: "Unbounded", fontWeight: 700, fontSize: 15,
+                    letterSpacing: "-0.02em", color: "#0E0F0E", lineHeight: 1.15,
                   }}>
                     {line.title}
                   </div>
-                  <div className="tabular mt-1" style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11, color: active ? line.accent : "#888", letterSpacing: "0.02em" }}>
+                  <div className="tabular mt-1" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 11, color: "#888", letterSpacing: "0.01em" }}>
                     {line.kcal} ккал
-                  </div>
-                  <div className="mt-0.5" style={{ fontFamily: "Inter", fontSize: 11, color: "#888", lineHeight: 1.35 }}>
-                    {line.desc}
                   </div>
                 </div>
               </button>
@@ -546,30 +542,34 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
           </div>
         </div>
 
-        {/* Day circles */}
-        <div className="reveal mt-6 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 8 }}>
+        {/* Day pills — horizontal scroll, premium */}
+        <div className="reveal mt-6 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 8, scrollSnapType: "x mandatory" }}>
           {DAYS.map((d, i) => {
             const active = i === day;
             return (
               <button
                 key={d}
                 onClick={() => pickDay(i)}
-                className="press shrink-0 flex flex-col items-center justify-center rounded-2xl"
+                className="press shrink-0 inline-flex items-center justify-center rounded-full"
                 style={{
-                  width: 56, height: 64,
-                  background: active ? "#D4AF37" : "#161816",
+                  height: 44, padding: "0 16px", minWidth: 64,
+                  scrollSnapAlign: "start",
+                  background: active ? "#D4AF37" : "transparent",
                   color: active ? "#0E0F0E" : "#A0A89A",
-                  border: active ? "none" : "1px solid #2A2E2A",
-                  fontFamily: "Inter", fontWeight: 700,
-                  transition: "all 200ms ease",
+                  border: `1px solid ${active ? "#D4AF37" : "#2A2E2A"}`,
+                  fontFamily: "Inter", fontWeight: 700, fontSize: 13,
+                  letterSpacing: "0.02em",
+                  transition: "background 200ms ease, color 200ms ease, border-color 200ms ease",
+                  whiteSpace: "nowrap",
                 }}
               >
-                <span style={{ fontSize: 12, opacity: 0.7 }}>{d}</span>
-                <span style={{ fontSize: 16, fontWeight: 800 }}>{i + 1}</span>
+                <span style={{ opacity: active ? 0.65 : 0.7, marginRight: 6 }}>{d}</span>
+                <span className="tabular" style={{ fontWeight: 800 }}>{i + 1}</span>
               </button>
             );
           })}
         </div>
+
 
         <div className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 13, color: "#7A8278" }}>
           {DAYS_FULL[day]}
@@ -768,10 +768,12 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 return (
                   <button key={s} onClick={() => setSex(s)} className="press"
                     style={{
-                      flex: 1, height: 52, borderRadius: 14,
+                      flex: 1, minWidth: 0, height: 52, borderRadius: 14,
                       background: active ? "#0E0F0E" : "#F5F5F5",
                       color: active ? "#FFFFFF" : "#555",
-                      fontFamily: "Inter", fontWeight: 600, fontSize: 15,
+                      fontFamily: "Inter", fontWeight: 600,
+                      fontSize: "clamp(13px, 3.6vw, 15px)",
+                      whiteSpace: "nowrap", padding: "0 8px",
                       transition: "all 180ms ease",
                     }}>{s === "M" ? "Мужчина" : "Женщина"}</button>
                 );
@@ -815,11 +817,13 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 return (
                   <button key={k} onClick={() => setGoal(k)} className="press"
                     style={{
-                      flex: 1, height: 52, borderRadius: 14,
+                      flex: 1, minWidth: 0, height: 52, borderRadius: 14,
                       background: active ? "#0E0F0E" : "#F5F5F5",
                       color: active ? "#FFFFFF" : "#555",
-                      fontFamily: "Inter", fontWeight: 600, fontSize: 14,
-                      whiteSpace: "nowrap",
+                      fontFamily: "Inter", fontWeight: 600,
+                      fontSize: "clamp(12px, 3.4vw, 14px)",
+                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                      padding: "0 8px",
                     }}>{l}</button>
                 );
               })}
@@ -1101,19 +1105,57 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
         </p>
 
         {sent ? (
-          <div className="reveal in mt-5 animate-fade-in text-center" style={{
-            background: "#161816", border: "1px solid #2E7D32", borderRadius: 20, padding: 28,
+          <div className="reveal in mt-5 animate-fade-in" style={{
+            background: "#161816", border: "1px solid #2A2E2A", borderRadius: 20, padding: 22,
           }}>
-            <div className="mx-auto grid place-items-center rounded-full"
-              style={{ width: 56, height: 56, background: "#2E7D32" }}>
-              <Check size={28} color="#FFFFFF" strokeWidth={3} />
+            <div className="flex items-center gap-3">
+              <div className="grid place-items-center rounded-full shrink-0"
+                style={{ width: 44, height: 44, background: "#2E7D32" }}>
+                <Check size={22} color="#FFFFFF" strokeWidth={3} />
+              </div>
+              <div className="min-w-0">
+                <div style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 18, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+                  Заявка принята
+                </div>
+                <div className="mt-0.5" style={{ fontFamily: "Inter", fontSize: 12.5, color: "#A0A89A" }}>
+                  Напишем в Telegram за 30 минут
+                </div>
+              </div>
             </div>
-            <div className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
-              Заявка принята
+
+            <div className="mt-4 rounded-2xl" style={{ background: "#0E0F0E", border: "1px solid #2A2E2A", padding: 14 }}>
+              <div style={{ fontFamily: "Inter", fontSize: 10.5, color: "#7A8278", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                Ваш заказ
+              </div>
+              <dl className="mt-2 space-y-1.5" style={{ fontFamily: "Inter", fontSize: 13 }}>
+                {[
+                  ["Имя", state.name || "—"],
+                  ["Телефон", state.phone || "—"],
+                  ["Рацион", LINES.find((l) => l.id === state.line)?.title ?? state.line],
+                  ["Период", state.period],
+                  ["Адрес", state.address || "—"],
+                  ["Слот", state.slot],
+                  ...(state.messenger ? [["Telegram", state.messenger]] as const : [] as const),
+                ].map(([k, v]) => (
+                  <div key={k} className="flex gap-3 justify-between">
+                    <dt style={{ color: "#7A8278" }}>{k}</dt>
+                    <dd className="text-right min-w-0" style={{ color: "#FFFFFF", fontWeight: 500, wordBreak: "break-word" }}>{v}</dd>
+                  </div>
+                ))}
+              </dl>
             </div>
-            <p className="mt-1.5" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A", lineHeight: 1.5 }}>
-              Напишем в Telegram в течение 30 минут.
-            </p>
+
+            <button
+              onClick={() => setSent(false)}
+              className="press mt-4 w-full"
+              style={{
+                height: 48, borderRadius: 50,
+                background: "transparent", border: "1px solid #2A2E2A",
+                color: "#FFFFFF", fontFamily: "Inter", fontWeight: 600, fontSize: 14,
+              }}
+            >
+              Изменить заявку
+            </button>
           </div>
         ) : (
           <form onSubmit={submit} className="reveal mt-4 space-y-2.5">

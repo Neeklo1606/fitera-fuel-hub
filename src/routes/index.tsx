@@ -132,15 +132,11 @@ const WEEK_MENU: Record<LineId, Dish[][]> = {
   ]),
 };
 
-// Generates 7 days of menus by lightly rotating/permuting the base 4-meal day
+// Generates 7 days of menus by lightly rotating the base 4-meal day.
+// Keep names clean — no "вариант N" suffixes that bloat the UI.
 function makeWeekFromBase(base: Dish[]): Dish[][] {
-  const dayNames = ["", " · вариант 2", " · вариант 3", " · вариант 4", " · вариант 5", " · вариант 6", " · вариант 7"];
-  return dayNames.map((suffix, i) =>
-    base.map((d) => ({
-      ...d,
-      name: i === 0 ? d.name : d.name + suffix,
-      kcal: d.kcal + (i * 5) - 10,
-    })),
+  return Array.from({ length: 7 }, (_, i) =>
+    base.map((d) => ({ ...d, kcal: d.kcal + i * 5 - 10 })),
   );
 }
 

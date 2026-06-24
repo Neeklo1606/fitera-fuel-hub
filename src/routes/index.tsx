@@ -815,11 +815,13 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 return (
                   <button key={k} onClick={() => setGoal(k)} className="press"
                     style={{
-                      flex: 1, height: 52, borderRadius: 14,
+                      flex: 1, minWidth: 0, height: 52, borderRadius: 14,
                       background: active ? "#0E0F0E" : "#F5F5F5",
                       color: active ? "#FFFFFF" : "#555",
-                      fontFamily: "Inter", fontWeight: 600, fontSize: 14,
-                      whiteSpace: "nowrap",
+                      fontFamily: "Inter", fontWeight: 600,
+                      fontSize: "clamp(12px, 3.4vw, 14px)",
+                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+                      padding: "0 8px",
                     }}>{l}</button>
                 );
               })}

@@ -519,25 +519,12 @@ function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id:
 
 function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDish: (d: Dish) => void; onOrder: () => void }) {
   const [day, setDay] = useState(0);
-  const [fade, setFade] = useState(true);
   const line = LINES.find((l) => l.id === lineId)!;
   const dayMeals = WEEK_MENU[lineId][day];
 
-  // re-trigger fade when line changes
-  const prevLine = useRef<LineId>(lineId);
-  useEffect(() => {
-    if (prevLine.current !== lineId) {
-      setFade(false);
-      const t = setTimeout(() => setFade(true), 180);
-      prevLine.current = lineId;
-      return () => clearTimeout(t);
-    }
-  }, [lineId]);
-
   function pickDay(i: number) {
     if (i === day) return;
-    setFade(false);
-    setTimeout(() => { setDay(i); setFade(true); }, 180);
+    setDay(i);
   }
 
   const totalKcal = dayMeals.reduce((s, d) => s + d.kcal, 0);

@@ -579,14 +579,13 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
           {DAYS_FULL[day]}
         </div>
 
-        {/* Dishes */}
+        {/* Dishes — re-mount on line/day change to retrigger animation */}
         <div
-          className="mt-5 grid"
+          key={`${lineId}-${day}`}
+          className="mt-5 grid menu-anim"
           style={{
             gridTemplateColumns: "1fr",
             gap: 1,
-            opacity: fade ? 1 : 0,
-            transition: "opacity 200ms ease",
             borderRadius: 24,
             overflow: "hidden",
             background: "#2A2E2A",

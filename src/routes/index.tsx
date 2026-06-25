@@ -919,13 +919,13 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
           </div>
 
           {/* Result column */}
-          <div className="reveal rounded-3xl flex flex-col" style={{
+          <div className="reveal rounded-3xl flex flex-col md:sticky md:top-20" style={{
             background: result
               ? "linear-gradient(160deg, #0E0F0E 0%, #1B2E1B 100%)"
               : "#FFFFFF",
-            padding: 24, minHeight: 360,
+            padding: 24, minHeight: result ? 360 : 280,
             border: result ? "none" : "1.5px dashed #E0E0DC",
-            boxShadow: result ? "0 24px 60px -30px rgba(46,125,50,0.4)" : "none",
+            boxShadow: result ? "0 24px 60px -30px rgba(46,125,50,0.4)" : "0 12px 30px -20px rgba(0,0,0,0.1)",
             transition: "background 320ms ease",
           }}>
             {result ? (

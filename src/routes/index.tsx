@@ -540,40 +540,40 @@ function LinesSection({ selected, openId, onOpen, onChoose }: {
 
                 <div
                   style={{
-                    maxHeight: isOpen ? 480 : 0,
+                    maxHeight: isOpen ? 420 : 0,
                     overflow: "hidden",
                     transition: "max-height 320ms cubic-bezier(.2,.7,.2,1)",
                   }}
                 >
-                  <div className="grid md:grid-cols-[160px_1fr] gap-4" style={{ padding: "4px 16px 16px" }}>
+                  <div className="grid md:grid-cols-[120px_1fr] gap-4" style={{ padding: "4px 16px 14px" }}>
                     <SmartImage
                       src={line.image}
                       alt={line.title}
                       light
                       eager
                       aspectRatio="1 / 1"
-                      style={{ borderRadius: 14, width: "100%", maxWidth: 160 }}
+                      style={{ borderRadius: 12, width: "100%", maxWidth: 120 }}
                     />
                     <div className="flex flex-col">
                       <div className="tabular sm:hidden mb-2" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 14, color: "#0E0F0E" }}>
                         {line.priceFrom} <span style={{ color: "#888", fontWeight: 500, fontSize: 11 }}>/ день</span>
                       </div>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1.5">
                         {line.features.map((f) => (
-                          <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#2A2E2A" }}>
+                          <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13, color: "#2A2E2A" }}>
                             <span className="grid place-items-center rounded-full shrink-0 mt-0.5"
-                              style={{ width: 16, height: 16, background: line.accent, color: "#FFFFFF" }}>
-                              <Check size={10} strokeWidth={3} />
+                              style={{ width: 14, height: 14, background: line.accent, color: "#FFFFFF" }}>
+                              <Check size={9} strokeWidth={3} />
                             </span>
                             {f}
                           </li>
                         ))}
                       </ul>
-                      <button onClick={() => onChoose(line.id)} className="press rounded-full mt-4 inline-flex items-center justify-center gap-2 self-start"
+                      <button onClick={() => onChoose(line.id)} className="press rounded-full mt-3 inline-flex items-center justify-center gap-2 self-start"
                         style={{
                           background: "#0E0F0E", color: "#FFFFFF",
-                          height: 44, padding: "0 22px",
-                          fontFamily: "Inter", fontWeight: 600, fontSize: 13.5,
+                          height: 40, padding: "0 18px",
+                          fontFamily: "Inter", fontWeight: 600, fontSize: 13,
                         }}>
                         Выбрать рацион <ArrowRight size={14} />
                       </button>

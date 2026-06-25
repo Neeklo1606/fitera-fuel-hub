@@ -718,7 +718,7 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
 
 /* ────────── Dish Modal (bottom sheet) ────────── */
 
-function DishModal({ dish, onClose }: { dish: Dish; onClose: () => void }) {
+function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void; onOrder: (line: LineId) => void }) {
   const line = LINES.find((l) => l.id === dish.line)!;
   useEffect(() => {
     const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -731,60 +731,61 @@ function DishModal({ dish, onClose }: { dish: Dish; onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in"
       style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }} onClick={onClose}>
       <div onClick={(e) => e.stopPropagation()}
-        className="relative w-full sm:max-w-[480px] max-h-[92vh] overflow-y-auto animate-slide-up"
+        className="relative w-full sm:max-w-[440px] animate-slide-up"
         style={{ background: "#161816", borderRadius: "24px 24px 0 0", border: "1px solid #2A2E2A" }}>
         <div className="mx-auto mt-2.5 mb-1 rounded-full sm:hidden" style={{ width: 40, height: 4, background: "#2A2E2A" }} />
-        <button onClick={onClose} className="absolute top-3 right-3 z-10 h-10 w-10 grid place-items-center rounded-full"
+        <button onClick={onClose} className="absolute top-2.5 right-2.5 z-10 h-9 w-9 grid place-items-center rounded-full"
           style={{ background: "rgba(0,0,0,0.6)", color: "#FFFFFF" }} aria-label="Закрыть">
-          <X size={20} />
+          <X size={18} />
         </button>
         <SmartImage
           src={line.image}
           alt={dish.name}
-          style={{ background: "#0E0F0E" }}
-          aspectRatio="16 / 10"
+          style={{ background: "#0E0F0E", borderRadius: "24px 24px 0 0" }}
+          aspectRatio="16 / 9"
         />
 
-        <div className="p-5 space-y-5">
+        <div className="p-4 space-y-3">
           <div>
-            <span style={{ background: line.accent, color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 11, padding: "4px 10px", borderRadius: 50 }}>
+            <span style={{ background: line.accent, color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 10, padding: "3px 9px", borderRadius: 50 }}>
               {dish.line}
             </span>
-            <h3 className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, lineHeight: 1.2, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+            <h3 className="mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 18, lineHeight: 1.2, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
               {dish.name}
             </h3>
           </div>
 
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-1.5">
             {[
               { l: "ккал", v: dish.kcal },
-              { l: "Белки", v: dish.p },
-              { l: "Жиры", v: dish.f },
-              { l: "Углев.", v: dish.c },
+              { l: "Б", v: dish.p },
+              { l: "Ж", v: dish.f },
+              { l: "У", v: dish.c },
             ].map((m) => (
-              <div key={m.l} className="rounded-xl p-3 text-center" style={{ background: "#1C1E1C" }}>
-                <div style={{ fontSize: 10, color: "#A0A89A", textTransform: "uppercase", letterSpacing: "0.06em" }}>{m.l}</div>
-                <div className="tabular mt-1" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 18, color: "#D4AF37" }}>{m.v}</div>
+              <div key={m.l} className="rounded-lg py-2 text-center" style={{ background: "#1C1E1C" }}>
+                <div style={{ fontSize: 9, color: "#A0A89A", textTransform: "uppercase", letterSpacing: "0.06em" }}>{m.l}</div>
+                <div className="tabular mt-0.5" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 15, color: "#D4AF37" }}>{m.v}</div>
               </div>
             ))}
           </div>
 
           <div>
-            <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 11, color: "#A0A89A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>СОСТАВ</div>
-            <ul className="space-y-1.5">
-              {dish.ingredients.split(", ").map((i) => (
-                <li key={i} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 14, color: "#FFFFFF" }}>
-                  <span style={{ marginTop: 7, width: 4, height: 4, borderRadius: 9999, background: "#2E7D32", flexShrink: 0 }} />
-                  {i}
-                </li>
-              ))}
-            </ul>
+            <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 10, color: "#A0A89A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Состав</div>
+            <p style={{ fontFamily: "Inter", fontSize: 13, lineHeight: 1.5, color: "#E5E7E0" }}>{dish.ingredients}</p>
           </div>
+
+          <button
+            onClick={() => { onOrder(dish.line); onClose(); }}
+            className="press w-full rounded-full inline-flex items-center justify-center gap-2"
+            style={{ height: 48, background: "linear-gradient(180deg,#E6C04A 0%,#D4AF37 100%)", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 24px rgba(212,175,55,0.28)" }}>
+            Заказать {dish.line} <ArrowRight size={16} />
+          </button>
         </div>
       </div>
     </div>
   );
 }
+
 
 /* ────────── Calculator ────────── */
 

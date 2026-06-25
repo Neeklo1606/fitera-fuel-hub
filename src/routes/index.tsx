@@ -10,6 +10,9 @@ import lineBalance from "../assets/line-balance.jpg";
 import linePower from "../assets/line-power.jpg";
 import lineMom from "../assets/line-mom.jpg";
 import linePro from "../assets/line-pro.jpg";
+import fiteraLogoAsset from "../assets/fitera-logo.png.asset.json";
+
+const FITERA_LOGO = fiteraLogoAsset.url;
 
 // Real Unsplash food photo — dark, premium plate composition
 const HERO_BG =
@@ -294,30 +297,17 @@ function ScrollProgress() {
 
 /* ────────── Logo / Navbar ────────── */
 
-function Logo({ size = 36 }: { size?: number }) {
+function Logo({ size = 40 }: { size?: number }) {
   return (
-    <a href="#top" className="flex items-center gap-2.5 select-none">
-      <div
-        className="grid place-items-center rounded-[10px] text-white shrink-0"
-        style={{
-          background: "linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%)",
-          width: size, height: size,
-          fontFamily: "Unbounded", fontWeight: 900, fontSize: size * 0.5,
-          boxShadow: "0 4px 12px rgba(46,125,50,0.35), inset 0 1px 0 rgba(255,255,255,0.18)",
-        }}
-      >
-        F
-      </div>
-      <div className="leading-none">
-        <div style={{
-          fontFamily: "Unbounded", fontWeight: 800, fontSize: 17,
-          letterSpacing: "-0.02em", color: "#FFFFFF",
-        }}>FITERA</div>
-        <div style={{
-          fontFamily: "Inter", fontWeight: 600, fontSize: 8,
-          color: "#D4AF37", letterSpacing: "0.18em", marginTop: 3, textTransform: "uppercase",
-        }}>Ешь для результата</div>
-      </div>
+    <a href="#top" aria-label="FITERA — Ешь для результата" className="flex items-center select-none shrink-0">
+      <img
+        src={FITERA_LOGO}
+        alt="FITERA — Ешь для результата"
+        width={size * 3.2}
+        height={size}
+        style={{ height: size, width: "auto", display: "block" }}
+        decoding="async"
+      />
     </a>
   );
 }

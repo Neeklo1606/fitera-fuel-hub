@@ -1352,6 +1352,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
             <input
               style={fieldStyle}
               type="text"
+              list="addr-suggest"
               autoComplete="street-address"
               placeholder="Адрес доставки: ул., дом, кв."
               value={state.address}
@@ -1360,6 +1361,9 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
               onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
               onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"}
             />
+            <datalist id="addr-suggest">
+              {addrSuggest.map((s) => <option key={s} value={s} />)}
+            </datalist>
 
 
             <button type="submit" className="press"

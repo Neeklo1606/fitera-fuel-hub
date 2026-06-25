@@ -1342,16 +1342,11 @@ function Footer() {
         </a>
 
         <div className="mt-5 flex" style={{ gap: 10 }}>
-          {[
-            { Icon: Send, href: "https://t.me/fitera_rstv", label: "Telegram" },
-            { Icon: Instagram, href: "https://instagram.com/fitera.food", label: "Instagram" },
-          ].map(({ Icon, href, label }) => (
-            <a key={label} href={href} aria-label={label}
-              className="grid place-items-center rounded-full"
-              style={{ width: 36, height: 36, background: "#1A1E1A", color: "#D4AF37" }}>
-              <Icon size={16} />
-            </a>
-          ))}
+          <a href="https://t.me/fitera_rstv" aria-label="Telegram"
+            className="grid place-items-center rounded-full"
+            style={{ width: 36, height: 36, background: "#1A1E1A", color: "#D4AF37" }}>
+            <Send size={16} />
+          </a>
         </div>
 
         <div className="mt-6" style={{ fontFamily: "Inter", fontSize: 12, color: "#555" }}>

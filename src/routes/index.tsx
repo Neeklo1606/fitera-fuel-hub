@@ -1288,6 +1288,18 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
                 onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"}
               />
             </div>
+            <input
+              style={fieldStyle}
+              type="text"
+              autoComplete="street-address"
+              placeholder="Адрес доставки: ул., дом, кв."
+              value={state.address}
+              onChange={(e) => set("address", e.target.value)}
+              required
+              onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
+              onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"}
+            />
+
 
             <button type="submit" className="press"
               style={{

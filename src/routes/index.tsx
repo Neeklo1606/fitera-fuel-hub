@@ -281,7 +281,6 @@ function Logo({ size = 36 }: { size?: number }) {
 }
 
 function Navbar({ onOrder }: { onOrder: () => void }) {
-  const [open, setOpen] = useState(false);
   const items = [
     { l: "Рационы", h: "#lines" }, { l: "Меню", h: "#menu" },
     { l: "Калории", h: "#calc" }, { l: "Подписки", h: "#subs" },
@@ -290,9 +289,9 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
   return (
     <header
       className="sticky z-40 backdrop-blur-xl"
-      style={{ top: 2, background: "rgba(14,15,14,0.75)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      style={{ top: 2, background: "rgba(14,15,14,0.78)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
     >
-      <div className="mx-auto px-4 flex items-center justify-between" style={{ maxWidth: 1200, height: 64 }}>
+      <div className="mx-auto px-4 flex items-center justify-between gap-2" style={{ maxWidth: 1200, height: 56 }}>
         <Logo />
         <nav className="hidden lg:flex items-center gap-7">
           {items.map((i) => (
@@ -300,44 +299,26 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <a href="tel:+79991234567" className="hidden md:inline-block text-sm font-semibold" style={{ color: "#FFFFFF" }}>
+          <a
+            href="tel:+79991234567"
+            aria-label="Позвонить"
+            className="press lg:hidden grid place-items-center rounded-full"
+            style={{ width: 40, height: 40, background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.35)", color: "#D4AF37" }}
+          >
+            <Phone size={17} />
+          </a>
+          <a href="tel:+79991234567" className="hidden lg:inline-block text-sm font-semibold" style={{ color: "#FFFFFF" }}>
             +7 (999) 123-45-67
           </a>
           <button
             onClick={onOrder}
-            className="press rounded-full hidden md:inline-flex items-center gap-1.5"
-            style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 14, padding: "10px 18px" }}
+            className="press rounded-full inline-flex items-center gap-1.5"
+            style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 13, padding: "9px 16px" }}
           >
-            Заказать <ArrowRight size={14} />
-          </button>
-          <button
-            className="lg:hidden grid place-items-center rounded-xl"
-            style={{ width: 44, height: 44, color: "#FFFFFF" }}
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Меню"
-          >
-            {open ? <X size={22} /> : (
-              <span className="flex flex-col" style={{ gap: 5 }}>
-                <span style={{ width: 20, height: 2, background: "#fff", borderRadius: 2 }} />
-                <span style={{ width: 20, height: 2, background: "#fff", borderRadius: 2 }} />
-                <span style={{ width: 20, height: 2, background: "#fff", borderRadius: 2 }} />
-              </span>
-            )}
+            Заказать <ArrowRight size={13} />
           </button>
         </div>
       </div>
-      {open && (
-        <div className="lg:hidden animate-fade-in" style={{ borderTop: "1px solid #2A2E2A", background: "#0E0F0E" }}>
-          <div className="mx-auto px-4 py-3 flex flex-col" style={{ maxWidth: 1200 }}>
-            {items.map((i) => (
-              <a key={i.h} href={i.h} onClick={() => setOpen(false)} className="py-3 text-base"
-                style={{ borderBottom: "1px solid #1A1E1A", color: "#FFFFFF" }}>
-                {i.l}
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
     </header>
   );
 }

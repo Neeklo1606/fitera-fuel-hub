@@ -210,10 +210,10 @@ function useReveal() {
 }
 
 function SmartImage({
-  src, alt = "", className = "", style, light = false, aspectRatio = "1 / 1",
+  src, alt = "", className = "", style, light = false, aspectRatio = "1 / 1", eager = false,
 }: {
   src: string; alt?: string; className?: string; style?: React.CSSProperties;
-  light?: boolean; aspectRatio?: string;
+  light?: boolean; aspectRatio?: string; eager?: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
   return (
@@ -224,7 +224,7 @@ function SmartImage({
       <img
         src={src}
         alt={alt}
-        loading="lazy"
+        loading={eager ? "eager" : "lazy"}
         decoding="async"
         onLoad={() => setLoaded(true)}
         className={`img-fade ${loaded ? "loaded" : ""}`}
@@ -549,6 +549,7 @@ function LinesSection({ selected, openId, onOpen, onChoose }: {
                       src={line.image}
                       alt={line.title}
                       light
+                      eager
                       aspectRatio="1 / 1"
                       style={{ borderRadius: 14, width: "100%", maxWidth: 160 }}
                     />
@@ -612,22 +613,25 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
         />
 
         {/* Days — round pills */}
-        <div className="reveal mt-7 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 10, scrollSnapType: "x mandatory" }}>
+        <div className="reveal mt-7 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 12, paddingTop: 6, paddingBottom: 6, scrollSnapType: "x mandatory" }}>
           {DAYS.map((d, i) => {
             const active = i === day;
             return (
               <button
                 key={d}
                 onClick={() => setDay(i)}
+                aria-pressed={active}
+                aria-label={DAYS_FULL[i]}
                 className="press shrink-0 flex flex-col items-center justify-center rounded-full tile-trans"
                 style={{
                   width: 56, height: 56,
+                  aspectRatio: "1 / 1",
                   scrollSnapAlign: "start",
                   background: active ? "#D4AF37" : "transparent",
                   color: active ? "#0E0F0E" : "#A0A89A",
-                  border: `1.5px solid ${active ? "#D4AF37" : "#2A2E2A"}`,
+                  border: active ? "none" : "1.5px solid #2A2E2A",
                   fontFamily: "Inter",
-                  boxShadow: active ? "0 8px 22px -6px rgba(212,175,55,0.55)" : "none",
+                  boxShadow: active ? "0 0 0 4px rgba(212,175,55,0.18)" : "none",
                 }}
               >
                 <span style={{ fontSize: 10, fontWeight: 600, opacity: 0.7, letterSpacing: "0.05em" }}>{d}</span>
@@ -664,6 +668,7 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
                 src={line.image}
                 alt={d.name}
                 aspectRatio="4 / 3"
+                eager
                 style={{ width: "100%", background: "#0E0F0E" }}
               />
               <div className="flex-1 flex flex-col" style={{ padding: 12 }}>
@@ -791,16 +796,19 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   const [result, setResult] = useState<{ kcal: number; line: LineId } | null>(null);
 
   function compute() {
+    const a = Math.max(14, Math.min(100, age || 0));
+    const h = Math.max(120, Math.min(230, height || 0));
+    const w = Math.max(30, Math.min(250, weight || 0));
     const bmr = sex === "M"
-      ? 10 * weight + 6.25 * height - 5 * age + 5
-      : 10 * weight + 6.25 * height - 5 * age - 161;
+      ? 10 * w + 6.25 * h - 5 * a + 5
+      : 10 * w + 6.25 * h - 5 * a - 161;
     let kcal = Math.round(bmr * act);
-    if (goal === "loss") kcal -= 300;
-    if (goal === "gain") kcal += 300;
+    if (goal === "loss") kcal -= 400;
+    if (goal === "gain") kcal += 400;
     let line: LineId = "PRO";
-    if (kcal <= 1400) line = "LIGHT";
-    else if (kcal <= 1800) line = "BALANCE";
-    else if (kcal <= 2200) line = "POWER";
+    if (kcal <= 1450) line = "LIGHT";
+    else if (kcal <= 1850) line = "BALANCE";
+    else if (kcal <= 2300) line = "POWER";
     setResult({ kcal, line });
   }
 
@@ -834,14 +842,14 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 {(["M", "F"] as const).map((s) => {
                   const active = sex === s;
                   return (
-                    <button key={s} onClick={() => setSex(s)} className="press"
+                    <button key={s} onClick={() => setSex(s)} type="button" className="press inline-flex items-center justify-center"
                       style={{
                         flex: 1, minWidth: 0, height: 52, borderRadius: 14,
                         background: active ? "#0E0F0E" : "#F5F5F5",
                         color: active ? "#FFFFFF" : "#555",
                         fontFamily: "Inter", fontWeight: 600,
                         fontSize: "clamp(13px, 3.6vw, 15px)",
-                        whiteSpace: "nowrap",
+                        whiteSpace: "nowrap", textAlign: "center",
                         transition: "all 180ms ease",
                       }}>{s === "M" ? "Мужчина" : "Женщина"}</button>
                   );
@@ -883,14 +891,14 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 ] as const).map(([k, l]) => {
                   const active = goal === k;
                   return (
-                    <button key={k} onClick={() => setGoal(k)} className="press"
+                    <button key={k} onClick={() => setGoal(k)} type="button" className="press inline-flex items-center justify-center"
                       style={{
                         flex: 1, minWidth: 0, height: 52, borderRadius: 14,
                         background: active ? "#0E0F0E" : "#F5F5F5",
                         color: active ? "#FFFFFF" : "#555",
                         fontFamily: "Inter", fontWeight: 600,
                         fontSize: "clamp(12px, 3.4vw, 14px)",
-                        whiteSpace: "nowrap",
+                        whiteSpace: "nowrap", textAlign: "center",
                       }}>{l}</button>
                   );
                 })}
@@ -976,9 +984,9 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
   const plans = [
     { id: "1 день", price: "от 750 ₽", per: "за день", old: null as string | null, badge: null as string | null,
       features: ["4 приёма пищи", "Доставка сегодня", "Без подписки"], primary: false },
-    { id: "Неделя", price: "от 4 900 ₽", per: "−15%", old: "5 770 ₽", badge: "ПОПУЛЯРНО",
+    { id: "1 неделя", price: "от 4 900 ₽", per: "−15%", old: "5 770 ₽", badge: "ПОПУЛЯРНО",
       features: ["28 приёмов пищи", "Выбор линейки", "Скидка 15%"], primary: true },
-    { id: "Месяц", price: "от 19 500 ₽", per: "−20%", old: "24 000 ₽", badge: null,
+    { id: "1 месяц", price: "от 19 500 ₽", per: "−20%", old: "24 000 ₽", badge: null,
       features: ["Заморозка дней", "Приоритет", "Скидка 20%"], primary: false },
   ];
 
@@ -1177,7 +1185,25 @@ type OrderState = {
 function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: OrderState) => void }) {
   const [state, setState] = useState(initial);
   const [sent, setSent] = useState(false);
+  const [addrSuggest, setAddrSuggest] = useState<string[]>([]);
   useEffect(() => { setState(initial); }, [initial]);
+
+  // Address autocomplete via OpenStreetMap (no API key). Debounced + Rostov-bounded.
+  useEffect(() => {
+    const q = state.address.trim();
+    if (q.length < 3) { setAddrSuggest([]); return; }
+    const ctrl = new AbortController();
+    const t = setTimeout(async () => {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&accept-language=ru&countrycodes=ru&limit=5&q=${encodeURIComponent("Ростов-на-Дону, " + q)}`;
+        const r = await fetch(url, { signal: ctrl.signal, headers: { "Accept": "application/json" } });
+        if (!r.ok) return;
+        const data: Array<{ display_name: string }> = await r.json();
+        setAddrSuggest(data.map((d) => d.display_name).slice(0, 5));
+      } catch { /* ignore */ }
+    }, 350);
+    return () => { ctrl.abort(); clearTimeout(t); };
+  }, [state.address]);
 
   function set<K extends keyof OrderState>(k: K, v: OrderState[K]) {
     const next = { ...state, [k]: v }; setState(next); onUpdate(next);
@@ -1326,6 +1352,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
             <input
               style={fieldStyle}
               type="text"
+              list="addr-suggest"
               autoComplete="street-address"
               placeholder="Адрес доставки: ул., дом, кв."
               value={state.address}
@@ -1334,6 +1361,9 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
               onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
               onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"}
             />
+            <datalist id="addr-suggest">
+              {addrSuggest.map((s) => <option key={s} value={s} />)}
+            </datalist>
 
 
             <button type="submit" className="press"
@@ -1511,7 +1541,7 @@ function Landing() {
   const [selectedLine, setSelectedLine] = useState<LineId>("POWER");
   const [openLine, setOpenLine] = useState<LineId | null>("POWER");
   const [order, setOrder] = useState<OrderState>({
-    name: "", phone: "", telegram: "", address: "", line: "POWER", period: "Неделя",
+    name: "", phone: "", telegram: "", address: "", line: "POWER", period: "1 неделя",
   });
   const active = useActiveSection(["top", "lines", "menu", "calc", "subs", "delivery", "faq", "order-form"]);
 
@@ -1536,6 +1566,8 @@ function Landing() {
   }
 
   function openLineAccordion(id: LineId) {
+    setSelectedLine(id);
+    setOrder((s) => ({ ...s, line: id }));
     setOpenLine((cur) => (cur === id ? null : id));
   }
 

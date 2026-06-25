@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  X, Check, Phone, Leaf, Truck, Sparkles, Send, Instagram, MapPin, Plus, ChevronRight, ArrowRight,
+  X, Check, Phone, Leaf, Truck, Sparkles, Send, MapPin, Plus, ArrowRight,
   Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, type LucideIcon,
 } from "lucide-react";
 
@@ -281,7 +281,6 @@ function Logo({ size = 36 }: { size?: number }) {
 }
 
 function Navbar({ onOrder }: { onOrder: () => void }) {
-  const [open, setOpen] = useState(false);
   const items = [
     { l: "Рационы", h: "#lines" }, { l: "Меню", h: "#menu" },
     { l: "Калории", h: "#calc" }, { l: "Подписки", h: "#subs" },
@@ -290,9 +289,9 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
   return (
     <header
       className="sticky z-40 backdrop-blur-xl"
-      style={{ top: 2, background: "rgba(14,15,14,0.75)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      style={{ top: 2, background: "rgba(14,15,14,0.78)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
     >
-      <div className="mx-auto px-4 flex items-center justify-between" style={{ maxWidth: 1200, height: 64 }}>
+      <div className="mx-auto px-4 flex items-center justify-between gap-2" style={{ maxWidth: 1200, height: 56 }}>
         <Logo />
         <nav className="hidden lg:flex items-center gap-7">
           {items.map((i) => (
@@ -300,44 +299,26 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <a href="tel:+79991234567" className="hidden md:inline-block text-sm font-semibold" style={{ color: "#FFFFFF" }}>
+          <a
+            href="tel:+79991234567"
+            aria-label="Позвонить"
+            className="press lg:hidden grid place-items-center rounded-full"
+            style={{ width: 40, height: 40, background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.35)", color: "#D4AF37" }}
+          >
+            <Phone size={17} />
+          </a>
+          <a href="tel:+79991234567" className="hidden lg:inline-block text-sm font-semibold" style={{ color: "#FFFFFF" }}>
             +7 (999) 123-45-67
           </a>
           <button
             onClick={onOrder}
-            className="press rounded-full hidden md:inline-flex items-center gap-1.5"
-            style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 14, padding: "10px 18px" }}
+            className="press rounded-full inline-flex items-center gap-1.5"
+            style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 13, padding: "9px 16px" }}
           >
-            Заказать <ArrowRight size={14} />
-          </button>
-          <button
-            className="lg:hidden grid place-items-center rounded-xl"
-            style={{ width: 44, height: 44, color: "#FFFFFF" }}
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Меню"
-          >
-            {open ? <X size={22} /> : (
-              <span className="flex flex-col" style={{ gap: 5 }}>
-                <span style={{ width: 20, height: 2, background: "#fff", borderRadius: 2 }} />
-                <span style={{ width: 20, height: 2, background: "#fff", borderRadius: 2 }} />
-                <span style={{ width: 20, height: 2, background: "#fff", borderRadius: 2 }} />
-              </span>
-            )}
+            Заказать <ArrowRight size={13} />
           </button>
         </div>
       </div>
-      {open && (
-        <div className="lg:hidden animate-fade-in" style={{ borderTop: "1px solid #2A2E2A", background: "#0E0F0E" }}>
-          <div className="mx-auto px-4 py-3 flex flex-col" style={{ maxWidth: 1200 }}>
-            {items.map((i) => (
-              <a key={i.h} href={i.h} onClick={() => setOpen(false)} className="py-3 text-base"
-                style={{ borderBottom: "1px solid #1A1E1A", color: "#FFFFFF" }}>
-                {i.l}
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
     </header>
   );
 }
@@ -350,7 +331,10 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
       <div className="absolute inset-0">
         <img
           src={HERO_BG}
-          alt=""
+          alt="Готовый рацион FITERA"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           className="w-full h-full object-cover"
           style={{ objectPosition: "center" }}
         />
@@ -365,7 +349,7 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
       </div>
 
       <div className="relative mx-auto px-4 flex flex-col justify-end md:justify-center"
-        style={{ maxWidth: 1200, minHeight: "min(720px, 92vh)", paddingTop: 80, paddingBottom: 56 }}>
+        style={{ maxWidth: 1200, minHeight: "min(640px, 86vh)", paddingTop: 32, paddingBottom: 44 }}>
         <div className="reveal in" style={{ maxWidth: 620 }}>
           <span
             className="inline-flex items-center gap-1.5 rounded-full backdrop-blur"
@@ -803,8 +787,8 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Калькулятор КБЖУ"
-          title="Рассчитай свою норму"
-          desc="Формула Миффлина-Сан Жеора. Подберём подходящий рацион автоматически."
+          title="Рассчитай свою норму калорий"
+          desc="Подберём подходящий рацион автоматически."
           accent="#2E7D32"
           center
         />
@@ -960,8 +944,8 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
   const plans = [
     { id: "1 день", price: "от 750 ₽", per: "за день", old: null as string | null, badge: null as string | null,
       features: ["4 приёма пищи", "Доставка сегодня", "Без подписки"], primary: false },
-    { id: "3 дня", price: "от 2 100 ₽", per: "−12%", old: "2 400 ₽", badge: "ПОПУЛЯРНО",
-      features: ["12 приёмов пищи", "Выбор линейки", "Скидка 12%"], primary: true },
+    { id: "Неделя", price: "от 4 900 ₽", per: "−15%", old: "5 770 ₽", badge: "ПОПУЛЯРНО",
+      features: ["28 приёмов пищи", "Выбор линейки", "Скидка 15%"], primary: true },
     { id: "Месяц", price: "от 19 500 ₽", per: "−20%", old: "24 000 ₽", badge: null,
       features: ["Заморозка дней", "Приоритет", "Скидка 20%"], primary: false },
   ];
@@ -1155,7 +1139,7 @@ function FAQSection() {
 /* ────────── Order Form (minimal — 3 fields) ────────── */
 
 type OrderState = {
-  name: string; phone: string; telegram: string; line: LineId; period: string;
+  name: string; phone: string; telegram: string; address: string; line: LineId; period: string;
 };
 
 function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: OrderState) => void }) {
@@ -1260,6 +1244,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
                   ["Имя", state.name || "—"],
                   ["Телефон", state.phone || "—"],
                   ["Telegram", state.telegram || "—"],
+                  ["Адрес", state.address || "—"],
                   ["Рацион", `${state.line} · ${line.title}`],
                   ["Период", state.period],
                 ].map(([k, v]) => (
@@ -1306,6 +1291,18 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
                 onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"}
               />
             </div>
+            <input
+              style={fieldStyle}
+              type="text"
+              autoComplete="street-address"
+              placeholder="Адрес доставки: ул., дом, кв."
+              value={state.address}
+              onChange={(e) => set("address", e.target.value)}
+              required
+              onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
+              onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"}
+            />
+
 
             <button type="submit" className="press"
               style={{
@@ -1361,16 +1358,11 @@ function Footer() {
         </a>
 
         <div className="mt-5 flex" style={{ gap: 10 }}>
-          {[
-            { Icon: Send, href: "https://t.me/fitera_rstv", label: "Telegram" },
-            { Icon: Instagram, href: "https://instagram.com/fitera.food", label: "Instagram" },
-          ].map(({ Icon, href, label }) => (
-            <a key={label} href={href} aria-label={label}
-              className="grid place-items-center rounded-full"
-              style={{ width: 36, height: 36, background: "#1A1E1A", color: "#D4AF37" }}>
-              <Icon size={16} />
-            </a>
-          ))}
+          <a href="https://t.me/fitera_rstv" aria-label="Telegram"
+            className="grid place-items-center rounded-full"
+            style={{ width: 36, height: 36, background: "#1A1E1A", color: "#D4AF37" }}>
+            <Send size={16} />
+          </a>
         </div>
 
         <div className="mt-6" style={{ fontFamily: "Inter", fontSize: 12, color: "#555" }}>
@@ -1487,7 +1479,7 @@ function Landing() {
   const [selectedLine, setSelectedLine] = useState<LineId>("POWER");
   const [openLine, setOpenLine] = useState<LineId | null>("POWER");
   const [order, setOrder] = useState<OrderState>({
-    name: "", phone: "", telegram: "", line: "POWER", period: "3 дня",
+    name: "", phone: "", telegram: "", address: "", line: "POWER", period: "Неделя",
   });
   const active = useActiveSection(["top", "lines", "menu", "calc", "subs", "delivery", "faq", "order-form"]);
 

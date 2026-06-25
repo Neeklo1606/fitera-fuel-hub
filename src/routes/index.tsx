@@ -1136,7 +1136,7 @@ function FAQSection() {
 /* ────────── Order Form (minimal — 3 fields) ────────── */
 
 type OrderState = {
-  name: string; phone: string; telegram: string; line: LineId; period: string;
+  name: string; phone: string; telegram: string; address: string; line: LineId; period: string;
 };
 
 function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: OrderState) => void }) {

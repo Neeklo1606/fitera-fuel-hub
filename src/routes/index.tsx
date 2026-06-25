@@ -298,7 +298,7 @@ function ScrollProgress() {
 
 /* ────────── Logo / Navbar ────────── */
 
-function Logo({ size = 64 }: { size?: number }) {
+function Logo({ size = 96 }: { size?: number }) {
   return (
     <a href="#top" aria-label="FITERA — Ешь для результата" className="flex items-center select-none shrink-0">
       <img

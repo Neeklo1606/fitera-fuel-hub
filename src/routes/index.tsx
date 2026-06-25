@@ -796,16 +796,19 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   const [result, setResult] = useState<{ kcal: number; line: LineId } | null>(null);
 
   function compute() {
+    const a = Math.max(14, Math.min(100, age || 0));
+    const h = Math.max(120, Math.min(230, height || 0));
+    const w = Math.max(30, Math.min(250, weight || 0));
     const bmr = sex === "M"
-      ? 10 * weight + 6.25 * height - 5 * age + 5
-      : 10 * weight + 6.25 * height - 5 * age - 161;
+      ? 10 * w + 6.25 * h - 5 * a + 5
+      : 10 * w + 6.25 * h - 5 * a - 161;
     let kcal = Math.round(bmr * act);
-    if (goal === "loss") kcal -= 300;
-    if (goal === "gain") kcal += 300;
+    if (goal === "loss") kcal -= 400;
+    if (goal === "gain") kcal += 400;
     let line: LineId = "PRO";
-    if (kcal <= 1400) line = "LIGHT";
-    else if (kcal <= 1800) line = "BALANCE";
-    else if (kcal <= 2200) line = "POWER";
+    if (kcal <= 1450) line = "LIGHT";
+    else if (kcal <= 1850) line = "BALANCE";
+    else if (kcal <= 2300) line = "POWER";
     setResult({ kcal, line });
   }
 

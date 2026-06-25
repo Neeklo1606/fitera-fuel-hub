@@ -1442,6 +1442,12 @@ function Footer() {
           </a>
         </div>
 
+        <ul className="mt-6 flex flex-wrap" style={{ gap: 14 }}>
+          <li><a href="/privacy" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>Политика конфиденциальности</a></li>
+          <li><a href="/terms" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>Условия использования</a></li>
+          <li><a href="/offer" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>Публичная оферта</a></li>
+        </ul>
+
         <div className="mt-6" style={{ fontFamily: "Inter", fontSize: 12, color: "#555" }}>
           © 2026 FITERA. Доставка рационов питания по Ростову-на-Дону
         </div>

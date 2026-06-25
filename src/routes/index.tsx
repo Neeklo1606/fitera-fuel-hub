@@ -784,8 +784,8 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Калькулятор КБЖУ"
-          title="Рассчитай свою норму"
-          desc="Формула Миффлина-Сан Жеора. Подберём подходящий рацион автоматически."
+          title="Рассчитай свою норму калорий"
+          desc="Подберём подходящий рацион автоматически."
           accent="#2E7D32"
           center
         />

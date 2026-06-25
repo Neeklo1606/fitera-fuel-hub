@@ -1463,7 +1463,7 @@ function Landing() {
   const [selectedLine, setSelectedLine] = useState<LineId>("POWER");
   const [openLine, setOpenLine] = useState<LineId | null>("POWER");
   const [order, setOrder] = useState<OrderState>({
-    name: "", phone: "", telegram: "", line: "POWER", period: "3 дня",
+    name: "", phone: "", telegram: "", address: "", line: "POWER", period: "Неделя",
   });
   const active = useActiveSection(["top", "lines", "menu", "calc", "subs", "delivery", "faq", "order-form"]);
 

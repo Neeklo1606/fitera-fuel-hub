@@ -839,14 +839,14 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 {(["M", "F"] as const).map((s) => {
                   const active = sex === s;
                   return (
-                    <button key={s} onClick={() => setSex(s)} className="press"
+                    <button key={s} onClick={() => setSex(s)} type="button" className="press inline-flex items-center justify-center"
                       style={{
                         flex: 1, minWidth: 0, height: 52, borderRadius: 14,
                         background: active ? "#0E0F0E" : "#F5F5F5",
                         color: active ? "#FFFFFF" : "#555",
                         fontFamily: "Inter", fontWeight: 600,
                         fontSize: "clamp(13px, 3.6vw, 15px)",
-                        whiteSpace: "nowrap",
+                        whiteSpace: "nowrap", textAlign: "center",
                         transition: "all 180ms ease",
                       }}>{s === "M" ? "Мужчина" : "Женщина"}</button>
                   );

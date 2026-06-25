@@ -1622,7 +1622,7 @@ function Landing() {
         <OrderForm initial={order} onUpdate={setOrder} />
       </main>
       <Footer />
-      {dish && <DishModal dish={dish} onClose={() => setDish(null)} />}
+      {dish && <DishModal dish={dish} onClose={() => setDish(null)} onOrder={(line) => { setSelectedLine(line); setOpenLine(line); setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />}
       <MobileBottomBar
         activeId={active}
         onTab={(_id, hash) => scrollTo(hash.slice(1))}

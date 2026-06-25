@@ -969,9 +969,19 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 <div style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, color: "#0E0F0E", letterSpacing: "-0.02em" }}>
                   Готовы посчитать?
                 </div>
-                <div className="mt-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#777", maxWidth: 260, lineHeight: 1.5 }}>
+                <div className="mt-2 mb-5" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#777", maxWidth: 260, lineHeight: 1.5 }}>
                   Заполните параметры слева — здесь появится ваша норма и подходящий рацион.
                 </div>
+                <button onClick={compute} className="press inline-flex items-center justify-center gap-2"
+                  style={{
+                    height: 48, padding: "0 22px", borderRadius: 50,
+                    background: "linear-gradient(135deg, #D4AF37 0%, #E9C75A 100%)",
+                    color: "#0E0F0E",
+                    fontFamily: "Inter", fontWeight: 700, fontSize: 14,
+                    boxShadow: "0 12px 26px -10px rgba(212,175,55,0.55)",
+                  }}>
+                  Посчитать сейчас <ArrowRight size={14} />
+                </button>
               </div>
             )}
           </div>

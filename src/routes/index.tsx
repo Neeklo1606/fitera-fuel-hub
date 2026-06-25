@@ -210,10 +210,10 @@ function useReveal() {
 }
 
 function SmartImage({
-  src, alt = "", className = "", style, light = false, aspectRatio = "1 / 1",
+  src, alt = "", className = "", style, light = false, aspectRatio = "1 / 1", eager = false,
 }: {
   src: string; alt?: string; className?: string; style?: React.CSSProperties;
-  light?: boolean; aspectRatio?: string;
+  light?: boolean; aspectRatio?: string; eager?: boolean;
 }) {
   const [loaded, setLoaded] = useState(false);
   return (
@@ -224,7 +224,7 @@ function SmartImage({
       <img
         src={src}
         alt={alt}
-        loading="lazy"
+        loading={eager ? "eager" : "lazy"}
         decoding="async"
         onLoad={() => setLoaded(true)}
         className={`img-fade ${loaded ? "loaded" : ""}`}

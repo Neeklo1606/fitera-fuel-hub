@@ -331,7 +331,10 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
       <div className="absolute inset-0">
         <img
           src={HERO_BG}
-          alt=""
+          alt="Готовый рацион FITERA"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
           className="w-full h-full object-cover"
           style={{ objectPosition: "center" }}
         />

@@ -941,8 +941,8 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
   const plans = [
     { id: "1 день", price: "от 750 ₽", per: "за день", old: null as string | null, badge: null as string | null,
       features: ["4 приёма пищи", "Доставка сегодня", "Без подписки"], primary: false },
-    { id: "3 дня", price: "от 2 100 ₽", per: "−12%", old: "2 400 ₽", badge: "ПОПУЛЯРНО",
-      features: ["12 приёмов пищи", "Выбор линейки", "Скидка 12%"], primary: true },
+    { id: "Неделя", price: "от 4 900 ₽", per: "−15%", old: "5 770 ₽", badge: "ПОПУЛЯРНО",
+      features: ["28 приёмов пищи", "Выбор линейки", "Скидка 15%"], primary: true },
     { id: "Месяц", price: "от 19 500 ₽", per: "−20%", old: "24 000 ₽", badge: null,
       features: ["Заморозка дней", "Приоритет", "Скидка 20%"], primary: false },
   ];

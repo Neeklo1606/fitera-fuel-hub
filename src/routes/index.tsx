@@ -1185,7 +1185,25 @@ type OrderState = {
 function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: OrderState) => void }) {
   const [state, setState] = useState(initial);
   const [sent, setSent] = useState(false);
+  const [addrSuggest, setAddrSuggest] = useState<string[]>([]);
   useEffect(() => { setState(initial); }, [initial]);
+
+  // Address autocomplete via OpenStreetMap (no API key). Debounced + Rostov-bounded.
+  useEffect(() => {
+    const q = state.address.trim();
+    if (q.length < 3) { setAddrSuggest([]); return; }
+    const ctrl = new AbortController();
+    const t = setTimeout(async () => {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&accept-language=ru&countrycodes=ru&limit=5&q=${encodeURIComponent("Ростов-на-Дону, " + q)}`;
+        const r = await fetch(url, { signal: ctrl.signal, headers: { "Accept": "application/json" } });
+        if (!r.ok) return;
+        const data: Array<{ display_name: string }> = await r.json();
+        setAddrSuggest(data.map((d) => d.display_name).slice(0, 5));
+      } catch { /* ignore */ }
+    }, 350);
+    return () => { ctrl.abort(); clearTimeout(t); };
+  }, [state.address]);
 
   function set<K extends keyof OrderState>(k: K, v: OrderState[K]) {
     const next = { ...state, [k]: v }; setState(next); onUpdate(next);

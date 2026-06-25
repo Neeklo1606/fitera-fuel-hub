@@ -1544,6 +1544,8 @@ function Landing() {
   }
 
   function openLineAccordion(id: LineId) {
+    setSelectedLine(id);
+    setOrder((s) => ({ ...s, line: id }));
     setOpenLine((cur) => (cur === id ? null : id));
   }
 

@@ -298,7 +298,7 @@ function ScrollProgress() {
 
 /* ────────── Logo / Navbar ────────── */
 
-function Logo({ size = 40 }: { size?: number }) {
+function Logo({ size = 96 }: { size?: number }) {
   return (
     <a href="#top" aria-label="FITERA — Ешь для результата" className="flex items-center select-none shrink-0">
       <img
@@ -313,6 +313,7 @@ function Logo({ size = 40 }: { size?: number }) {
   );
 }
 
+
 function Navbar({ onOrder }: { onOrder: () => void }) {
   const items = [
     { l: "Рационы", h: "#lines" }, { l: "Меню", h: "#menu" },
@@ -324,7 +325,7 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
       className="sticky z-40 backdrop-blur-xl"
       style={{ top: 2, background: "rgba(14,15,14,0.78)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
     >
-      <div className="mx-auto px-4 flex items-center justify-between gap-2" style={{ maxWidth: 1200, height: 56 }}>
+      <div className="mx-auto px-4 flex items-center justify-between gap-2" style={{ maxWidth: 1200, height: 112 }}>
         <Logo />
         <nav className="hidden lg:flex items-center gap-7">
           {items.map((i) => (
@@ -462,7 +463,7 @@ function LinesSection({ selected, openId, onOpen, onChoose }: {
   onChoose: (id: LineId) => void;
 }) {
   return (
-    <section id="lines" style={{ background: "#F7F7F5", padding: "64px 16px 56px" }}>
+    <section id="lines" style={{ background: "#F7F7F5", padding: "48px 16px 40px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Наши рационы"
@@ -602,7 +603,7 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
   const totalC = dayMeals.reduce((s, d) => s + d.c, 0);
 
   return (
-    <section id="menu" style={{ background: "#0E0F0E", padding: "64px 16px" }}>
+    <section id="menu" style={{ background: "#0E0F0E", padding: "48px 16px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Меню недели"
@@ -649,12 +650,12 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
         {/* 2×2 grid of meal cards */}
         <div
           key={`${lineId}-${day}`}
-          className="mt-5 grid menu-anim"
+          className="mt-5 grid menu-anim grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
           style={{
-            gridTemplateColumns: "repeat(2, minmax(0,1fr))",
-            gap: 10,
+            gap: 12,
           }}
         >
+
           {dayMeals.map((d) => (
             <button
               key={d.meal + d.name}
@@ -824,7 +825,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   };
 
   return (
-    <section id="calc" style={{ background: "#F7F7F5", padding: "64px 16px" }}>
+    <section id="calc" style={{ background: "#F7F7F5", padding: "48px 16px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Калькулятор КБЖУ"
@@ -1004,7 +1005,7 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
   ];
 
   return (
-    <section id="subs" style={{ background: "#0E0F0E", padding: "64px 16px" }}>
+    <section id="subs" style={{ background: "#0E0F0E", padding: "48px 16px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Подписки"
@@ -1078,7 +1079,7 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
 
 function Delivery({ onAsk }: { onAsk: () => void }) {
   return (
-    <section id="delivery" style={{ background: "#FFFFFF", padding: "64px 16px" }}>
+    <section id="delivery" style={{ background: "#FFFFFF", padding: "48px 16px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Доставка"
@@ -1139,7 +1140,7 @@ function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" style={{ background: "#0E0F0E", padding: "64px 16px" }}>
+    <section id="faq" style={{ background: "#0E0F0E", padding: "48px 16px" }}>
       <div className="mx-auto" style={{ maxWidth: 720 }}>
         <SectionHeader
           eyebrow="FAQ"

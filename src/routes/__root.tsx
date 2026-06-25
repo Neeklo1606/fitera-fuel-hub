@@ -76,7 +76,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#0E0F0E" },
       { title: "FITERA — Доставка готовых рационов в Ростове-на-Дону" },
       { name: "description", content: "Готовые рационы с расчётом КБЖУ. Без готовки, без подсчётов. Доставка по Ростову ежедневно." },
       { name: "author", content: "FITERA" },

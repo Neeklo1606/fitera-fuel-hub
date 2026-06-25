@@ -215,7 +215,7 @@ function SmartImage({
   src: string; alt?: string; className?: string; style?: React.CSSProperties;
   light?: boolean; aspectRatio?: string; eager?: boolean;
 }) {
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(eager);
   return (
     <div
       className={`${loaded ? "" : `img-skel ${light ? "light" : ""}`} ${className}`}
@@ -226,6 +226,7 @@ function SmartImage({
         alt={alt}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
+        fetchPriority={eager ? "high" : "auto"}
         onLoad={() => setLoaded(true)}
         className={`img-fade ${loaded ? "loaded" : ""}`}
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}

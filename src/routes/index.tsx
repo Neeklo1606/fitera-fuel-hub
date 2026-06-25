@@ -1,24 +1,26 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  X, Check, Phone, Leaf, Truck, Star, Sparkles, Send, Instagram, MapPin, Plus, Minus, ChevronRight, ArrowRight,
-  Flame, Heart, Crown, type LucideIcon,
+  X, Check, Phone, Leaf, Truck, Sparkles, Send, Instagram, MapPin, Plus, ChevronRight, ArrowRight,
+  Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, type LucideIcon,
 } from "lucide-react";
 
-
-import heroFood from "../assets/hero-food.jpg";
 import lineLight from "../assets/line-light.jpg";
 import lineBalance from "../assets/line-balance.jpg";
 import linePower from "../assets/line-power.jpg";
 import lineMom from "../assets/line-mom.jpg";
 import linePro from "../assets/line-pro.jpg";
 
+// Real Unsplash food photo — dark, premium plate composition
+const HERO_BG =
+  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1800&q=80";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "FITERA — Доставка готовых рационов в Ростове-на-Дону" },
       { name: "description", content: "Готовые рационы с расчётом КБЖУ. Доставка ежедневно по Ростову. Линейки LIGHT, BALANCE, POWER, MOM, PRO." },
-      { property: "og:title", content: "FITERA — Умное питание под твою цель" },
+      { property: "og:title", content: "FITERA — Ешь для результата" },
       { property: "og:description", content: "Готовые рационы FITERA с расчётом КБЖУ. Без готовки, без подсчётов." },
     ],
   }),
@@ -40,16 +42,16 @@ type Line = {
   tint: string;
   image: string;
   Icon: LucideIcon;
+  features: string[];
 };
 
 const LINES: Line[] = [
-  { id: "LIGHT",   title: "Лёгкий",  kcal: "1200–1400", desc: "Снижение веса",        priceFrom: "от 750 ₽",  accent: "#7CB342", tint: "#EEF7E4", image: lineLight,   Icon: Leaf },
-  { id: "BALANCE", title: "Баланс",  kcal: "1500–1800", desc: "Поддержание формы",    priceFrom: "от 850 ₽",  accent: "#42A5F5", tint: "#E5F1FB", image: lineBalance, Icon: Sparkles },
-  { id: "POWER",   title: "Сила",    kcal: "2000–2500", desc: "Набор массы",          priceFrom: "от 950 ₽",  popular: true, accent: "#D4AF37", tint: "#FBF3DC", image: linePower, Icon: Flame },
-  { id: "MOM",     title: "Мама",    kcal: "1600–1900", desc: "Для молодых мам",      priceFrom: "от 900 ₽",  accent: "#EC8DA5", tint: "#FBEAF0", image: lineMom,     Icon: Heart },
-  { id: "PRO",     title: "Премиум", kcal: "2200–2800", desc: "Для занятых людей",    priceFrom: "от 1 100 ₽", accent: "#8E7CC3", tint: "#EFEAF8", image: linePro,    Icon: Crown },
+  { id: "LIGHT",   title: "Лёгкий",  kcal: "1200–1400", desc: "Снижение веса",     priceFrom: "от 750 ₽",   accent: "#7CB342", tint: "#EEF7E4", image: lineLight,   Icon: Leaf,     features: ["Низкокалорийный профиль", "Овощи, рыба, белок", "Дефицит 300–500 ккал"] },
+  { id: "BALANCE", title: "Баланс",  kcal: "1500–1800", desc: "Поддержание формы", priceFrom: "от 850 ₽",   accent: "#42A5F5", tint: "#E5F1FB", image: lineBalance, Icon: Sparkles, features: ["Сбалансированный КБЖУ", "Разнообразное меню", "Без переедания"] },
+  { id: "POWER",   title: "Сила",    kcal: "2000–2500", desc: "Набор массы",       priceFrom: "от 950 ₽",   popular: true, accent: "#D4AF37", tint: "#FBF3DC", image: linePower, Icon: Flame, features: ["Профицит +300–500 ккал", "Больше белка и сложных углей", "Для силовых тренировок"] },
+  { id: "MOM",     title: "Мама",    kcal: "1600–1900", desc: "Для молодых мам",   priceFrom: "от 900 ₽",   accent: "#EC8DA5", tint: "#FBEAF0", image: lineMom,     Icon: Heart,    features: ["Без острого и аллергенов", "Кальций и железо", "Поддержка лактации"] },
+  { id: "PRO",     title: "Премиум", kcal: "2200–2800", desc: "Для занятых людей", priceFrom: "от 1 100 ₽", accent: "#8E7CC3", tint: "#EFEAF8", image: linePro,     Icon: Crown,    features: ["Премиум-ингредиенты", "Авторские блюда", "Идеально для офиса"] },
 ];
-
 
 type Dish = {
   name: string;
@@ -60,7 +62,6 @@ type Dish = {
   ingredients: string;
 };
 
-// 7 завтраков × 5 линеек и т.д. (компактно — варианты по линейке × дню)
 const WEEK_MENU: Record<LineId, Dish[][]> = {
   LIGHT: [
     [
@@ -132,8 +133,6 @@ const WEEK_MENU: Record<LineId, Dish[][]> = {
   ]),
 };
 
-// Generates 7 days of menus by lightly rotating the base 4-meal day.
-// Keep names clean — no "вариант N" suffixes that bloat the UI.
 function makeWeekFromBase(base: Dish[]): Dish[][] {
   return Array.from({ length: 7 }, (_, i) =>
     base.map((d) => ({ ...d, kcal: d.kcal + i * 5 - 10 })),
@@ -165,7 +164,6 @@ function useReveal() {
   }, []);
 }
 
-/* Image with skeleton placeholder — fixed aspect, fade-in on load */
 function SmartImage({
   src, alt = "", className = "", style, light = false, aspectRatio = "1 / 1",
 }: {
@@ -191,7 +189,6 @@ function SmartImage({
   );
 }
 
-/* Unified section header — eyebrow + title + optional description */
 function SectionHeader({
   eyebrow, title, desc, dark = false, accent = "#2E7D32", center = false, titleAccent,
 }: {
@@ -224,22 +221,61 @@ function SectionHeader({
   );
 }
 
-/* ────────── Navbar ────────── */
+/* ────────── Scroll progress bar ────────── */
 
-function Logo({ light = true }: { light?: boolean }) {
+function ScrollProgress() {
+  const [pct, setPct] = useState(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      setPct(max > 0 ? (h.scrollTop / max) * 100 : 0);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none" style={{ height: 2 }}>
+      <div
+        style={{
+          width: `${pct}%`,
+          height: "100%",
+          background: "linear-gradient(90deg, #2E7D32, #D4AF37)",
+          transition: "width 80ms linear",
+          boxShadow: "0 0 8px rgba(212,175,55,0.6)",
+        }}
+      />
+    </div>
+  );
+}
+
+/* ────────── Logo / Navbar ────────── */
+
+function Logo({ size = 36 }: { size?: number }) {
   return (
     <a href="#top" className="flex items-center gap-2.5 select-none">
       <div
         className="grid place-items-center rounded-[10px] text-white shrink-0"
-        style={{ background: "#2E7D32", width: 36, height: 36, fontFamily: "Unbounded", fontWeight: 900, fontSize: 18 }}
+        style={{
+          background: "linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%)",
+          width: size, height: size,
+          fontFamily: "Unbounded", fontWeight: 900, fontSize: size * 0.5,
+          boxShadow: "0 4px 12px rgba(46,125,50,0.35), inset 0 1px 0 rgba(255,255,255,0.18)",
+        }}
       >
         F
       </div>
-      <span
-        style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, letterSpacing: "-0.02em", color: light ? "#FFFFFF" : "#0E0F0E" }}
-      >
-        FITERA
-      </span>
+      <div className="leading-none">
+        <div style={{
+          fontFamily: "Unbounded", fontWeight: 800, fontSize: 17,
+          letterSpacing: "-0.02em", color: "#FFFFFF",
+        }}>FITERA</div>
+        <div style={{
+          fontFamily: "Inter", fontWeight: 600, fontSize: 8,
+          color: "#D4AF37", letterSpacing: "0.18em", marginTop: 3, textTransform: "uppercase",
+        }}>Ешь для результата</div>
+      </div>
     </a>
   );
 }
@@ -248,15 +284,15 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
   const [open, setOpen] = useState(false);
   const items = [
     { l: "Рационы", h: "#lines" }, { l: "Меню", h: "#menu" },
-    { l: "Калькулятор", h: "#calc" }, { l: "Доставка", h: "#delivery" },
+    { l: "Калории", h: "#calc" }, { l: "Подписки", h: "#subs" },
     { l: "FAQ", h: "#faq" },
   ];
   return (
     <header
-      className="sticky top-0 z-40 backdrop-blur-xl"
-      style={{ background: "rgba(14,15,14,0.78)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      className="sticky z-40 backdrop-blur-xl"
+      style={{ top: 2, background: "rgba(14,15,14,0.75)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
     >
-      <div className="mx-auto max-w-6xl px-4 flex items-center justify-between" style={{ height: 64 }}>
+      <div className="mx-auto px-4 flex items-center justify-between" style={{ maxWidth: 1200, height: 64 }}>
         <Logo />
         <nav className="hidden lg:flex items-center gap-7">
           {items.map((i) => (
@@ -264,15 +300,15 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <a href="tel:+79991234567" className="hidden md:inline-block text-sm font-semibold" style={{ color: "#FFFFFF", letterSpacing: "0.01em" }}>
+          <a href="tel:+79991234567" className="hidden md:inline-block text-sm font-semibold" style={{ color: "#FFFFFF" }}>
             +7 (999) 123-45-67
           </a>
           <button
             onClick={onOrder}
-            className="press rounded-full"
-            style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 14, padding: "10px 20px", letterSpacing: "0.01em" }}
+            className="press rounded-full hidden md:inline-flex items-center gap-1.5"
+            style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 14, padding: "10px 18px" }}
           >
-            Заказать
+            Заказать <ArrowRight size={14} />
           </button>
           <button
             className="lg:hidden grid place-items-center rounded-xl"
@@ -292,7 +328,7 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
       </div>
       {open && (
         <div className="lg:hidden animate-fade-in" style={{ borderTop: "1px solid #2A2E2A", background: "#0E0F0E" }}>
-          <div className="mx-auto max-w-6xl px-4 py-3 flex flex-col">
+          <div className="mx-auto px-4 py-3 flex flex-col" style={{ maxWidth: 1200 }}>
             {items.map((i) => (
               <a key={i.h} href={i.h} onClick={() => setOpen(false)} className="py-3 text-base"
                 style={{ borderBottom: "1px solid #1A1E1A", color: "#FFFFFF" }}>
@@ -306,118 +342,93 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
   );
 }
 
-/* ────────── Hero (Level Kitchen-inspired) ────────── */
+/* ────────── Hero ────────── */
 
 function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) {
-  const chips = [
-    { Icon: Leaf, l: "Научный подход" },
-    { Icon: Sparkles, l: "Под твою цель" },
-    { Icon: Star, l: "Премиум" },
-    { Icon: Truck, l: "Ежедневно" },
-  ];
   return (
-    <section id="top" className="relative" style={{ background: "#0E0F0E" }}>
-      {/* Background photo */}
-      <div className="absolute inset-0 overflow-hidden">
+    <section id="top" className="relative" style={{ background: "#0E0F0E", overflow: "hidden" }}>
+      <div className="absolute inset-0">
         <img
-          src={heroFood}
+          src={HERO_BG}
           alt=""
-          width={1600}
-          height={1200}
           className="w-full h-full object-cover"
-          style={{ objectPosition: "right center" }}
+          style={{ objectPosition: "center" }}
         />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(14,15,14,0.55) 0%, rgba(14,15,14,0.35) 40%, rgba(14,15,14,0.92) 100%)",
-          }}
-        />
-        {/* Desktop: side gradient to support white card */}
-        <div
-          className="hidden md:block absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(90deg, rgba(14,15,14,0.85) 0%, rgba(14,15,14,0.35) 50%, rgba(14,15,14,0) 100%)",
-          }}
-        />
+        <div className="absolute inset-0" style={{
+          background:
+            "radial-gradient(ellipse at 70% 30%, rgba(14,15,14,0.35) 0%, rgba(14,15,14,0.8) 60%, rgba(14,15,14,0.98) 100%)",
+        }} />
+        <div className="absolute inset-0" style={{
+          background:
+            "linear-gradient(180deg, rgba(14,15,14,0.5) 0%, rgba(14,15,14,0) 30%, rgba(14,15,14,0) 60%, rgba(14,15,14,1) 100%)",
+        }} />
       </div>
 
-      <div className="relative mx-auto max-w-6xl px-4" style={{ paddingTop: 32, paddingBottom: 40, minHeight: "min(640px, 90vh)" }}>
-        <div className="reveal in" style={{ maxWidth: 560 }}>
+      <div className="relative mx-auto px-4 flex flex-col justify-end md:justify-center"
+        style={{ maxWidth: 1200, minHeight: "min(720px, 92vh)", paddingTop: 80, paddingBottom: 56 }}>
+        <div className="reveal in" style={{ maxWidth: 620 }}>
           <span
             className="inline-flex items-center gap-1.5 rounded-full backdrop-blur"
             style={{
-              padding: "6px 14px", border: "1px solid rgba(46,125,50,0.6)",
-              background: "rgba(46,125,50,0.18)", color: "#C8E6C9",
-              fontFamily: "Inter", fontSize: 13, fontWeight: 500,
+              padding: "6px 14px", border: "1px solid rgba(212,175,55,0.4)",
+              background: "rgba(212,175,55,0.12)", color: "#E8C46B",
+              fontFamily: "Inter", fontSize: 12, fontWeight: 600, letterSpacing: "0.04em",
             }}
           >
-            <MapPin size={13} /> Доставка по Ростову-на-Дону
+            <MapPin size={12} /> РОСТОВ-НА-ДОНУ · ЕЖЕДНЕВНО
           </span>
 
-          {/* White overlay card (Level Kitchen style) */}
-          <div
-            className="mt-6 backdrop-blur-md"
+          <h1
+            className="mt-5"
             style={{
-              background: "rgba(255,255,255,0.97)",
-              borderRadius: 28,
-              padding: "28px 24px",
-              boxShadow: "0 30px 80px -20px rgba(0,0,0,0.6)",
+              fontFamily: "Unbounded", fontWeight: 900,
+              fontSize: "clamp(38px, 8vw, 72px)", lineHeight: 0.98, letterSpacing: "-0.035em",
+              color: "#FFFFFF",
             }}
           >
-            <h1
-              className="font-display"
+            Ешь для<br />
+            <span style={{
+              background: "linear-gradient(90deg, #D4AF37 0%, #F5E08F 100%)",
+              WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent",
+            }}>результата.</span>
+          </h1>
+
+          <p className="mt-5" style={{ color: "#C8CCC4", fontFamily: "Inter", fontSize: 16, lineHeight: 1.55, maxWidth: 480 }}>
+            5 линеек готовых рационов с точным расчётом КБЖУ. Свежее, без готовки, доставка к двери.
+          </p>
+
+          <div className="mt-7 flex flex-col sm:flex-row gap-3 sm:items-center">
+            <button onClick={onOrder} className="press rounded-full inline-flex items-center justify-center gap-2"
               style={{
-                fontFamily: "Unbounded", fontWeight: 900,
-                fontSize: "clamp(34px, 7vw, 56px)", lineHeight: 1.05, letterSpacing: "-0.03em",
-                color: "#0E0F0E",
-              }}
-            >
-              Готовое питание
-              <br />
-              <span style={{
-                background: "linear-gradient(90deg, #2E7D32 0%, #D4AF37 100%)",
-                WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent",
-              }}>с доставкой</span>
-            </h1>
-
-            <p className="mt-4" style={{ color: "#555", fontFamily: "Inter", fontSize: 15, lineHeight: 1.55 }}>
-              5 линеек рационов с точным расчётом КБЖУ. Свежее, без готовки, каждый день.
-            </p>
-
-            <div className="mt-5 flex flex-wrap gap-2">
-              <button onClick={onOrder} className="press rounded-full inline-flex items-center gap-2"
-                style={{ background: "#0E0F0E", color: "#FFFFFF", height: 52, padding: "0 24px", fontFamily: "Inter", fontWeight: 700, fontSize: 15 }}>
-                Выбрать рацион <ArrowRight size={18} />
-              </button>
-              <button onClick={onCalc} className="press rounded-full"
-                style={{ background: "transparent", border: "1.5px solid #0E0F0E", color: "#0E0F0E", height: 52, padding: "0 22px", fontFamily: "Inter", fontWeight: 600, fontSize: 15 }}>
-                Рассчитать калории
-              </button>
-            </div>
-
-            <div className="mt-4 flex items-center gap-3 flex-wrap" style={{ fontFamily: "Inter", fontSize: 12, color: "#555" }}>
-              <span className="inline-flex items-center gap-1.5">
-                <Check size={14} color="#2E7D32" /> Бесплатная доставка
-              </span>
-              <span style={{ width: 3, height: 3, borderRadius: 99, background: "#CCC" }} />
-              <span className="inline-flex items-center gap-1.5">
-                <Check size={14} color="#2E7D32" /> Первая неделя −15%
-              </span>
-            </div>
+                background: "#D4AF37", color: "#0E0F0E",
+                height: 54, padding: "0 26px",
+                fontFamily: "Inter", fontWeight: 700, fontSize: 15,
+                boxShadow: "0 12px 32px -8px rgba(212,175,55,0.5)",
+              }}>
+              Выбрать рацион <ArrowRight size={18} />
+            </button>
+            <button onClick={onCalc} className="press rounded-full inline-flex items-center justify-center gap-2"
+              style={{
+                background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(46,125,50,0.7)",
+                color: "#FFFFFF", height: 54, padding: "0 22px",
+                fontFamily: "Inter", fontWeight: 600, fontSize: 15, backdropFilter: "blur(8px)",
+              }}>
+              <CalcIcon size={16} /> Рассчитать калории
+            </button>
           </div>
 
-          {/* Chips */}
-          <div className="mt-5 flex gap-2 overflow-x-auto hide-scrollbar -mx-4 px-4">
-            {chips.map(({ Icon, l }) => (
-              <div key={l} className="shrink-0 inline-flex items-center rounded-full backdrop-blur"
-                style={{ background: "rgba(28,30,28,0.7)", border: "1px solid rgba(255,255,255,0.08)", padding: "8px 14px", gap: 6 }}>
-                <Icon size={16} color="#D4AF37" />
-                <span style={{ color: "#FFFFFF", fontFamily: "Inter", fontSize: 13 }}>{l}</span>
-              </div>
-            ))}
+          <div className="mt-7 flex items-center gap-4 flex-wrap" style={{ fontFamily: "Inter", fontSize: 12.5, color: "#9AA197" }}>
+            <span className="inline-flex items-center gap-1.5">
+              <Check size={14} color="#7CB342" /> Бесплатная доставка
+            </span>
+            <span style={{ width: 3, height: 3, borderRadius: 99, background: "#444" }} />
+            <span className="inline-flex items-center gap-1.5">
+              <Check size={14} color="#7CB342" /> Первая неделя −15%
+            </span>
+            <span style={{ width: 3, height: 3, borderRadius: 99, background: "#444" }} />
+            <span className="inline-flex items-center gap-1.5">
+              <Check size={14} color="#7CB342" /> 5 линеек под цель
+            </span>
           </div>
         </div>
       </div>
@@ -425,150 +436,147 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
   );
 }
 
-/* ────────── Lines (compact row, drives menu) ────────── */
+/* ────────── Lines — vertical accordion (Level Kitchen style) ────────── */
 
-function LinesSection({ selected, onSelect }: { selected: LineId; onSelect: (id: LineId) => void }) {
-  const selectedLine = LINES.find((l) => l.id === selected)!;
-
+function LinesSection({ selected, openId, onOpen, onChoose }: {
+  selected: LineId;
+  openId: LineId | null;
+  onOpen: (id: LineId) => void;
+  onChoose: (id: LineId) => void;
+}) {
   return (
-    <section id="lines" style={{ background: "#F7F7F5", padding: "56px 16px 32px" }}>
-      <div className="mx-auto max-w-6xl">
+    <section id="lines" style={{ background: "#F7F7F5", padding: "64px 16px 56px" }}>
+      <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Наши рационы"
           title="Выбери линейку"
-          desc="Меню ниже автоматически собирается под выбранный рацион"
+          desc="Под каждую цель — свой рацион с точным КБЖУ. Меню недели ниже подстроится автоматически."
           accent="#2E7D32"
           center
         />
 
-        {/* Reference-style cards: header + kcal + desc + large image */}
-        <style>{`
-          #lines-grid {
-            display: grid; gap: 12px;
-            grid-template-columns: repeat(2, minmax(0,1fr));
-          }
-          @media (min-width: 640px) { #lines-grid { grid-template-columns: repeat(3, minmax(0,1fr)); } }
-          @media (min-width: 960px) { #lines-grid { grid-template-columns: repeat(5, minmax(0,1fr)); gap: 16px; } }
-        `}</style>
-
-        <div id="lines-grid" className="reveal mt-7">
+        <div className="reveal mt-8 mx-auto" style={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: 10 }}>
           {LINES.map((line) => {
-            const active = line.id === selected;
+            const isOpen = openId === line.id;
+            const isSelected = selected === line.id;
             return (
-              <button
+              <div
                 key={line.id}
-                onClick={() => onSelect(line.id)}
-                aria-pressed={active}
-                className="press tile-trans relative text-left overflow-hidden flex flex-col"
+                className="overflow-hidden tile-trans"
                 style={{
-                  background: "#FFFFFF",
-                  border: `1.5px solid ${active ? line.accent : "rgba(15,17,15,0.08)"}`,
-                  borderRadius: 18,
-                  boxShadow: active
-                    ? `0 14px 30px -14px ${line.accent}80`
-                    : "0 2px 8px rgba(0,0,0,0.03)",
+                  background: line.tint,
+                  border: `1.5px solid ${isSelected ? line.accent : "transparent"}`,
+                  borderRadius: 20,
+                  boxShadow: isSelected
+                    ? `0 12px 28px -14px ${line.accent}80`
+                    : "0 2px 8px rgba(0,0,0,0.04)",
                 }}
               >
-                <div style={{ padding: "12px 12px 10px" }}>
-                  <div className="flex items-center justify-between gap-2" style={{ minHeight: 20 }}>
-                    <div style={{
-                      fontFamily: "Unbounded", fontWeight: 800,
-                      fontSize: 15, letterSpacing: "0.04em",
-                      color: "#0E0F0E", lineHeight: 1,
-                    }}>
-                      {line.id}
-                    </div>
-                    {line.popular ? (
-                      <span style={{
-                        background: "#0E0F0E", color: "#D4AF37",
-                        borderRadius: 50, padding: "3px 7px",
-                        fontFamily: "Inter", fontWeight: 700, fontSize: 9, letterSpacing: "0.08em",
-                      }}>ХИТ</span>
-                    ) : active ? (
-                      <span
-                        key="check"
-                        className="grid place-items-center rounded-full check-pop"
-                        style={{ width: 20, height: 20, background: line.accent, color: "#FFFFFF" }}
-                      >
-                        <Check size={12} strokeWidth={3} />
+                <button
+                  onClick={() => onOpen(line.id)}
+                  className="press w-full flex items-center text-left"
+                  style={{ padding: "14px 16px", gap: 14 }}
+                  aria-expanded={isOpen}
+                >
+                  <div className="grid place-items-center rounded-2xl shrink-0"
+                    style={{ width: 44, height: 44, background: line.accent, color: "#FFFFFF" }}>
+                    <line.Icon size={20} />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, letterSpacing: "-0.01em", color: "#0E0F0E" }}>
+                        {line.id}
                       </span>
-                    ) : null}
+                      <span className="hidden sm:inline" style={{ fontFamily: "Inter", fontSize: 13, color: "#5A5F58" }}>
+                        · {line.title}
+                      </span>
+                      {line.popular && (
+                        <span style={{
+                          background: "#0E0F0E", color: "#D4AF37", borderRadius: 50, padding: "2px 8px",
+                          fontFamily: "Inter", fontWeight: 700, fontSize: 9, letterSpacing: "0.08em",
+                        }}>ХИТ</span>
+                      )}
+                    </div>
+                    <div className="tabular mt-1" style={{ fontFamily: "Inter", fontSize: 12.5, color: "#5A5F58" }}>
+                      {line.kcal} ккал · {line.desc}
+                    </div>
                   </div>
-                  <div className="tabular mt-1.5" style={{
-                    fontFamily: "Inter", fontWeight: 600, fontSize: 11,
-                    color: "#0E0F0E", letterSpacing: "0.01em",
-                  }}>
-                    {line.kcal} ккал
+
+                  <div className="text-right shrink-0 hidden sm:block">
+                    <div className="tabular" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 14, color: "#0E0F0E" }}>
+                      {line.priceFrom}
+                    </div>
+                    <div style={{ fontFamily: "Inter", fontSize: 10.5, color: "#888", marginTop: 2 }}>за день</div>
                   </div>
-                  <div className="mt-1" style={{
-                    fontFamily: "Inter", fontSize: 11, color: "#8A8E88", lineHeight: 1.3,
-                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
-                    overflow: "hidden", minHeight: 28,
-                  }}>
-                    {line.desc}
+
+                  <div
+                    className="grid place-items-center rounded-full shrink-0 tile-trans"
+                    style={{
+                      width: 32, height: 32, background: "rgba(14,15,14,0.06)", color: "#0E0F0E",
+                      transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+                    }}
+                  >
+                    <Plus size={16} />
+                  </div>
+                </button>
+
+                <div
+                  style={{
+                    maxHeight: isOpen ? 480 : 0,
+                    overflow: "hidden",
+                    transition: "max-height 320ms cubic-bezier(.2,.7,.2,1)",
+                  }}
+                >
+                  <div className="grid md:grid-cols-[160px_1fr] gap-4" style={{ padding: "4px 16px 16px" }}>
+                    <SmartImage
+                      src={line.image}
+                      alt={line.title}
+                      light
+                      aspectRatio="1 / 1"
+                      style={{ borderRadius: 14, width: "100%", maxWidth: 160 }}
+                    />
+                    <div className="flex flex-col">
+                      <div className="tabular sm:hidden mb-2" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 14, color: "#0E0F0E" }}>
+                        {line.priceFrom} <span style={{ color: "#888", fontWeight: 500, fontSize: 11 }}>/ день</span>
+                      </div>
+                      <ul className="space-y-2">
+                        {line.features.map((f) => (
+                          <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#2A2E2A" }}>
+                            <span className="grid place-items-center rounded-full shrink-0 mt-0.5"
+                              style={{ width: 16, height: 16, background: line.accent, color: "#FFFFFF" }}>
+                              <Check size={10} strokeWidth={3} />
+                            </span>
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                      <button onClick={() => onChoose(line.id)} className="press rounded-full mt-4 inline-flex items-center justify-center gap-2 self-start"
+                        style={{
+                          background: "#0E0F0E", color: "#FFFFFF",
+                          height: 44, padding: "0 22px",
+                          fontFamily: "Inter", fontWeight: 600, fontSize: 13.5,
+                        }}>
+                        Выбрать рацион <ArrowRight size={14} />
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <SmartImage
-                  src={line.image}
-                  alt={line.title}
-                  light
-                  aspectRatio="1 / 1"
-                  style={{ marginTop: "auto", width: "100%" }}
-                />
-              </button>
+              </div>
             );
           })}
-        </div>
-
-        {/* Selected line summary pill — anchors the choice */}
-        <div
-          className="reveal mt-5 mx-auto flex items-center gap-3 rounded-full"
-          style={{
-            background: "#FFFFFF",
-            border: `1px solid ${selectedLine.accent}33`,
-            padding: "8px 14px 8px 8px",
-            maxWidth: 420,
-            boxShadow: "0 4px 14px rgba(0,0,0,0.04)",
-          }}
-        >
-          <span
-            className="rounded-full shrink-0 overflow-hidden block"
-            style={{ width: 36, height: 36, background: `url(${selectedLine.image}) center/cover` }}
-          />
-          <div className="min-w-0 flex-1">
-            <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 13, color: "#0E0F0E", lineHeight: 1.1 }}>
-              Выбран рацион <span style={{ color: selectedLine.accent }}>{selectedLine.title}</span>
-            </div>
-            <div className="truncate" style={{ fontFamily: "Inter", fontSize: 11, color: "#888", marginTop: 2 }}>
-              {selectedLine.kcal} ккал · {selectedLine.desc}
-            </div>
-          </div>
-          <a
-            href="#menu"
-            className="press grid place-items-center rounded-full shrink-0"
-            style={{ width: 36, height: 36, background: "#0E0F0E", color: "#FFFFFF" }}
-            aria-label="К меню"
-          >
-            <ChevronRight size={18} />
-          </a>
         </div>
       </div>
     </section>
   );
 }
 
-
-/* ────────── Menu (auto-filtered by selected line) ────────── */
+/* ────────── Menu (2×2 grid, day pills) ────────── */
 
 function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDish: (d: Dish) => void; onOrder: () => void }) {
   const [day, setDay] = useState(0);
   const line = LINES.find((l) => l.id === lineId)!;
   const dayMeals = WEEK_MENU[lineId][day];
-
-  function pickDay(i: number) {
-    if (i === day) return;
-    setDay(i);
-  }
 
   const totalKcal = dayMeals.reduce((s, d) => s + d.kcal, 0);
   const totalP = dayMeals.reduce((s, d) => s + d.p, 0);
@@ -576,109 +584,103 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
   const totalC = dayMeals.reduce((s, d) => s + d.c, 0);
 
   return (
-    <section id="menu" style={{ background: "#0E0F0E", padding: "56px 16px" }}>
-      <div className="mx-auto max-w-6xl">
+    <section id="menu" style={{ background: "#0E0F0E", padding: "64px 16px" }}>
+      <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Меню недели"
           title="Рацион"
           titleAccent={<span style={{ color: line.accent }}>{line.id}</span>}
-          desc={`${line.desc} · ${line.kcal} ккал`}
+          desc={`${line.desc} · ${line.kcal} ккал в день`}
           dark
           accent="#D4AF37"
         />
 
-        {/* Day pills — horizontal scroll, premium */}
-        <div className="reveal mt-6 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 8, scrollSnapType: "x mandatory" }}>
+        {/* Days — round pills */}
+        <div className="reveal mt-7 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 10, scrollSnapType: "x mandatory" }}>
           {DAYS.map((d, i) => {
             const active = i === day;
             return (
               <button
                 key={d}
-                onClick={() => pickDay(i)}
-                className="press shrink-0 inline-flex items-center justify-center rounded-full"
+                onClick={() => setDay(i)}
+                className="press shrink-0 flex flex-col items-center justify-center rounded-full tile-trans"
                 style={{
-                  height: 44, padding: "0 16px", minWidth: 64,
+                  width: 56, height: 56,
                   scrollSnapAlign: "start",
                   background: active ? "#D4AF37" : "transparent",
                   color: active ? "#0E0F0E" : "#A0A89A",
-                  border: `1px solid ${active ? "#D4AF37" : "#2A2E2A"}`,
-                  fontFamily: "Inter", fontWeight: 700, fontSize: 13,
-                  letterSpacing: "0.02em",
-                  transition: "background 200ms ease, color 200ms ease, border-color 200ms ease",
-                  whiteSpace: "nowrap",
+                  border: `1.5px solid ${active ? "#D4AF37" : "#2A2E2A"}`,
+                  fontFamily: "Inter",
+                  boxShadow: active ? "0 8px 22px -6px rgba(212,175,55,0.55)" : "none",
                 }}
               >
-                <span style={{ opacity: active ? 0.65 : 0.7, marginRight: 6 }}>{d}</span>
-                <span className="tabular" style={{ fontWeight: 800 }}>{i + 1}</span>
+                <span style={{ fontSize: 10, fontWeight: 600, opacity: 0.7, letterSpacing: "0.05em" }}>{d}</span>
+                <span className="tabular" style={{ fontWeight: 800, fontSize: 16, lineHeight: 1 }}>{i + 1}</span>
               </button>
             );
           })}
         </div>
 
-
-        <div className="reveal mt-2" style={{ fontFamily: "Inter", fontSize: 13, color: "#7A8278" }}>
+        <div className="reveal mt-3" style={{ fontFamily: "Inter", fontSize: 13, color: "#7A8278" }}>
           {DAYS_FULL[day]}
         </div>
 
-        {/* Dishes — re-mount on line/day change to retrigger animation */}
+        {/* 2×2 grid of meal cards */}
         <div
           key={`${lineId}-${day}`}
           className="mt-5 grid menu-anim"
           style={{
-            gridTemplateColumns: "1fr",
-            gap: 1,
-            borderRadius: 24,
-            overflow: "hidden",
-            background: "#2A2E2A",
+            gridTemplateColumns: "repeat(2, minmax(0,1fr))",
+            gap: 10,
           }}
         >
           {dayMeals.map((d) => (
             <button
               key={d.meal + d.name}
               onClick={() => onOpenDish(d)}
-              className="press text-left"
+              className="press text-left flex flex-col overflow-hidden tile-trans"
               style={{
-                background: "#161816", padding: 14,
-                display: "flex", gap: 12, alignItems: "center",
+                background: "#161816", border: "1px solid #2A2E2A",
+                borderRadius: 18,
               }}
             >
               <SmartImage
                 src={line.image}
                 alt={d.name}
-                className="shrink-0 rounded-2xl"
-                style={{ width: 60, height: 60, background: "#0E0F0E" }}
-                aspectRatio="1 / 1"
+                aspectRatio="4 / 3"
+                style={{ width: "100%", background: "#0E0F0E" }}
               />
-              <div className="min-w-0 flex-1">
-                <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 10, color: line.accent, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+              <div className="flex-1 flex flex-col" style={{ padding: 12 }}>
+                <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 9, color: line.accent, letterSpacing: "0.12em", textTransform: "uppercase" }}>
                   {d.meal}
                 </div>
                 <div
                   className="mt-1"
                   style={{
-                    fontFamily: "Inter", fontWeight: 700, fontSize: 14.5, color: "#FFFFFF", lineHeight: 1.3,
+                    fontFamily: "Inter", fontWeight: 700, fontSize: 13.5, color: "#FFFFFF", lineHeight: 1.25,
                     display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
-                    overflow: "hidden", wordBreak: "break-word",
+                    overflow: "hidden", wordBreak: "break-word", minHeight: 34,
                   }}
                 >
                   {d.name}
                 </div>
-                <div className="mt-1 tabular" style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 11.5, color: "#A0A89A" }}>
-                  {d.kcal} ккал · Б{d.p} · Ж{d.f} · У{d.c}
+                <div className="mt-2 tabular flex items-center flex-wrap" style={{ fontFamily: "Inter", fontSize: 10.5, color: "#A0A89A", gap: 6 }}>
+                  <span style={{ color: "#D4AF37", fontWeight: 700 }}>{d.kcal} ккал</span>
+                  <span style={{ opacity: 0.4 }}>·</span>
+                  <span>Б{d.p} Ж{d.f} У{d.c}</span>
                 </div>
               </div>
-              <ChevronRight size={16} color="#A0A89A" className="shrink-0" />
             </button>
           ))}
         </div>
 
         {/* Totals + CTA */}
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl"
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl"
           style={{ background: "#161816", border: "1px solid #2A2E2A", padding: 18 }}>
-          <div className="tabular" style={{ fontFamily: "Inter", color: "#A0A89A", fontSize: 13 }}>
-            ИТОГО ЗА ДЕНЬ
-            <div className="mt-1" style={{ color: "#FFFFFF", fontFamily: "Unbounded", fontWeight: 800, fontSize: 22 }}>
-              {totalKcal} <span style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A", fontWeight: 500 }}>ккал · Б {totalP} · Ж {totalF} · У {totalC}</span>
+          <div className="tabular" style={{ fontFamily: "Inter", color: "#A0A89A", fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            Итого за день
+            <div className="mt-1" style={{ color: "#FFFFFF", fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em" }}>
+              {totalKcal} <span style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A", fontWeight: 500, letterSpacing: 0, textTransform: "none" }}>ккал · Б {totalP} · Ж {totalF} · У {totalC}</span>
             </div>
           </div>
           <button onClick={onOrder} className="press rounded-full inline-flex items-center gap-2"
@@ -691,7 +693,7 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
   );
 }
 
-/* ────────── Dish Modal ────────── */
+/* ────────── Dish Modal (bottom sheet) ────────── */
 
 function DishModal({ dish, onClose }: { dish: Dish; onClose: () => void }) {
   const line = LINES.find((l) => l.id === dish.line)!;
@@ -708,6 +710,7 @@ function DishModal({ dish, onClose }: { dish: Dish; onClose: () => void }) {
       <div onClick={(e) => e.stopPropagation()}
         className="relative w-full sm:max-w-[480px] max-h-[92vh] overflow-y-auto animate-slide-up"
         style={{ background: "#161816", borderRadius: "24px 24px 0 0", border: "1px solid #2A2E2A" }}>
+        <div className="mx-auto mt-2.5 mb-1 rounded-full sm:hidden" style={{ width: 40, height: 4, background: "#2A2E2A" }} />
         <button onClick={onClose} className="absolute top-3 right-3 z-10 h-10 w-10 grid place-items-center rounded-full"
           style={{ background: "rgba(0,0,0,0.6)", color: "#FFFFFF" }} aria-label="Закрыть">
           <X size={20} />
@@ -715,8 +718,8 @@ function DishModal({ dish, onClose }: { dish: Dish; onClose: () => void }) {
         <SmartImage
           src={line.image}
           alt={dish.name}
-          style={{ height: 220, borderRadius: "24px 24px 0 0", background: "#0E0F0E" }}
-          aspectRatio="auto"
+          style={{ background: "#0E0F0E" }}
+          aspectRatio="16 / 10"
         />
 
         <div className="p-5 space-y-5">
@@ -796,126 +799,167 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   };
 
   return (
-    <section id="calc" style={{ background: "#F7F7F5", padding: "56px 16px" }}>
-      <div className="mx-auto max-w-2xl">
+    <section id="calc" style={{ background: "#F7F7F5", padding: "64px 16px" }}>
+      <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Калькулятор КБЖУ"
-          title="Рассчитай норму"
-          desc="Подберём рацион под твои параметры"
+          title="Рассчитай свою норму"
+          desc="Формула Миффлина-Сан Жеора. Подберём подходящий рацион автоматически."
           accent="#2E7D32"
+          center
         />
 
-        <div className="reveal mt-6 space-y-5 rounded-3xl" style={{ background: "#FFFFFF", padding: 24, boxShadow: "0 24px 60px -30px rgba(0,0,0,0.25)" }}>
-          <div>
-            <label style={lbl}>Пол</label>
-            <div className="flex" style={{ gap: 8 }}>
-              {(["M", "F"] as const).map((s) => {
-                const active = sex === s;
-                return (
-                  <button key={s} onClick={() => setSex(s)} className="press"
-                    style={{
-                      flex: 1, minWidth: 0, height: 52, borderRadius: 14,
-                      background: active ? "#0E0F0E" : "#F5F5F5",
-                      color: active ? "#FFFFFF" : "#555",
-                      fontFamily: "Inter", fontWeight: 600,
-                      fontSize: "clamp(13px, 3.6vw, 15px)",
-                      whiteSpace: "nowrap", padding: "0 8px",
-                      transition: "all 180ms ease",
-                    }}>{s === "M" ? "Мужчина" : "Женщина"}</button>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2">
-            {[
-              { l: "Возраст", v: age, set: setAge, min: 18, max: 80 },
-              { l: "Рост, см", v: height, set: setHeight, min: 120, max: 220 },
-              { l: "Вес, кг", v: weight, set: setWeight, min: 35, max: 200 },
-            ].map((f) => (
-              <div key={f.l}>
-                <label style={lbl}>{f.l}</label>
-                <input type="number" inputMode="numeric" min={f.min} max={f.max} value={f.v}
-                  onChange={(e) => f.set(parseInt(e.target.value) || 0)}
-                  className="tabular"
-                  style={{ ...inputStyle, fontWeight: 700 }} />
+        <div className="mt-8 mx-auto grid md:grid-cols-[1fr_1fr] gap-5 items-start" style={{ maxWidth: 980 }}>
+          {/* Form column */}
+          <div className="reveal space-y-5 rounded-3xl" style={{ background: "#FFFFFF", padding: 24, boxShadow: "0 24px 60px -30px rgba(0,0,0,0.18)" }}>
+            <div>
+              <label style={lbl}>Пол</label>
+              <div className="flex" style={{ gap: 8 }}>
+                {(["M", "F"] as const).map((s) => {
+                  const active = sex === s;
+                  return (
+                    <button key={s} onClick={() => setSex(s)} className="press"
+                      style={{
+                        flex: 1, minWidth: 0, height: 52, borderRadius: 14,
+                        background: active ? "#0E0F0E" : "#F5F5F5",
+                        color: active ? "#FFFFFF" : "#555",
+                        fontFamily: "Inter", fontWeight: 600,
+                        fontSize: "clamp(13px, 3.6vw, 15px)",
+                        whiteSpace: "nowrap",
+                        transition: "all 180ms ease",
+                      }}>{s === "M" ? "Мужчина" : "Женщина"}</button>
+                  );
+                })}
               </div>
-            ))}
-          </div>
-
-          <div>
-            <label style={lbl}>Активность</label>
-            <select value={act} onChange={(e) => setAct(parseFloat(e.target.value))} style={inputStyle}>
-              <option value={1.2}>Сидячий образ жизни</option>
-              <option value={1.375}>Лёгкая активность (1–3 раза)</option>
-              <option value={1.55}>Умеренная (3–5 раз)</option>
-              <option value={1.725}>Высокая (6–7 раз)</option>
-            </select>
-          </div>
-
-          <div>
-            <label style={lbl}>Цель</label>
-            <div className="flex" style={{ gap: 8 }}>
-              {([
-                ["loss", "Снижение"], ["keep", "Норма"], ["gain", "Набор"],
-              ] as const).map(([k, l]) => {
-                const active = goal === k;
-                return (
-                  <button key={k} onClick={() => setGoal(k)} className="press"
-                    style={{
-                      flex: 1, minWidth: 0, height: 52, borderRadius: 14,
-                      background: active ? "#0E0F0E" : "#F5F5F5",
-                      color: active ? "#FFFFFF" : "#555",
-                      fontFamily: "Inter", fontWeight: 600,
-                      fontSize: "clamp(12px, 3.4vw, 14px)",
-                      whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-                      padding: "0 8px",
-                    }}>{l}</button>
-                );
-              })}
             </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { l: "Возраст", v: age, set: setAge, min: 18, max: 80 },
+                { l: "Рост, см", v: height, set: setHeight, min: 120, max: 220 },
+                { l: "Вес, кг", v: weight, set: setWeight, min: 35, max: 200 },
+              ].map((f) => (
+                <div key={f.l}>
+                  <label style={lbl}>{f.l}</label>
+                  <input type="number" inputMode="numeric" min={f.min} max={f.max} value={f.v}
+                    onChange={(e) => f.set(parseInt(e.target.value) || 0)}
+                    className="tabular"
+                    style={{ ...inputStyle, fontWeight: 700 }} />
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <label style={lbl}>Активность</label>
+              <select value={act} onChange={(e) => setAct(parseFloat(e.target.value))} style={inputStyle}>
+                <option value={1.2}>Сидячий образ жизни</option>
+                <option value={1.375}>Лёгкая активность (1–3 раза)</option>
+                <option value={1.55}>Умеренная (3–5 раз)</option>
+                <option value={1.725}>Высокая (6–7 раз)</option>
+              </select>
+            </div>
+
+            <div>
+              <label style={lbl}>Цель</label>
+              <div className="flex" style={{ gap: 8 }}>
+                {([
+                  ["loss", "Снижение"], ["keep", "Норма"], ["gain", "Набор"],
+                ] as const).map(([k, l]) => {
+                  const active = goal === k;
+                  return (
+                    <button key={k} onClick={() => setGoal(k)} className="press"
+                      style={{
+                        flex: 1, minWidth: 0, height: 52, borderRadius: 14,
+                        background: active ? "#0E0F0E" : "#F5F5F5",
+                        color: active ? "#FFFFFF" : "#555",
+                        fontFamily: "Inter", fontWeight: 600,
+                        fontSize: "clamp(12px, 3.4vw, 14px)",
+                        whiteSpace: "nowrap",
+                      }}>{l}</button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <button onClick={compute} className="press"
+              style={{
+                width: "100%", height: 56, borderRadius: 50,
+                background: "#0E0F0E", color: "#D4AF37",
+                fontFamily: "Unbounded", fontWeight: 700, fontSize: 16, letterSpacing: "-0.01em",
+              }}>
+              Рассчитать
+            </button>
           </div>
 
-          <button onClick={compute} className="press"
-            style={{
-              width: "100%", height: 56, borderRadius: 50,
-              background: "#0E0F0E", color: "#D4AF37",
-              fontFamily: "Unbounded", fontWeight: 700, fontSize: 16, letterSpacing: "-0.01em",
-            }}>
-            Рассчитать
-          </button>
+          {/* Result column */}
+          <div className="reveal rounded-3xl flex flex-col" style={{
+            background: result
+              ? "linear-gradient(160deg, #0E0F0E 0%, #1B2E1B 100%)"
+              : "#FFFFFF",
+            padding: 24, minHeight: 360,
+            border: result ? "none" : "1.5px dashed #E0E0DC",
+            boxShadow: result ? "0 24px 60px -30px rgba(46,125,50,0.4)" : "none",
+            transition: "background 320ms ease",
+          }}>
+            {result ? (
+              <div className="animate-fade-in flex-1 flex flex-col">
+                <div style={{ fontFamily: "Inter", fontSize: 12, color: "#A0A89A", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                  Ваша норма
+                </div>
+                <div className="tabular mt-2" style={{ fontFamily: "Unbounded", fontWeight: 900, fontSize: 56, color: "#D4AF37", lineHeight: 1, letterSpacing: "-0.03em" }}>
+                  {result.kcal}
+                </div>
+                <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A" }}>
+                  ккал в день
+                </div>
 
-          {result && (
-            <div className="animate-fade-in" style={{ background: "#0E0F0E", borderRadius: 20, padding: 24 }}>
-              <div style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A" }}>Ваша норма:</div>
-              <div className="tabular mt-1" style={{ fontFamily: "Unbounded", fontWeight: 900, fontSize: 40, color: "#D4AF37", lineHeight: 1.1 }}>
-                {result.kcal} <span style={{ fontFamily: "Inter", fontSize: 16, fontWeight: 500, color: "#A0A89A" }}>ккал/день</span>
+                <div className="mt-6 rounded-2xl" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", padding: 16 }}>
+                  <div style={{ fontFamily: "Inter", fontSize: 11, color: "#A0A89A", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+                    Рекомендуем
+                  </div>
+                  <div className="mt-1" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, color: "#FFFFFF", letterSpacing: "-0.02em" }}>
+                    Рацион {result.line}
+                  </div>
+                  <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 13, color: "#9AA197" }}>
+                    {LINES.find(l => l.id === result.line)?.desc}
+                  </div>
+                </div>
+
+                <button onClick={() => onOrder(result.line)} className="press mt-auto"
+                  style={{
+                    width: "100%", height: 54, borderRadius: 50, marginTop: 24,
+                    background: "#D4AF37", color: "#0E0F0E",
+                    fontFamily: "Inter", fontWeight: 700, fontSize: 15,
+                  }}>
+                  Выбрать рацион {result.line}
+                </button>
               </div>
-              <div className="mt-3" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 16, color: "#FFFFFF" }}>
-                Рекомендуем: {result.line}
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-center">
+                <div className="grid place-items-center rounded-full mb-4" style={{ width: 72, height: 72, background: "#F0F4EE" }}>
+                  <CalcIcon size={32} color="#2E7D32" />
+                </div>
+                <div style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, color: "#0E0F0E", letterSpacing: "-0.02em" }}>
+                  Готовы посчитать?
+                </div>
+                <div className="mt-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#777", maxWidth: 260, lineHeight: 1.5 }}>
+                  Заполните параметры слева — здесь появится ваша норма и подходящий рацион.
+                </div>
               </div>
-              <button onClick={() => onOrder(result.line)} className="press mt-4"
-                style={{
-                  width: "100%", height: 52, borderRadius: 50,
-                  background: "#D4AF37", color: "#0E0F0E",
-                  fontFamily: "Inter", fontWeight: 700, fontSize: 16,
-                }}>
-                Выбрать рацион {result.line}
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-/* ────────── Subscription (compact horizontal cards) ────────── */
+/* ────────── Subscriptions ────────── */
 
 function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
   const plans = [
     { id: "1 день", price: "от 750 ₽", per: "за день", old: null as string | null, badge: null as string | null,
-      features: ["4 приёма пищи", "Доставка сегодня"], primary: false },
+      features: ["4 приёма пищи", "Доставка сегодня", "Без подписки"], primary: false },
     { id: "3 дня", price: "от 2 100 ₽", per: "−12%", old: "2 400 ₽", badge: "ПОПУЛЯРНО",
       features: ["12 приёмов пищи", "Выбор линейки", "Скидка 12%"], primary: true },
     { id: "Месяц", price: "от 19 500 ₽", per: "−20%", old: "24 000 ₽", badge: null,
@@ -923,57 +967,61 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
   ];
 
   return (
-    <section style={{ background: "#0E0F0E", padding: "56px 16px" }}>
-      <div className="mx-auto max-w-6xl">
+    <section id="subs" style={{ background: "#0E0F0E", padding: "64px 16px" }}>
+      <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Подписки"
           title="Выбери формат"
-          desc="Чем длиннее период — тем выгоднее"
+          desc="Чем длиннее период — тем выгоднее цена за день"
           dark
           accent="#D4AF37"
+          center
         />
 
-        <div className="mt-6 grid sm:grid-cols-3" style={{ gap: 12 }}>
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3" style={{ gap: 12 }}>
           {plans.map((p) => (
-            <div key={p.id} className="reveal relative flex flex-col"
+            <div key={p.id} className="reveal relative flex flex-col tile-trans"
               style={{
                 background: p.primary ? "linear-gradient(180deg, #1C2A1C 0%, #162016 100%)" : "#161816",
                 border: p.primary ? "1.5px solid #2E7D32" : "1px solid #2A2E2A",
-                borderRadius: 20, padding: 20,
+                borderRadius: 22, padding: 22,
+                boxShadow: p.primary ? "0 20px 50px -20px rgba(46,125,50,0.45)" : "none",
               }}>
               {p.badge && (
                 <span className="absolute" style={{
-                  top: -10, right: 16, background: "#D4AF37", color: "#0E0F0E",
-                  borderRadius: 50, padding: "4px 12px",
-                  fontFamily: "Inter", fontWeight: 700, fontSize: 10, letterSpacing: "0.06em",
+                  top: -11, left: "50%", transform: "translateX(-50%)",
+                  background: "#D4AF37", color: "#0E0F0E",
+                  borderRadius: 50, padding: "5px 14px",
+                  fontFamily: "Inter", fontWeight: 700, fontSize: 10, letterSpacing: "0.08em",
+                  boxShadow: "0 6px 16px -4px rgba(212,175,55,0.5)",
                 }}>
                   {p.badge}
                 </span>
               )}
-              <div style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 16, letterSpacing: "-0.02em", color: "#FFFFFF", textTransform: "uppercase" }}>
+              <div style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 17, letterSpacing: "-0.02em", color: "#FFFFFF", textTransform: "uppercase" }}>
                 {p.id}
               </div>
 
               <div className="mt-2 flex items-baseline gap-2 flex-wrap">
-                <span className="tabular" style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 24, color: "#D4AF37" }}>{p.price}</span>
+                <span className="tabular" style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 26, color: "#D4AF37" }}>{p.price}</span>
                 {p.old && (
                   <span className="tabular" style={{ fontFamily: "Inter", fontSize: 13, color: "#777", textDecoration: "line-through" }}>{p.old}</span>
                 )}
               </div>
-              <div style={{ fontFamily: "Inter", fontSize: 12, color: "#9FD89F", marginTop: 2 }}>{p.per}</div>
+              <div style={{ fontFamily: "Inter", fontSize: 12, color: p.primary ? "#9FD89F" : "#A0A89A", marginTop: 2 }}>{p.per}</div>
 
-              <ul className="mt-4 space-y-1.5 flex-1">
+              <ul className="mt-5 space-y-2 flex-1">
                 {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>
-                    <Check size={14} color="#9FD89F" style={{ marginTop: 3, flexShrink: 0 }} />
+                  <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#C8CCC4" }}>
+                    <Check size={14} color={p.primary ? "#9FD89F" : "#7CB342"} style={{ marginTop: 3, flexShrink: 0 }} />
                     {f}
                   </li>
                 ))}
               </ul>
 
-              <button onClick={() => onSelect(p.id)} className="press mt-5 w-full"
+              <button onClick={() => onSelect(p.id)} className="press mt-6 w-full"
                 style={{
-                  height: 46, borderRadius: 50,
+                  height: 48, borderRadius: 50,
                   background: p.primary ? "#D4AF37" : "transparent",
                   border: p.primary ? "none" : "1.5px solid #2A2E2A",
                   color: p.primary ? "#0E0F0E" : "#FFFFFF",
@@ -993,21 +1041,22 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
 
 function Delivery({ onAsk }: { onAsk: () => void }) {
   return (
-    <section id="delivery" style={{ background: "#FFFFFF", padding: "56px 16px" }}>
-      <div className="mx-auto max-w-6xl">
+    <section id="delivery" style={{ background: "#FFFFFF", padding: "64px 16px" }}>
+      <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Доставка"
           title="Привезём свежее"
           desc="Ежедневно по Ростову, бесплатно — выберите удобный слот"
           accent="#2E7D32"
+          center
         />
 
-        <div className="mt-6 grid sm:grid-cols-2" style={{ gap: 12 }}>
-          <div className="reveal" style={{ background: "#E8F5E9", borderRadius: 20, padding: 20 }}>
-            <div className="grid place-items-center rounded-full" style={{ width: 40, height: 40, background: "#2E7D32" }}>
-              <Truck size={20} color="#FFFFFF" />
+        <div className="mt-8 grid sm:grid-cols-2" style={{ gap: 12, maxWidth: 880, marginInline: "auto" }}>
+          <div className="reveal" style={{ background: "#E8F5E9", borderRadius: 22, padding: 22 }}>
+            <div className="grid place-items-center rounded-2xl" style={{ width: 44, height: 44, background: "#2E7D32" }}>
+              <Truck size={22} color="#FFFFFF" />
             </div>
-            <div className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 20, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
+            <div className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 19, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
               Бесплатно по Ростову
             </div>
             <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 14, color: "#555", lineHeight: 1.5 }}>
@@ -1023,11 +1072,11 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
             </div>
           </div>
 
-          <div className="reveal" style={{ background: "#FFF8E1", borderRadius: 20, padding: 20 }}>
-            <div className="grid place-items-center rounded-full" style={{ width: 40, height: 40, background: "#D4AF37" }}>
-              <Phone size={20} color="#0E0F0E" />
+          <div className="reveal" style={{ background: "#FFF8E1", borderRadius: 22, padding: 22 }}>
+            <div className="grid place-items-center rounded-2xl" style={{ width: 44, height: 44, background: "#D4AF37" }}>
+              <Phone size={22} color="#0E0F0E" />
             </div>
-            <div className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 20, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
+            <div className="mt-3" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 19, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
               Пригороды
             </div>
             <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 14, color: "#555", lineHeight: 1.5 }}>
@@ -1053,17 +1102,18 @@ function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" style={{ background: "#0E0F0E", padding: "56px 16px" }}>
-      <div className="mx-auto max-w-2xl">
+    <section id="faq" style={{ background: "#0E0F0E", padding: "64px 16px" }}>
+      <div className="mx-auto" style={{ maxWidth: 720 }}>
         <SectionHeader
           eyebrow="FAQ"
           title="Частые вопросы"
-          desc="Коротко о доставке, меню и оформлении заявки"
+          desc="Коротко о доставке, меню и оформлении"
           dark
           accent="#D4AF37"
+          center
         />
 
-        <div className="reveal mt-6">
+        <div className="reveal mt-7">
           {FAQ.map((item, i) => {
             const isOpen = open === i;
             return (
@@ -1072,13 +1122,20 @@ function FAQSection() {
                   className="w-full flex items-center justify-between text-left"
                   style={{ padding: "18px 0", fontFamily: "Inter", fontWeight: 600, fontSize: 16, color: "#FFFFFF" }}>
                   <span style={{ paddingRight: 16 }}>{item.q}</span>
-                  {isOpen
-                    ? <Minus size={20} color="#D4AF37" style={{ flexShrink: 0 }} />
-                    : <Plus size={20} color="#D4AF37" style={{ flexShrink: 0 }} />}
+                  <span
+                    className="grid place-items-center rounded-full shrink-0 tile-trans"
+                    style={{
+                      width: 28, height: 28, background: isOpen ? "#D4AF37" : "rgba(255,255,255,0.06)",
+                      color: isOpen ? "#0E0F0E" : "#D4AF37",
+                      transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
+                    }}
+                  >
+                    <Plus size={16} />
+                  </span>
                 </button>
                 <div style={{
                   maxHeight: isOpen ? 320 : 0, overflow: "hidden",
-                  transition: "max-height 250ms ease",
+                  transition: "max-height 280ms ease",
                 }}>
                   <p style={{
                     fontFamily: "Inter", fontWeight: 400, fontSize: 15,
@@ -1095,11 +1152,10 @@ function FAQSection() {
   );
 }
 
-/* ────────── Order Form ────────── */
+/* ────────── Order Form (minimal — 3 fields) ────────── */
 
 type OrderState = {
-  name: string; phone: string; messenger: string; line: string; period: string;
-  address: string; slot: string; comment: string;
+  name: string; phone: string; telegram: string; line: LineId; period: string;
 };
 
 function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: OrderState) => void }) {
@@ -1128,57 +1184,84 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
   }
 
   const fieldStyle: React.CSSProperties = {
-    background: "#161816", border: "1px solid #2A2E2A", borderRadius: 12,
-    padding: "0 14px", fontFamily: "Inter", fontWeight: 500, fontSize: 15,
-    color: "#FFFFFF", height: 48, width: "100%", outline: "none",
+    background: "#161816", border: "1px solid #2A2E2A", borderRadius: 14,
+    padding: "0 16px", fontFamily: "Inter", fontWeight: 500, fontSize: 15,
+    color: "#FFFFFF", height: 54, width: "100%", outline: "none",
+    transition: "border-color 180ms ease",
   };
+
+  const line = LINES.find((l) => l.id === state.line)!;
 
   return (
     <section id="order-form" style={{
-      background: "linear-gradient(180deg, #0E0F0E 0%, #0F1A0F 100%)",
-      padding: "40px 16px",
+      position: "relative",
+      background: "#0E0F0E",
+      padding: "56px 16px 72px",
+      overflow: "hidden",
     }}>
-      <div className="mx-auto max-w-xl">
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background: "radial-gradient(circle at 80% 0%, rgba(46,125,50,0.18) 0%, transparent 50%), radial-gradient(circle at 0% 100%, rgba(212,175,55,0.1) 0%, transparent 50%)",
+      }} />
+
+      <div className="relative mx-auto" style={{ maxWidth: 520 }}>
         <SectionHeader
           eyebrow="Заявка"
           title="Оставь заявку"
-          desc="Ответим в Telegram за 30 минут"
+          desc="Менеджер напишет в Telegram за 30 минут"
           dark
           accent="#D4AF37"
+          center
         />
 
+        {/* Selected ration badge */}
+        <div className="reveal mt-5 flex justify-center">
+          <div className="inline-flex items-center gap-2 rounded-full"
+            style={{
+              background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.4)",
+              padding: "8px 14px",
+            }}>
+            <line.Icon size={14} color="#D4AF37" />
+            <span style={{ fontFamily: "Inter", fontSize: 12.5, color: "#E8C46B", fontWeight: 600 }}>
+              Выбран рацион
+            </span>
+            <span style={{ fontFamily: "Unbounded", fontSize: 12.5, color: "#D4AF37", fontWeight: 800, letterSpacing: "0.02em" }}>
+              {state.line}
+            </span>
+            <span style={{ color: "#7A8278", fontFamily: "Inter", fontSize: 12 }}>· {state.period}</span>
+          </div>
+        </div>
+
         {sent ? (
-          <div className="reveal in mt-5 animate-fade-in" style={{
-            background: "#161816", border: "1px solid #2A2E2A", borderRadius: 20, padding: 22,
+          <div className="reveal in mt-6 animate-fade-in" style={{
+            background: "#161816", border: "1px solid #2A2E2A", borderRadius: 22, padding: 22,
           }}>
             <div className="flex items-center gap-3">
-              <div className="grid place-items-center rounded-full shrink-0"
-                style={{ width: 44, height: 44, background: "#2E7D32" }}>
-                <Check size={22} color="#FFFFFF" strokeWidth={3} />
+              <div className="grid place-items-center rounded-full shrink-0 check-pop"
+                style={{ width: 48, height: 48, background: "#2E7D32", boxShadow: "0 8px 22px -6px rgba(46,125,50,0.5)" }}>
+                <Check size={24} color="#FFFFFF" strokeWidth={3} />
               </div>
               <div className="min-w-0">
-                <div style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 18, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+                <div style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 19, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
                   Заявка принята
                 </div>
-                <div className="mt-0.5" style={{ fontFamily: "Inter", fontSize: 12.5, color: "#A0A89A" }}>
+                <div className="mt-0.5" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>
                   Напишем в Telegram за 30 минут
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 rounded-2xl" style={{ background: "#0E0F0E", border: "1px solid #2A2E2A", padding: 14 }}>
+            <div className="mt-4 rounded-2xl" style={{ background: "#0E0F0E", border: "1px solid #2A2E2A", padding: 16 }}>
               <div style={{ fontFamily: "Inter", fontSize: 10.5, color: "#7A8278", letterSpacing: "0.12em", textTransform: "uppercase" }}>
                 Ваш заказ
               </div>
-              <dl className="mt-2 space-y-1.5" style={{ fontFamily: "Inter", fontSize: 13 }}>
+              <dl className="mt-2 space-y-1.5" style={{ fontFamily: "Inter", fontSize: 13.5 }}>
                 {[
                   ["Имя", state.name || "—"],
                   ["Телефон", state.phone || "—"],
-                  ["Рацион", LINES.find((l) => l.id === state.line)?.title ?? state.line],
+                  ["Telegram", state.telegram || "—"],
+                  ["Рацион", `${state.line} · ${line.title}`],
                   ["Период", state.period],
-                  ["Адрес", state.address || "—"],
-                  ["Слот", state.slot],
-                  ...(state.messenger ? [["Telegram", state.messenger]] as const : [] as const),
                 ].map(([k, v]) => (
                   <div key={k} className="flex gap-3 justify-between">
                     <dt style={{ color: "#7A8278" }}>{k}</dt>
@@ -1192,7 +1275,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
               onClick={() => setSent(false)}
               className="press mt-4 w-full"
               style={{
-                height: 48, borderRadius: 50,
+                height: 50, borderRadius: 50,
                 background: "transparent", border: "1px solid #2A2E2A",
                 color: "#FFFFFF", fontFamily: "Inter", fontWeight: 600, fontSize: 14,
               }}
@@ -1201,51 +1284,40 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
             </button>
           </div>
         ) : (
-          <form onSubmit={submit} className="reveal mt-4 space-y-2.5">
-            <div className="grid grid-cols-2 gap-2.5">
-              <input style={fieldStyle} placeholder="Имя" value={state.name} onChange={(e) => set("name", e.target.value)} required
-                onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
-                onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
-              <input style={fieldStyle} type="tel" placeholder="+7 (000) 000-00-00" value={state.phone}
-                onChange={(e) => set("phone", maskPhone(e.target.value))} required
-                onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
-                onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
-            </div>
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <select style={fieldStyle} value={state.line} onChange={(e) => set("line", e.target.value)}>
-                {LINES.map((l) => <option key={l.id} value={l.id}>{l.title}</option>)}
-              </select>
-              <select style={fieldStyle} value={state.period} onChange={(e) => set("period", e.target.value)}>
-                <option>1 день</option><option>3 дня</option><option>Месяц</option>
-              </select>
-            </div>
-
-            <input style={fieldStyle} placeholder="Адрес доставки" value={state.address}
-              onChange={(e) => set("address", e.target.value)} required
+          <form onSubmit={submit} className="reveal mt-6 space-y-3">
+            <input style={fieldStyle} placeholder="Ваше имя" value={state.name} onChange={(e) => set("name", e.target.value)} required
               onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
               onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
-
-            <div className="grid grid-cols-2 gap-2.5">
-              <input style={fieldStyle} placeholder="Telegram" value={state.messenger}
-                onChange={(e) => set("messenger", e.target.value)}
+            <input style={fieldStyle} type="tel" placeholder="+7 (000) 000-00-00" value={state.phone}
+              onChange={(e) => set("phone", maskPhone(e.target.value))} required
+              onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
+              onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
+            <div style={{ position: "relative" }}>
+              <span style={{
+                position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)",
+                fontFamily: "Inter", color: "#7A8278", fontSize: 15, pointerEvents: "none",
+              }}>@</span>
+              <input
+                style={{ ...fieldStyle, paddingLeft: 32 }}
+                placeholder="username"
+                value={state.telegram.replace(/^@/, "")}
+                onChange={(e) => set("telegram", e.target.value.replace(/^@/, ""))}
                 onFocus={(e) => e.currentTarget.style.borderColor = "#D4AF37"}
-                onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"} />
-              <select style={fieldStyle} value={state.slot} onChange={(e) => set("slot", e.target.value)}>
-                <option>07:00–08:00</option><option>09:00–10:00</option><option>18:00–19:00</option>
-              </select>
+                onBlur={(e) => e.currentTarget.style.borderColor = "#2A2E2A"}
+              />
             </div>
 
             <button type="submit" className="press"
               style={{
-                marginTop: 6,
-                width: "100%", height: 52, borderRadius: 50,
+                marginTop: 8,
+                width: "100%", height: 56, borderRadius: 50,
                 background: "#D4AF37", color: "#0E0F0E",
                 fontFamily: "Unbounded", fontWeight: 700, fontSize: 15, letterSpacing: "-0.01em",
+                boxShadow: "0 14px 32px -10px rgba(212,175,55,0.55)",
               }}>
               Отправить заявку
             </button>
-            <p className="text-center" style={{ marginTop: 6, fontFamily: "Inter", fontSize: 11, color: "#7A8278" }}>
+            <p className="text-center" style={{ marginTop: 8, fontFamily: "Inter", fontSize: 11, color: "#7A8278" }}>
               Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности
             </p>
           </form>
@@ -1261,13 +1333,13 @@ function Footer() {
   const links = [
     { l: "Рационы", h: "#lines" },
     { l: "Меню", h: "#menu" },
-    { l: "Калькулятор", h: "#calc" },
-    { l: "Доставка", h: "#delivery" },
+    { l: "Калории", h: "#calc" },
+    { l: "Подписки", h: "#subs" },
     { l: "FAQ", h: "#faq" },
   ];
   return (
     <footer id="footer" style={{ background: "#0A0B0A", borderTop: "1px solid #1A1E1A", padding: "40px 16px 48px" }}>
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <Logo />
         <p className="mt-3" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A", maxWidth: 320, lineHeight: 1.6 }}>
           Готовые рационы с расчётом КБЖУ. Доставка по Ростову-на-Дону.
@@ -1309,76 +1381,103 @@ function Footer() {
   );
 }
 
-/* ────────── Mobile Bottom Bar (app-style dock) ────────── */
-
+/* ────────── Mobile Bottom Nav (4 tabs + order pill) ────────── */
 
 function MobileBottomBar({
-  selectedLine,
-  onMenu,
-  onCalc,
+  activeId,
+  onTab,
   onOrder,
 }: {
-  selectedLine: LineId;
-  onMenu: () => void;
-  onCalc: () => void;
+  activeId: string;
+  onTab: (id: string, hash: string) => void;
   onOrder: () => void;
 }) {
-  const line = LINES.find((l) => l.id === selectedLine)!;
+  const tabs = [
+    { id: "top", label: "Главная", Icon: Home, hash: "#top" },
+    { id: "lines", label: "Рационы", Icon: UtensilsCrossed, hash: "#lines" },
+    { id: "menu", label: "Меню", Icon: Sparkles, hash: "#menu" },
+    { id: "calc", label: "Калории", Icon: CalcIcon, hash: "#calc" },
+  ];
   return (
     <div
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 pb-safe"
       style={{
-        background: "rgba(14,15,14,0.92)",
-        backdropFilter: "blur(16px)",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-        paddingTop: 10,
-        paddingLeft: 12,
-        paddingRight: 12,
+        background: "rgba(14,15,14,0.88)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderTop: "1px solid rgba(255,255,255,0.08)",
+        paddingTop: 8,
+        paddingLeft: 8,
+        paddingRight: 8,
       }}
     >
-      <div className="flex items-center gap-2">
-        <button
-          onClick={onMenu}
-          className="press flex flex-col items-center justify-center rounded-2xl shrink-0"
-          style={{ width: 56, height: 52, background: "#161816", color: "#FFFFFF", border: "1px solid #2A2E2A" }}
-          aria-label="Меню"
-        >
-          <line.Icon size={18} color={line.accent} />
-          <span style={{ fontFamily: "Inter", fontSize: 9, marginTop: 2, color: "#A0A89A", letterSpacing: "0.04em" }}>
-            {line.id}
-          </span>
-        </button>
-        <button
-          onClick={onCalc}
-          className="press flex flex-col items-center justify-center rounded-2xl shrink-0"
-          style={{ width: 56, height: 52, background: "#161816", color: "#FFFFFF", border: "1px solid #2A2E2A" }}
-          aria-label="Калькулятор"
-        >
-          <Sparkles size={18} color="#D4AF37" />
-          <span style={{ fontFamily: "Inter", fontSize: 9, marginTop: 2, color: "#A0A89A", letterSpacing: "0.04em" }}>
-            КБЖУ
-          </span>
-        </button>
+      <div className="flex items-center" style={{ gap: 4 }}>
+        {tabs.map((t) => {
+          const active = activeId === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => onTab(t.id, t.hash)}
+              className="press flex flex-col items-center justify-center rounded-xl"
+              style={{
+                flex: 1, height: 52,
+                background: active ? "rgba(212,175,55,0.12)" : "transparent",
+                color: active ? "#D4AF37" : "#A0A89A",
+                transition: "background 200ms ease, color 200ms ease",
+              }}
+              aria-label={t.label}
+              aria-current={active ? "page" : undefined}
+            >
+              <t.Icon size={18} />
+              <span style={{ fontFamily: "Inter", fontSize: 9.5, marginTop: 3, fontWeight: 600, letterSpacing: "0.02em" }}>
+                {t.label}
+              </span>
+            </button>
+          );
+        })}
         <button
           onClick={onOrder}
-          className="press flex-1 inline-flex items-center justify-center gap-1.5 rounded-2xl"
+          className="press inline-flex items-center justify-center gap-1 rounded-xl shrink-0"
           style={{
-            height: 52,
+            height: 52, paddingInline: 14,
             background: "#D4AF37",
             color: "#0E0F0E",
             fontFamily: "Inter",
             fontWeight: 700,
-            fontSize: 15,
+            fontSize: 13,
+            boxShadow: "0 8px 22px -6px rgba(212,175,55,0.55)",
           }}
         >
-          Заказать <ArrowRight size={16} />
+          Заказать <ArrowRight size={14} />
         </button>
       </div>
     </div>
   );
 }
 
+/* ────────── Active section tracker ────────── */
 
+function useActiveSection(ids: string[]) {
+  const [active, setActive] = useState(ids[0]);
+  useEffect(() => {
+    const els = ids
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    if (!els.length) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) setActive(visible[0].target.id);
+      },
+      { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 1] }
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [ids.join(",")]);
+  return active;
+}
 
 /* ────────── Root ────────── */
 
@@ -1386,20 +1485,41 @@ function Landing() {
   useReveal();
   const [dish, setDish] = useState<Dish | null>(null);
   const [selectedLine, setSelectedLine] = useState<LineId>("POWER");
+  const [openLine, setOpenLine] = useState<LineId | null>("POWER");
   const [order, setOrder] = useState<OrderState>({
-    name: "", phone: "", messenger: "", line: "POWER", period: "3 дня",
-    address: "", slot: "09:00–10:00", comment: "",
+    name: "", phone: "", telegram: "", line: "POWER", period: "3 дня",
   });
+  const active = useActiveSection(["top", "lines", "menu", "calc", "subs", "delivery", "faq", "order-form"]);
+
+  // Telegram Mini App viewport — try to expand & set theme
+  const tgInitRan = useRef(false);
+  useEffect(() => {
+    if (tgInitRan.current) return;
+    tgInitRan.current = true;
+    const tg = (window as unknown as { Telegram?: { WebApp?: { ready?: () => void; expand?: () => void; setHeaderColor?: (c: string) => void; setBackgroundColor?: (c: string) => void } } }).Telegram?.WebApp;
+    if (tg) {
+      try {
+        tg.ready?.();
+        tg.expand?.();
+        tg.setHeaderColor?.("#0E0F0E");
+        tg.setBackgroundColor?.("#0E0F0E");
+      } catch { /* noop */ }
+    }
+  }, []);
 
   function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function openLineAccordion(id: LineId) {
+    setOpenLine((cur) => (cur === id ? null : id));
   }
 
   function chooseLine(id: LineId) {
     setSelectedLine(id);
+    setOpenLine(id);
     setOrder((s) => ({ ...s, line: id }));
-    // Scroll to menu so user sees the bound menu
-    setTimeout(() => scrollTo("menu"), 100);
+    setTimeout(() => scrollTo("menu"), 120);
   }
 
   function choosePeriod(period: string) {
@@ -1408,18 +1528,23 @@ function Landing() {
   }
 
   function askOutOfCity() {
-    setOrder((s) => ({ ...s, comment: "Доставка за пределы Ростова — уточнить стоимость. " + s.comment }));
     scrollTo("order-form");
   }
 
   return (
     <div className="has-bottom-bar" style={{ background: "#0E0F0E", minHeight: "100vh" }}>
+      <ScrollProgress />
       <Navbar onOrder={() => scrollTo("order-form")} />
       <main>
         <Hero onOrder={() => scrollTo("lines")} onCalc={() => scrollTo("calc")} />
-        <LinesSection selected={selectedLine} onSelect={chooseLine} />
+        <LinesSection
+          selected={selectedLine}
+          openId={openLine}
+          onOpen={openLineAccordion}
+          onChoose={chooseLine}
+        />
         <MenuSection lineId={selectedLine} onOpenDish={setDish} onOrder={() => scrollTo("order-form")} />
-        <Calculator onOrder={(line) => { setSelectedLine(line); setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />
+        <Calculator onOrder={(line) => { setSelectedLine(line); setOpenLine(line); setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />
         <Subscription onSelect={choosePeriod} />
         <Delivery onAsk={askOutOfCity} />
         <FAQSection />
@@ -1428,9 +1553,8 @@ function Landing() {
       <Footer />
       {dish && <DishModal dish={dish} onClose={() => setDish(null)} />}
       <MobileBottomBar
-        selectedLine={selectedLine}
-        onMenu={() => scrollTo("menu")}
-        onCalc={() => scrollTo("calc")}
+        activeId={active}
+        onTab={(_id, hash) => scrollTo(hash.slice(1))}
         onOrder={() => scrollTo("order-form")}
       />
     </div>

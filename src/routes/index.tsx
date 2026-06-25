@@ -325,7 +325,7 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
       className="sticky z-40 backdrop-blur-xl"
       style={{ top: 2, background: "rgba(14,15,14,0.78)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
     >
-      <div className="mx-auto px-4 flex items-center justify-between gap-2" style={{ maxWidth: 1200, height: 80 }}>
+      <div className="mx-auto px-4 flex items-center justify-between gap-2" style={{ maxWidth: 1200, height: 112 }}>
         <Logo />
         <nav className="hidden lg:flex items-center gap-7">
           {items.map((i) => (

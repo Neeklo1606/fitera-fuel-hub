@@ -298,7 +298,7 @@ function ScrollProgress() {
 
 /* ────────── Logo / Navbar ────────── */
 
-function Logo({ size = 40 }: { size?: number }) {
+function Logo({ size = 64 }: { size?: number }) {
   return (
     <a href="#top" aria-label="FITERA — Ешь для результата" className="flex items-center select-none shrink-0">
       <img
@@ -312,6 +312,7 @@ function Logo({ size = 40 }: { size?: number }) {
     </a>
   );
 }
+
 
 function Navbar({ onOrder }: { onOrder: () => void }) {
   const items = [

@@ -650,12 +650,12 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
         {/* 2×2 grid of meal cards */}
         <div
           key={`${lineId}-${day}`}
-          className="mt-5 grid menu-anim"
+          className="mt-5 grid menu-anim grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
           style={{
-            gridTemplateColumns: "repeat(2, minmax(0,1fr))",
-            gap: 10,
+            gap: 12,
           }}
         >
+
           {dayMeals.map((d) => (
             <button
               key={d.meal + d.name}

@@ -463,7 +463,7 @@ function LinesSection({ selected, openId, onOpen, onChoose }: {
   onChoose: (id: LineId) => void;
 }) {
   return (
-    <section id="lines" style={{ background: "#F7F7F5", padding: "64px 16px 56px" }}>
+    <section id="lines" style={{ background: "#F7F7F5", padding: "48px 16px 40px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Наши рационы"
@@ -603,7 +603,7 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
   const totalC = dayMeals.reduce((s, d) => s + d.c, 0);
 
   return (
-    <section id="menu" style={{ background: "#0E0F0E", padding: "64px 16px" }}>
+    <section id="menu" style={{ background: "#0E0F0E", padding: "48px 16px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Меню недели"
@@ -825,7 +825,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   };
 
   return (
-    <section id="calc" style={{ background: "#F7F7F5", padding: "64px 16px" }}>
+    <section id="calc" style={{ background: "#F7F7F5", padding: "48px 16px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Калькулятор КБЖУ"
@@ -1005,7 +1005,7 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
   ];
 
   return (
-    <section id="subs" style={{ background: "#0E0F0E", padding: "64px 16px" }}>
+    <section id="subs" style={{ background: "#0E0F0E", padding: "48px 16px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Подписки"
@@ -1079,7 +1079,7 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
 
 function Delivery({ onAsk }: { onAsk: () => void }) {
   return (
-    <section id="delivery" style={{ background: "#FFFFFF", padding: "64px 16px" }}>
+    <section id="delivery" style={{ background: "#FFFFFF", padding: "48px 16px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Доставка"
@@ -1140,7 +1140,7 @@ function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" style={{ background: "#0E0F0E", padding: "64px 16px" }}>
+    <section id="faq" style={{ background: "#0E0F0E", padding: "48px 16px" }}>
       <div className="mx-auto" style={{ maxWidth: 720 }}>
         <SectionHeader
           eyebrow="FAQ"

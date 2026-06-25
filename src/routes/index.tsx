@@ -909,10 +909,12 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
             <button onClick={compute} className="press"
               style={{
                 width: "100%", height: 56, borderRadius: 50,
-                background: "#0E0F0E", color: "#D4AF37",
-                fontFamily: "Unbounded", fontWeight: 700, fontSize: 16, letterSpacing: "-0.01em",
+                background: "linear-gradient(135deg, #D4AF37 0%, #E9C75A 100%)",
+                color: "#0E0F0E",
+                fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, letterSpacing: "-0.01em",
+                boxShadow: "0 14px 30px -10px rgba(212,175,55,0.55)",
               }}>
-              Рассчитать
+              Рассчитать норму
             </button>
           </div>
 

@@ -76,7 +76,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
+      { name: "theme-color", content: "#0E0F0E" },
       { title: "FITERA — Доставка готовых рационов в Ростове-на-Дону" },
       { name: "description", content: "Готовые рационы с расчётом КБЖУ. Без готовки, без подсчётов. Доставка по Ростову ежедневно." },
       { name: "author", content: "FITERA" },
@@ -95,6 +96,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Unbounded:wght@700;800;900&display=swap" },
       { rel: "stylesheet", href: appCss },
+    ],
+    scripts: [
+      { src: "https://telegram.org/js/telegram-web-app.js", async: true },
     ],
   }),
   shellComponent: RootShell,

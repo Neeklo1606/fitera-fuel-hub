@@ -888,14 +888,14 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 ] as const).map(([k, l]) => {
                   const active = goal === k;
                   return (
-                    <button key={k} onClick={() => setGoal(k)} className="press"
+                    <button key={k} onClick={() => setGoal(k)} type="button" className="press inline-flex items-center justify-center"
                       style={{
                         flex: 1, minWidth: 0, height: 52, borderRadius: 14,
                         background: active ? "#0E0F0E" : "#F5F5F5",
                         color: active ? "#FFFFFF" : "#555",
                         fontFamily: "Inter", fontWeight: 600,
                         fontSize: "clamp(12px, 3.4vw, 14px)",
-                        whiteSpace: "nowrap",
+                        whiteSpace: "nowrap", textAlign: "center",
                       }}>{l}</button>
                   );
                 })}

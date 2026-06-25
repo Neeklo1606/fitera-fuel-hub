@@ -215,7 +215,7 @@ function SmartImage({
   src: string; alt?: string; className?: string; style?: React.CSSProperties;
   light?: boolean; aspectRatio?: string; eager?: boolean;
 }) {
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(eager);
   return (
     <div
       className={`${loaded ? "" : `img-skel ${light ? "light" : ""}`} ${className}`}
@@ -226,6 +226,7 @@ function SmartImage({
         alt={alt}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
+        fetchPriority={eager ? "high" : "auto"}
         onLoad={() => setLoaded(true)}
         className={`img-fade ${loaded ? "loaded" : ""}`}
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
@@ -539,40 +540,40 @@ function LinesSection({ selected, openId, onOpen, onChoose }: {
 
                 <div
                   style={{
-                    maxHeight: isOpen ? 480 : 0,
+                    maxHeight: isOpen ? 420 : 0,
                     overflow: "hidden",
                     transition: "max-height 320ms cubic-bezier(.2,.7,.2,1)",
                   }}
                 >
-                  <div className="grid md:grid-cols-[160px_1fr] gap-4" style={{ padding: "4px 16px 16px" }}>
+                  <div className="grid md:grid-cols-[120px_1fr] gap-4" style={{ padding: "4px 16px 14px" }}>
                     <SmartImage
                       src={line.image}
                       alt={line.title}
                       light
                       eager
                       aspectRatio="1 / 1"
-                      style={{ borderRadius: 14, width: "100%", maxWidth: 160 }}
+                      style={{ borderRadius: 12, width: "100%", maxWidth: 120 }}
                     />
                     <div className="flex flex-col">
                       <div className="tabular sm:hidden mb-2" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 14, color: "#0E0F0E" }}>
                         {line.priceFrom} <span style={{ color: "#888", fontWeight: 500, fontSize: 11 }}>/ день</span>
                       </div>
-                      <ul className="space-y-2">
+                      <ul className="space-y-1.5">
                         {line.features.map((f) => (
-                          <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#2A2E2A" }}>
+                          <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13, color: "#2A2E2A" }}>
                             <span className="grid place-items-center rounded-full shrink-0 mt-0.5"
-                              style={{ width: 16, height: 16, background: line.accent, color: "#FFFFFF" }}>
-                              <Check size={10} strokeWidth={3} />
+                              style={{ width: 14, height: 14, background: line.accent, color: "#FFFFFF" }}>
+                              <Check size={9} strokeWidth={3} />
                             </span>
                             {f}
                           </li>
                         ))}
                       </ul>
-                      <button onClick={() => onChoose(line.id)} className="press rounded-full mt-4 inline-flex items-center justify-center gap-2 self-start"
+                      <button onClick={() => onChoose(line.id)} className="press rounded-full mt-3 inline-flex items-center justify-center gap-2 self-start"
                         style={{
                           background: "#0E0F0E", color: "#FFFFFF",
-                          height: 44, padding: "0 22px",
-                          fontFamily: "Inter", fontWeight: 600, fontSize: 13.5,
+                          height: 40, padding: "0 18px",
+                          fontFamily: "Inter", fontWeight: 600, fontSize: 13,
                         }}>
                         Выбрать рацион <ArrowRight size={14} />
                       </button>
@@ -908,21 +909,23 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
             <button onClick={compute} className="press"
               style={{
                 width: "100%", height: 56, borderRadius: 50,
-                background: "#0E0F0E", color: "#D4AF37",
-                fontFamily: "Unbounded", fontWeight: 700, fontSize: 16, letterSpacing: "-0.01em",
+                background: "linear-gradient(135deg, #D4AF37 0%, #E9C75A 100%)",
+                color: "#0E0F0E",
+                fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, letterSpacing: "-0.01em",
+                boxShadow: "0 14px 30px -10px rgba(212,175,55,0.55)",
               }}>
-              Рассчитать
+              Рассчитать норму
             </button>
           </div>
 
           {/* Result column */}
-          <div className="reveal rounded-3xl flex flex-col" style={{
+          <div className="reveal rounded-3xl flex flex-col md:sticky md:top-20" style={{
             background: result
               ? "linear-gradient(160deg, #0E0F0E 0%, #1B2E1B 100%)"
               : "#FFFFFF",
-            padding: 24, minHeight: 360,
+            padding: 24, minHeight: result ? 360 : 280,
             border: result ? "none" : "1.5px dashed #E0E0DC",
-            boxShadow: result ? "0 24px 60px -30px rgba(46,125,50,0.4)" : "none",
+            boxShadow: result ? "0 24px 60px -30px rgba(46,125,50,0.4)" : "0 12px 30px -20px rgba(0,0,0,0.1)",
             transition: "background 320ms ease",
           }}>
             {result ? (
@@ -966,9 +969,19 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 <div style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, color: "#0E0F0E", letterSpacing: "-0.02em" }}>
                   Готовы посчитать?
                 </div>
-                <div className="mt-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#777", maxWidth: 260, lineHeight: 1.5 }}>
+                <div className="mt-2 mb-5" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#777", maxWidth: 260, lineHeight: 1.5 }}>
                   Заполните параметры слева — здесь появится ваша норма и подходящий рацион.
                 </div>
+                <button onClick={compute} className="press inline-flex items-center justify-center gap-2"
+                  style={{
+                    height: 48, padding: "0 22px", borderRadius: 50,
+                    background: "linear-gradient(135deg, #D4AF37 0%, #E9C75A 100%)",
+                    color: "#0E0F0E",
+                    fontFamily: "Inter", fontWeight: 700, fontSize: 14,
+                    boxShadow: "0 12px 26px -10px rgba(212,175,55,0.55)",
+                  }}>
+                  Посчитать сейчас <ArrowRight size={14} />
+                </button>
               </div>
             )}
           </div>

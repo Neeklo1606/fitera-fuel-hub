@@ -15,13 +15,55 @@ import linePro from "../assets/line-pro.jpg";
 const HERO_BG =
   "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1800&q=80";
 
+const SITE_URL = "https://fitera-fuel-hub.lovable.app";
+const OG_IMAGE = "https://fitera-fuel-hub.lovable.app/og-image.jpg";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "FITERA — Доставка готовых рационов в Ростове-на-Дону" },
-      { name: "description", content: "Готовые рационы с расчётом КБЖУ. Доставка ежедневно по Ростову. Линейки LIGHT, BALANCE, POWER, MOM, PRO." },
+      { title: "FITERA — Доставка готовых рационов КБЖУ в Ростове-на-Дону" },
+      { name: "description", content: "Готовые рационы FITERA с расчётом КБЖУ: LIGHT, BALANCE, POWER, MOM, PRO. Доставка по Ростову-на-Дону ежедневно. Без готовки и подсчётов." },
+      { name: "keywords", content: "доставка еды Ростов, рационы питания, КБЖУ, правильное питание, готовая еда, ПП доставка, FITERA" },
+      { name: "robots", content: "index, follow" },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "FITERA" },
+      { property: "og:locale", content: "ru_RU" },
       { property: "og:title", content: "FITERA — Ешь для результата" },
-      { property: "og:description", content: "Готовые рационы FITERA с расчётом КБЖУ. Без готовки, без подсчётов." },
+      { property: "og:description", content: "Готовые рационы FITERA с расчётом КБЖУ. Доставка по Ростову-на-Дону ежедневно." },
+      { property: "og:url", content: SITE_URL + "/" },
+      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "FITERA — Ешь для результата" },
+      { name: "twitter:description", content: "Готовые рационы с расчётом КБЖУ. Доставка по Ростову-на-Дону." },
+      { name: "twitter:image", content: OG_IMAGE },
+    ],
+    links: [
+      { rel: "canonical", href: SITE_URL + "/" },
+      { rel: "preload", as: "image", href: HERO_BG, fetchpriority: "high" } as unknown as { rel: string; href: string },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Restaurant",
+          name: "FITERA",
+          description: "Доставка готовых рационов с расчётом КБЖУ в Ростове-на-Дону.",
+          url: SITE_URL,
+          image: OG_IMAGE,
+          servesCuisine: "Healthy",
+          priceRange: "₽₽",
+          telephone: "+7 (999) 123-45-67",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Ростов-на-Дону",
+            addressCountry: "RU",
+          },
+          areaServed: "Ростов-на-Дону",
+        }),
+      },
     ],
   }),
   component: Landing,

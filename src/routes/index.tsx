@@ -549,6 +549,7 @@ function LinesSection({ selected, openId, onOpen, onChoose }: {
                       src={line.image}
                       alt={line.title}
                       light
+                      eager
                       aspectRatio="1 / 1"
                       style={{ borderRadius: 14, width: "100%", maxWidth: 160 }}
                     />

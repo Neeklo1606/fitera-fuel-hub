@@ -613,22 +613,25 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
         />
 
         {/* Days — round pills */}
-        <div className="reveal mt-7 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 10, scrollSnapType: "x mandatory" }}>
+        <div className="reveal mt-7 flex overflow-x-auto hide-scrollbar -mx-4 px-4" style={{ gap: 12, paddingTop: 6, paddingBottom: 6, scrollSnapType: "x mandatory" }}>
           {DAYS.map((d, i) => {
             const active = i === day;
             return (
               <button
                 key={d}
                 onClick={() => setDay(i)}
+                aria-pressed={active}
+                aria-label={DAYS_FULL[i]}
                 className="press shrink-0 flex flex-col items-center justify-center rounded-full tile-trans"
                 style={{
                   width: 56, height: 56,
+                  aspectRatio: "1 / 1",
                   scrollSnapAlign: "start",
                   background: active ? "#D4AF37" : "transparent",
                   color: active ? "#0E0F0E" : "#A0A89A",
-                  border: `1.5px solid ${active ? "#D4AF37" : "#2A2E2A"}`,
+                  border: active ? "none" : "1.5px solid #2A2E2A",
                   fontFamily: "Inter",
-                  boxShadow: active ? "0 8px 22px -6px rgba(212,175,55,0.55)" : "none",
+                  boxShadow: active ? "0 0 0 4px rgba(212,175,55,0.18)" : "none",
                 }}
               >
                 <span style={{ fontSize: 10, fontWeight: 600, opacity: 0.7, letterSpacing: "0.05em" }}>{d}</span>

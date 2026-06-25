@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  X, Check, Phone, Leaf, Truck, Sparkles, Send, Instagram, MapPin, Plus, ChevronRight, ArrowRight,
+  X, Check, Phone, Leaf, Truck, Sparkles, Send, MapPin, Plus, ArrowRight,
   Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, type LucideIcon,
 } from "lucide-react";
 

@@ -1241,6 +1241,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
                   ["Имя", state.name || "—"],
                   ["Телефон", state.phone || "—"],
                   ["Telegram", state.telegram || "—"],
+                  ["Адрес", state.address || "—"],
                   ["Рацион", `${state.line} · ${line.title}`],
                   ["Период", state.period],
                 ].map(([k, v]) => (

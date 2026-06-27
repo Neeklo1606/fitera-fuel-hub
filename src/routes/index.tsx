@@ -223,9 +223,14 @@ function useFocusTrap<T extends HTMLElement>(enabled: boolean) {
     const focusable = () =>
       Array.from(
         container.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
         )
-      ).filter((el) => !el.hasAttribute("disabled") && !el.getAttribute("aria-hidden"));
+      ).filter((el) => {
+        if (el.getAttribute("aria-hidden") === "true") return false;
+        // visibility check: offsetParent is null for display:none
+        if (el.offsetParent === null && getComputedStyle(el).position !== "fixed") return false;
+        return true;
+      });
 
     const first = () => focusable()[0];
     const last = () => focusable()[focusable().length - 1];

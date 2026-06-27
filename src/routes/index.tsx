@@ -723,34 +723,60 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
   useEffect(() => {
     const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", h);
+    const prevOverflow = document.body.style.overflow;
+    const prevTouch = document.body.style.touchAction;
     document.body.style.overflow = "hidden";
-    return () => { document.removeEventListener("keydown", h); document.body.style.overflow = ""; };
+    document.body.style.touchAction = "none";
+    return () => {
+      document.removeEventListener("keydown", h);
+      document.body.style.overflow = prevOverflow;
+      document.body.style.touchAction = prevTouch;
+    };
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in"
-      style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(8px)" }} onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()}
-        className="relative w-full sm:max-w-[440px] animate-slide-up"
-        style={{ background: "#161816", borderRadius: "24px 24px 0 0", border: "1px solid #2A2E2A" }}>
-        <div className="mx-auto mt-2.5 mb-1 rounded-full sm:hidden" style={{ width: 40, height: 4, background: "#2A2E2A" }} />
-        <button onClick={onClose} className="absolute top-2.5 right-2.5 z-10 h-9 w-9 grid place-items-center rounded-full"
-          style={{ background: "rgba(0,0,0,0.6)", color: "#FFFFFF" }} aria-label="Закрыть">
-          <X size={18} />
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in"
+      style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+      onClick={onClose}
+      onWheel={(e) => e.preventDefault()}
+      onTouchMove={(e) => e.preventDefault()}
+      role="dialog"
+      aria-modal="true"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full sm:max-w-[420px] animate-slide-up flex flex-col"
+        style={{
+          background: "#161816",
+          borderRadius: "20px 20px 0 0",
+          border: "1px solid #2A2E2A",
+          maxHeight: "92dvh",
+        }}
+      >
+        <div className="mx-auto mt-2 mb-0.5 rounded-full sm:hidden shrink-0" style={{ width: 36, height: 4, background: "#2A2E2A" }} />
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 z-10 h-8 w-8 grid place-items-center rounded-full"
+          style={{ background: "rgba(0,0,0,0.6)", color: "#FFFFFF" }}
+          aria-label="Закрыть"
+        >
+          <X size={16} />
         </button>
         <SmartImage
           src={line.image}
           alt={dish.name}
-          style={{ background: "#0E0F0E", borderRadius: "24px 24px 0 0" }}
-          aspectRatio="16 / 9"
+          eager
+          style={{ background: "#0E0F0E", borderRadius: "20px 20px 0 0", flexShrink: 0 }}
+          aspectRatio="21 / 9"
         />
 
-        <div className="p-4 space-y-3">
+        <div className="p-3.5 space-y-2.5">
           <div>
             <span style={{ background: line.accent, color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 10, padding: "3px 9px", borderRadius: 50 }}>
               {dish.line}
             </span>
-            <h3 className="mt-2" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 18, lineHeight: 1.2, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+            <h3 className="mt-1.5" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, lineHeight: 1.2, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
               {dish.name}
             </h3>
           </div>
@@ -762,22 +788,23 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
               { l: "Ж", v: dish.f },
               { l: "У", v: dish.c },
             ].map((m) => (
-              <div key={m.l} className="rounded-lg py-2 text-center" style={{ background: "#1C1E1C" }}>
+              <div key={m.l} className="rounded-lg py-1.5 text-center" style={{ background: "#1C1E1C" }}>
                 <div style={{ fontSize: 9, color: "#A0A89A", textTransform: "uppercase", letterSpacing: "0.06em" }}>{m.l}</div>
-                <div className="tabular mt-0.5" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 15, color: "#D4AF37" }}>{m.v}</div>
+                <div className="tabular" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 14, color: "#D4AF37" }}>{m.v}</div>
               </div>
             ))}
           </div>
 
-          <div>
-            <div style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 10, color: "#A0A89A", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Состав</div>
-            <p style={{ fontFamily: "Inter", fontSize: 13, lineHeight: 1.5, color: "#E5E7E0" }}>{dish.ingredients}</p>
-          </div>
+          <p style={{ fontFamily: "Inter", fontSize: 12.5, lineHeight: 1.45, color: "#C5C9BD" }}>
+            <span style={{ color: "#A0A89A", fontWeight: 600, textTransform: "uppercase", fontSize: 10, letterSpacing: "0.08em", marginRight: 6 }}>Состав:</span>
+            {dish.ingredients}
+          </p>
 
           <button
             onClick={() => { onOrder(dish.line); onClose(); }}
             className="press w-full rounded-full inline-flex items-center justify-center gap-2"
-            style={{ height: 48, background: "linear-gradient(180deg,#E6C04A 0%,#D4AF37 100%)", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 15, boxShadow: "0 8px 24px rgba(212,175,55,0.28)" }}>
+            style={{ height: 46, background: "linear-gradient(180deg,#E6C04A 0%,#D4AF37 100%)", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 14, boxShadow: "0 8px 24px rgba(212,175,55,0.28)" }}
+          >
             Заказать {dish.line} <ArrowRight size={16} />
           </button>
         </div>
@@ -785,6 +812,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
     </div>
   );
 }
+
 
 
 /* ────────── Calculator ────────── */

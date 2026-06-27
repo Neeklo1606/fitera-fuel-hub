@@ -209,6 +209,62 @@ function useReveal() {
   }, []);
 }
 
+function useFocusTrap<T extends HTMLElement>(enabled: boolean) {
+  const ref = useRef<T>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!enabled) return;
+    const container = ref.current;
+    if (!container) return;
+
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+
+    const focusable = () =>
+      Array.from(
+        container.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => !el.hasAttribute("disabled") && !el.getAttribute("aria-hidden"));
+
+    const first = () => focusable()[0];
+    const last = () => focusable()[focusable().length - 1];
+
+    // Focus the first element after a short tick to allow render to settle
+    const initialTimer = setTimeout(() => {
+      const f = first();
+      if (f) f.focus();
+    }, 0);
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const list = focusable();
+      if (list.length === 0) return;
+      const f = list[0];
+      const l = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === f) {
+        e.preventDefault();
+        l.focus();
+      } else if (!e.shiftKey && document.activeElement === l) {
+        e.preventDefault();
+        f.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handler, true);
+    return () => {
+      clearTimeout(initialTimer);
+      document.removeEventListener("keydown", handler, true);
+      if (previousFocusRef.current && typeof previousFocusRef.current.focus === "function") {
+        previousFocusRef.current.focus();
+      }
+    };
+  }, [enabled]);
+
+  return ref;
+}
+
+
 function SmartImage({
   src, alt = "", className = "", style, light = false, aspectRatio = "1 / 1", eager = false,
 }: {

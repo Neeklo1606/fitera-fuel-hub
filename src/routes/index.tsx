@@ -836,7 +836,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
             <span style={{ background: line.accent, color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 10, padding: "3px 9px", borderRadius: 50 }}>
               {dish.line}
             </span>
-            <h3 className="mt-1.5" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, lineHeight: 1.2, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+            <h3 id="dish-modal-title" className="mt-1.5" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, lineHeight: 1.2, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
               {dish.name}
             </h3>
           </div>

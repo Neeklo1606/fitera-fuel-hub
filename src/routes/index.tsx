@@ -782,27 +782,56 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
 function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void; onOrder: (line: LineId) => void }) {
   const line = LINES.find((l) => l.id === dish.line)!;
   const modalRef = useFocusTrap<HTMLDivElement>(true);
+  const mouseDownOnBackdropRef = useRef(false);
 
   useEffect(() => {
     const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", h);
-    const prevOverflow = document.body.style.overflow;
-    const prevTouch = document.body.style.touchAction;
-    document.body.style.overflow = "hidden";
-    document.body.style.touchAction = "none";
+    const body = document.body;
+    const html = document.documentElement;
+    const scrollY = window.scrollY;
+    const prev = {
+      bodyOverflow: body.style.overflow,
+      bodyTouch: body.style.touchAction,
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyWidth: body.style.width,
+      htmlOverflow: html.style.overflow,
+    };
+    body.style.overflow = "hidden";
+    body.style.touchAction = "none";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.width = "100%";
+    html.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", h);
-      document.body.style.overflow = prevOverflow;
-      document.body.style.touchAction = prevTouch;
+      body.style.overflow = prev.bodyOverflow;
+      body.style.touchAction = prev.bodyTouch;
+      body.style.position = prev.bodyPosition;
+      body.style.top = prev.bodyTop;
+      body.style.width = prev.bodyWidth;
+      html.style.overflow = prev.htmlOverflow;
+      window.scrollTo(0, scrollY);
     };
   }, [onClose]);
+
+  const onBackdropMouseDown = (e: React.MouseEvent) => {
+    mouseDownOnBackdropRef.current = e.target === e.currentTarget;
+  };
+  const onBackdropMouseUp = (e: React.MouseEvent) => {
+    if (mouseDownOnBackdropRef.current && e.target === e.currentTarget) onClose();
+    mouseDownOnBackdropRef.current = false;
+  };
 
   return (
     <div
       ref={modalRef}
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in"
       style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
-      onClick={onClose}
+      onMouseDown={onBackdropMouseDown}
+      onMouseUp={onBackdropMouseUp}
+      onTouchEnd={(e) => { if (e.target === e.currentTarget) onClose(); }}
       onWheel={(e) => e.preventDefault()}
       onTouchMove={(e) => e.preventDefault()}
       role="dialog"
@@ -810,7 +839,10 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
       aria-labelledby="dish-modal-title"
     >
       <div
+        onMouseDown={(e) => e.stopPropagation()}
+        onMouseUp={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
         className="relative w-full sm:max-w-[420px] animate-slide-up flex flex-col"
         style={{
           background: "#161816",

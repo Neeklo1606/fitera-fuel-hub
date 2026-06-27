@@ -209,6 +209,62 @@ function useReveal() {
   }, []);
 }
 
+function useFocusTrap<T extends HTMLElement>(enabled: boolean) {
+  const ref = useRef<T>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!enabled) return;
+    const container = ref.current;
+    if (!container) return;
+
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+
+    const focusable = () =>
+      Array.from(
+        container.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((el) => !el.hasAttribute("disabled") && !el.getAttribute("aria-hidden"));
+
+    const first = () => focusable()[0];
+    const last = () => focusable()[focusable().length - 1];
+
+    // Focus the first element after a short tick to allow render to settle
+    const initialTimer = setTimeout(() => {
+      const f = first();
+      if (f) f.focus();
+    }, 0);
+
+    const handler = (e: KeyboardEvent) => {
+      if (e.key !== "Tab") return;
+      const list = focusable();
+      if (list.length === 0) return;
+      const f = list[0];
+      const l = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === f) {
+        e.preventDefault();
+        l.focus();
+      } else if (!e.shiftKey && document.activeElement === l) {
+        e.preventDefault();
+        f.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handler, true);
+    return () => {
+      clearTimeout(initialTimer);
+      document.removeEventListener("keydown", handler, true);
+      if (previousFocusRef.current && typeof previousFocusRef.current.focus === "function") {
+        previousFocusRef.current.focus();
+      }
+    };
+  }, [enabled]);
+
+  return ref;
+}
+
+
 function SmartImage({
   src, alt = "", className = "", style, light = false, aspectRatio = "1 / 1", eager = false,
 }: {
@@ -720,6 +776,8 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
 
 function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void; onOrder: (line: LineId) => void }) {
   const line = LINES.find((l) => l.id === dish.line)!;
+  const modalRef = useFocusTrap<HTMLDivElement>(true);
+
   useEffect(() => {
     const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", h);
@@ -736,6 +794,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
 
   return (
     <div
+      ref={modalRef}
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in"
       style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
       onClick={onClose}
@@ -743,6 +802,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
       onTouchMove={(e) => e.preventDefault()}
       role="dialog"
       aria-modal="true"
+      aria-labelledby="dish-modal-title"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -776,7 +836,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
             <span style={{ background: line.accent, color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 10, padding: "3px 9px", borderRadius: 50 }}>
               {dish.line}
             </span>
-            <h3 className="mt-1.5" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, lineHeight: 1.2, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+            <h3 id="dish-modal-title" className="mt-1.5" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, lineHeight: 1.2, letterSpacing: "-0.02em", color: "#FFFFFF" }}>
               {dish.name}
             </h3>
           </div>

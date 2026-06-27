@@ -84,8 +84,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:locale", content: "ru_RU" },
     ],
     links: [
-      { rel: "icon", type: "image/png", href: "/__l5e/assets-v1/75de3398-d2ae-4c46-b7de-499b14f44576/fitera-logo.png" },
-      { rel: "apple-touch-icon", href: "/__l5e/assets-v1/75de3398-d2ae-4c46-b7de-499b14f44576/fitera-logo.png" },
+      { rel: "icon", type: "image/png", href: "/__l5e/assets-v1/f61cd9cf-4196-45a1-a23b-f7d014d2a46e/fitera-logo.png" },
+      { rel: "apple-touch-icon", href: "/__l5e/assets-v1/f61cd9cf-4196-45a1-a23b-f7d014d2a46e/fitera-logo.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Unbounded:wght@700;800;900&display=swap" },

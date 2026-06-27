@@ -776,6 +776,8 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
 
 function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void; onOrder: (line: LineId) => void }) {
   const line = LINES.find((l) => l.id === dish.line)!;
+  const modalRef = useFocusTrap<HTMLDivElement>(true);
+
   useEffect(() => {
     const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", h);
@@ -792,6 +794,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
 
   return (
     <div
+      ref={modalRef}
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in"
       style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
       onClick={onClose}
@@ -799,6 +802,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
       onTouchMove={(e) => e.preventDefault()}
       role="dialog"
       aria-modal="true"
+      aria-labelledby="dish-modal-title"
     >
       <div
         onClick={(e) => e.stopPropagation()}

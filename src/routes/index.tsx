@@ -2308,7 +2308,10 @@ function Landing() {
   }
 
   function chooseLine(id: LineId) {
-    openOrder(id);
+    setSelectedLine(id);
+    setTimeout(() => {
+      document.getElementById("menu")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
   }
 
   return (

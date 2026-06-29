@@ -806,7 +806,15 @@ function LinesSection({ selected, onChoose }: {
 /* ────────── Menu (swipeable slider, day pills) ────────── */
 
 function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Line; onOpenDish: (d: Dish) => void }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start", containScroll: "trimSnaps" });
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "start",
+    containScroll: "trimSnaps",
+    dragFree: false,
+    skipSnaps: false,
+    dragThreshold: 14,
+    duration: 22,
+  });
   const [selected, setSelected] = useState(0);
   const [snaps, setSnaps] = useState<number[]>([]);
   const [canPrev, setCanPrev] = useState(false);

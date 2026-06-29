@@ -1468,7 +1468,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
               onClick={() => setSent(false)}
               className="press mt-4 w-full"
               style={{
-                height: 50, borderRadius: 50,
+                height: 52, borderRadius: 50,
                 background: "transparent", border: "1px solid #2A2E2A",
                 color: "#FFFFFF", fontFamily: "Inter", fontWeight: 600, fontSize: 14,
               }}
@@ -1519,7 +1519,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
             <button type="submit" className="press"
               style={{
                 marginTop: 8,
-                width: "100%", height: 56, borderRadius: 50,
+                width: "100%", height: 52, borderRadius: 50,
                 background: "#D4AF37", color: "#0E0F0E",
                 fontFamily: "Unbounded", fontWeight: 700, fontSize: 15, letterSpacing: "-0.01em",
                 boxShadow: "0 14px 32px -10px rgba(212,175,55,0.55)",
@@ -1647,9 +1647,9 @@ function MobileBottomBar({
         })}
         <button
           onClick={onOrder}
-          className="press inline-flex items-center justify-center gap-1 rounded-xl shrink-0"
+          className="press inline-flex items-center justify-center gap-1 shrink-0"
           style={{
-            height: 52, paddingInline: 14,
+            height: 52, paddingInline: 14, borderRadius: 50,
             background: "#D4AF37",
             color: "#0E0F0E",
             fontFamily: "Inter",

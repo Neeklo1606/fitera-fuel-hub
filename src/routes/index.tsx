@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import {
   X, Check, Phone, Leaf, Truck, Sparkles, Send, MapPin, Plus, ArrowRight,
   Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, FlaskConical, Target,

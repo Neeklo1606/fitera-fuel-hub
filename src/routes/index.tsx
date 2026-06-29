@@ -517,7 +517,7 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
             </button>
           </div>
 
-          <div className="mt-7 flex flex-wrap gap-2">
+          <div className="mt-7 flex flex-wrap gap-2" style={{ minHeight: 168 }}>
             {[
               { Icon: FlaskConical, text: "Научный подход" },
               { Icon: Target, text: "Индивидуальный рацион" },

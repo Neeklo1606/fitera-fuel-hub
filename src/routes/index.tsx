@@ -715,10 +715,22 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
     };
   }, [emblaApi]);
 
+  useEffect(() => {
+    if (!emblaApi) return;
+    requestAnimationFrame(() => {
+      emblaApi.reInit();
+      emblaApi.scrollTo(0, true);
+      setSelected(0);
+      setSnaps(emblaApi.scrollSnapList());
+      setCanPrev(emblaApi.canScrollPrev());
+      setCanNext(emblaApi.canScrollNext());
+    });
+  }, [emblaApi, dishes.length, line.id]);
+
   return (
-    <div className="reveal relative mt-5">
+    <div className="menu-anim relative mt-5">
       <div className="overflow-hidden" ref={emblaRef} aria-label={`Блюда рациона ${line.id}`}>
-        <div className="flex" style={{ gap: 12, willChange: "transform" }}>
+        <div className="flex" style={{ gap: 12, willChange: "transform", touchAction: "pan-y pinch-zoom" }}>
           {dishes.map((d, i) => {
             const photo = line.dishPhotos[i % line.dishPhotos.length] || line.image;
             return (
@@ -739,8 +751,8 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
                     loading={i === 0 ? "eager" : "lazy"}
                     decoding="async"
                     fetchPriority={i === 0 ? "high" : "low"}
-                    width={640}
-                    height={480}
+                    width={1280}
+                    height={800}
                     style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   />
                 </div>
@@ -892,7 +904,6 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
         {/* Dishes — swipeable slider or empty state */}
         {hasMeals ? (
           <MenuDishSlider
-            key={`${lineId}-${day}`}
             dishes={dayMeals}
             line={line}
             onOpenDish={onOpenDish}

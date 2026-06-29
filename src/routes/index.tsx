@@ -716,8 +716,8 @@ function LinesSection({ selected, onChoose }: {
                     className="overflow-hidden"
                     style={{
                       borderRadius: 18,
-                      aspectRatio: "16 / 10",
-                      background: "rgba(14,15,14,0.06)",
+                      aspectRatio: "4 / 3",
+                      background: line.pastel,
                     }}
                   >
                     <img
@@ -725,7 +725,7 @@ function LinesSection({ selected, onChoose }: {
                       alt={`Пример блюд рациона ${line.id}`}
                       loading="lazy"
                       decoding="async"
-                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                      style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
                     />
                   </div>
                 </div>

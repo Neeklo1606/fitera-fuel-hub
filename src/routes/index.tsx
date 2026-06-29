@@ -2067,10 +2067,8 @@ function Landing() {
   const [dish, setDish] = useState<Dish | null>(null);
   const [selectedLine, setSelectedLine] = useState<LineId>("POWER");
   const [openLine, setOpenLine] = useState<LineId | null>("POWER");
-  const [order, setOrder] = useState<OrderState>({
-    name: "", phone: "", telegram: "", address: "", line: "POWER", period: "1 неделя",
-  });
-  const active = useActiveSection(["top", "lines", "menu", "calc", "subs", "delivery", "faq", "order-form"]);
+  const [orderModal, setOrderModal] = useState<{ line: LineId | null; period?: string } | null>(null);
+  const active = useActiveSection(["top", "lines", "menu", "calc", "subs", "delivery", "faq", "cant-decide"]);
 
   // Telegram Mini App viewport — try to expand & set theme
   const tgInitRan = useRef(false);
@@ -2092,32 +2090,27 @@ function Landing() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function openOrder(line: LineId | null = null, period?: string) {
+    if (line) {
+      setSelectedLine(line);
+      setOpenLine(line);
+    }
+    setOrderModal({ line, period });
+  }
+
   function openLineAccordion(id: LineId) {
     setSelectedLine(id);
-    setOrder((s) => ({ ...s, line: id }));
     setOpenLine((cur) => (cur === id ? null : id));
   }
 
   function chooseLine(id: LineId) {
-    setSelectedLine(id);
-    setOpenLine(id);
-    setOrder((s) => ({ ...s, line: id }));
-    setTimeout(() => scrollTo("menu"), 120);
-  }
-
-  function choosePeriod(period: string) {
-    setOrder((s) => ({ ...s, period }));
-    scrollTo("order-form");
-  }
-
-  function askOutOfCity() {
-    scrollTo("order-form");
+    openOrder(id);
   }
 
   return (
     <div className="has-bottom-bar" style={{ background: "#0E0F0E", minHeight: "100vh" }}>
       <ScrollProgress />
-      <Navbar onOrder={() => scrollTo("order-form")} />
+      <Navbar onOrder={() => openOrder()} />
       <main>
         <Hero onOrder={() => scrollTo("lines")} onCalc={() => scrollTo("calc")} />
         <LinesSection
@@ -2126,21 +2119,28 @@ function Landing() {
           onOpen={openLineAccordion}
           onChoose={chooseLine}
         />
-        <MenuSection lineId={selectedLine} onOpenDish={setDish} onOrder={() => scrollTo("order-form")} />
-        <Subscription onSelect={choosePeriod} />
-        <Delivery onAsk={askOutOfCity} />
-        <Calculator onOrder={(line) => { setSelectedLine(line); setOpenLine(line); setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />
+        <MenuSection lineId={selectedLine} onOpenDish={setDish} onOrder={() => openOrder(selectedLine)} />
+        <Subscription onSelect={(period) => openOrder(selectedLine, period)} />
+        <Delivery onAsk={() => openOrder()} />
+        <Calculator onOrder={(line) => openOrder(line)} />
         <FAQSection />
         <CantDecideSection />
-        <OrderForm initial={order} onUpdate={setOrder} />
       </main>
       <Footer />
-      {dish && <DishModal dish={dish} onClose={() => setDish(null)} onOrder={(line) => { setSelectedLine(line); setOpenLine(line); setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />}
+      {dish && <DishModal dish={dish} onClose={() => setDish(null)} onOrder={(line) => openOrder(line)} />}
+      {orderModal && (
+        <OrderModal
+          initialLine={orderModal.line}
+          initialPeriod={orderModal.period}
+          onClose={() => setOrderModal(null)}
+        />
+      )}
       <MobileBottomBar
         activeId={active}
         onTab={(_id, hash) => scrollTo(hash.slice(1))}
-        onOrder={() => scrollTo("order-form")}
+        onOrder={() => openOrder()}
       />
     </div>
   );
 }
+

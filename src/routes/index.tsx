@@ -1305,6 +1305,96 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
 
 /* ────────── FAQ ────────── */
 
+function CantDecideSection() {
+  const [phone, setPhone] = useState("+7 ");
+  const [agree, setAgree] = useState(true);
+  const [sent, setSent] = useState(false);
+
+  function maskPhone(v: string) {
+    const d = v.replace(/\D/g, "").replace(/^7?/, "");
+    const p = d.slice(0, 10);
+    let out = "+7";
+    if (p.length > 0) out += " " + p.slice(0, 3);
+    if (p.length >= 4) out += " " + p.slice(3, 6);
+    if (p.length >= 7) out += "-" + p.slice(6, 8);
+    if (p.length >= 9) out += "-" + p.slice(8, 10);
+    return out;
+  }
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!agree) return;
+    setSent(true);
+  }
+
+  return (
+    <section id="cant-decide" style={{ background: "#0E0F0E", padding: "48px 16px" }}>
+      <div className="mx-auto" style={{ maxWidth: 560 }}>
+        <SectionHeader
+          eyebrow="Помощь с выбором"
+          title="Не смогли определиться с выбором?"
+          desc="Оставьте заявку — менеджер подберёт идеальный вариант для вас"
+          dark
+          accent="#D4AF37"
+          center
+        />
+
+        {sent ? (
+          <div className="reveal mt-7 text-center" style={{
+            background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)",
+            borderRadius: 22, padding: 28, color: "#FFFFFF", fontFamily: "Inter",
+          }}>
+            <div style={{ fontFamily: "Unbounded", fontSize: 20, fontWeight: 700, color: "#D4AF37" }}>Заявка принята</div>
+            <div className="mt-2" style={{ fontSize: 14, color: "#A0A89A" }}>Свяжемся в течение 30 минут</div>
+          </div>
+        ) : (
+          <form onSubmit={submit} className="reveal mt-7" style={{ display: "grid", gap: 14 }}>
+            <input
+              type="tel"
+              inputMode="tel"
+              value={phone}
+              onChange={(e) => setPhone(maskPhone(e.target.value))}
+              placeholder="+7 999 000-00-00"
+              style={{
+                height: 52, padding: "0 18px", borderRadius: 50,
+                background: "rgba(255,255,255,0.06)", color: "#FFFFFF",
+                border: "1px solid rgba(255,255,255,0.12)",
+                fontFamily: "Inter", fontSize: 15, fontWeight: 500, outline: "none",
+              }}
+            />
+            <label className="flex items-start" style={{ gap: 10, color: "#A0A89A", fontFamily: "Inter", fontSize: 13, lineHeight: 1.55 }}>
+              <input
+                type="checkbox"
+                checked={agree}
+                onChange={(e) => setAgree(e.target.checked)}
+                style={{ marginTop: 3, accentColor: "#D4AF37", width: 16, height: 16, flexShrink: 0 }}
+              />
+              <span>
+                Я согласен с{" "}
+                <a href="/privacy" style={{ color: "#D4AF37", textDecoration: "underline" }}>обработкой персональных данных</a>{" "}
+                и принимаю условия{" "}
+                <a href="/privacy" style={{ color: "#D4AF37", textDecoration: "underline" }}>политики обработки персональных данных</a>
+              </span>
+            </label>
+            <button
+              type="submit"
+              disabled={!agree}
+              className="press"
+              style={{
+                height: 52, borderRadius: 50, background: agree ? "#D4AF37" : "rgba(212,175,55,0.4)",
+                color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 15,
+                letterSpacing: "-0.01em", cursor: agree ? "pointer" : "not-allowed",
+              }}
+            >
+              Хочу получить
+            </button>
+          </form>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
 

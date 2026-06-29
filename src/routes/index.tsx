@@ -836,48 +836,56 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
   return (
     <div className="reveal relative mt-5">
       <div className="overflow-hidden" ref={emblaRef} aria-label={`Блюда рациона ${line.id}`}>
-        <div className="flex" style={{ gap: 12 }}>
-          {dishes.map((d, i) => (
-            <button
-              key={d.meal + d.name + i}
-              type="button"
-              onClick={() => onOpenDish(d)}
-              className="press text-left flex flex-col overflow-hidden tile-trans shrink-0"
-              style={{
-                flex: "0 0 calc(80% - 6px)",
-                background: "#161816", border: "1px solid #2A2E2A", borderRadius: 18,
-              }}
-            >
-              <SmartImage
-                src={line.dishPhotos[i % line.dishPhotos.length] || line.image}
-                alt={d.name}
-                aspectRatio="4 / 3"
-                style={{ width: "100%", background: "#0E0F0E" }}
-              />
-              <div className="flex-1 flex flex-col" style={{ padding: 14 }}>
-                <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 10, color: line.accent, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                  {d.meal}
+        <div className="flex" style={{ gap: 12, willChange: "transform" }}>
+          {dishes.map((d, i) => {
+            const photo = line.dishPhotos[i % line.dishPhotos.length] || line.image;
+            return (
+              <button
+                key={d.meal + d.name + i}
+                type="button"
+                onClick={() => onOpenDish(d)}
+                className="press text-left flex flex-col overflow-hidden tile-trans shrink-0"
+                style={{
+                  flex: "0 0 calc(80% - 6px)",
+                  background: "#161816", border: "1px solid #2A2E2A", borderRadius: 18,
+                }}
+              >
+                <div style={{ position: "relative", width: "100%", aspectRatio: "4 / 3", background: "#0E0F0E", overflow: "hidden" }}>
+                  <img
+                    src={photo}
+                    alt={d.name}
+                    loading={i < 2 ? "eager" : "lazy"}
+                    decoding="async"
+                    fetchPriority={i === 0 ? "high" : "auto"}
+                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
                 </div>
-                <div
-                  className="mt-1"
-                  style={{
-                    fontFamily: "Inter", fontWeight: 700, fontSize: 15, color: "#FFFFFF", lineHeight: 1.25,
-                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
-                    overflow: "hidden", wordBreak: "break-word", minHeight: 38,
-                  }}
-                >
-                  {d.name}
+                <div className="flex-1 flex flex-col" style={{ padding: 14 }}>
+                  <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 10, color: line.accent, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                    {d.meal}
+                  </div>
+                  <div
+                    className="mt-1"
+                    style={{
+                      fontFamily: "Inter", fontWeight: 700, fontSize: 15, color: "#FFFFFF", lineHeight: 1.25,
+                      display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                      overflow: "hidden", wordBreak: "break-word", minHeight: 38,
+                    }}
+                  >
+                    {d.name}
+                  </div>
+                  <div className="mt-2 tabular flex items-center flex-wrap" style={{ fontFamily: "Inter", fontSize: 11.5, color: "#A0A89A", gap: 8 }}>
+                    <span style={{ color: "#D4AF37", fontWeight: 700 }}>{d.kcal} ккал</span>
+                    <span style={{ opacity: 0.4 }}>·</span>
+                    <span>Б {d.p} · Ж {d.f} · У {d.c}</span>
+                  </div>
                 </div>
-                <div className="mt-2 tabular flex items-center flex-wrap" style={{ fontFamily: "Inter", fontSize: 11.5, color: "#A0A89A", gap: 8 }}>
-                  <span style={{ color: "#D4AF37", fontWeight: 700 }}>{d.kcal} ккал</span>
-                  <span style={{ opacity: 0.4 }}>·</span>
-                  <span>Б {d.p} · Ж {d.f} · У {d.c}</span>
-                </div>
-              </div>
-            </button>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </div>
+
 
       {/* Arrows — desktop */}
       <button

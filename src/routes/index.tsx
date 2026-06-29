@@ -1911,52 +1911,64 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
 /* ────────── Footer ────────── */
 
 function Footer() {
-  const links = [
-    { l: "Рационы", h: "#lines" },
-    { l: "Меню", h: "#menu" },
-    { l: "Калории", h: "#calc" },
-    { l: "Подписки", h: "#subs" },
-    { l: "FAQ", h: "#faq" },
-  ];
+  const labelStyle = { fontFamily: "Unbounded", fontWeight: 700, fontSize: 13, letterSpacing: "0.08em", color: "#FFFFFF", textTransform: "uppercase" as const, marginBottom: 16 };
+  const linkStyle = { fontFamily: "Inter", fontSize: 14, color: "#A0A89A", lineHeight: 1.8, display: "block" as const };
+  const socialStyle = { width: 40, height: 40, background: "#1A1E1A", color: "#D4AF37", borderRadius: 999, display: "grid", placeItems: "center" } as const;
+
   return (
-    <footer id="footer" style={{ background: "#0A0B0A", borderTop: "1px solid #1A1E1A", padding: "40px 16px 48px" }}>
+    <footer id="footer" style={{ background: "#0A0B0A", borderTop: "1px solid #1A1E1A", padding: "56px 16px 32px" }}>
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
-        <Logo />
-        <p className="mt-3" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A", maxWidth: 320, lineHeight: 1.6 }}>
-          Готовые рационы с расчётом КБЖУ. Доставка по Ростову-на-Дону.
-        </p>
+        <div className="grid gap-10" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))" }}>
+          {/* Left */}
+          <div>
+            <Logo />
+            <p className="mt-3" style={{ fontFamily: "Inter", fontSize: 14, color: "#A0A89A", maxWidth: 280, lineHeight: 1.6 }}>
+              Доставка здорового питания
+            </p>
+            <p className="mt-5" style={{ fontFamily: "Inter", fontSize: 13, color: "#7A8076" }}>
+              ИП Иванов И.И.
+            </p>
+            <a href="#" style={{ fontFamily: "Inter", fontSize: 13, color: "#D4AF37", textDecoration: "underline", marginTop: 6, display: "inline-block" }}>
+              Посмотреть реквизиты
+            </a>
+          </div>
 
-        <ul className="mt-6 flex flex-wrap" style={{ gap: 16 }}>
-          {links.map((l) => (
-            <li key={l.h}>
-              <a href={l.h} style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 14, color: "#A0A89A" }}>
-                {l.l}
+          {/* Middle */}
+          <div>
+            <div style={labelStyle}>Полезная информация</div>
+            <a href="/offer" style={linkStyle}>Публичная оферта</a>
+            <a href="/privacy" style={linkStyle}>Политика обработки персональных данных</a>
+            <a href="/consent" style={linkStyle}>Согласие на обработку персональных данных</a>
+          </div>
+
+          {/* Right */}
+          <div>
+            <div style={labelStyle}>Контакты</div>
+            <div style={{ ...linkStyle, color: "#C5C9BD" }}>г. Ростов-на-Дону</div>
+            <a href="tel:+79966100006" style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 18, color: "#D4AF37", display: "inline-block", marginTop: 6 }}>
+              +7 (996) 610-00-06
+            </a>
+            <div className="mt-5 flex" style={{ gap: 10 }}>
+              <a href="https://vk.com/fitera" aria-label="VK" style={socialStyle}>
+                <span style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 14 }}>VK</span>
               </a>
-            </li>
-          ))}
-        </ul>
-
-        <a href="tel:+79991234567" className="mt-5 inline-block"
-          style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 16, color: "#D4AF37" }}>
-          +7 (999) 123-45-67
-        </a>
-
-        <div className="mt-5 flex" style={{ gap: 10 }}>
-          <a href="https://t.me/fitera_rstv" aria-label="Telegram"
-            className="grid place-items-center rounded-full"
-            style={{ width: 36, height: 36, background: "#1A1E1A", color: "#D4AF37" }}>
-            <Send size={16} />
-          </a>
+              <a href="https://t.me/fitera_rstv" aria-label="Telegram" style={socialStyle}>
+                <Send size={18} />
+              </a>
+              <a href="https://wa.me/79966100006" aria-label="WhatsApp" style={socialStyle}>
+                <MessageCircle size={18} />
+              </a>
+            </div>
+          </div>
         </div>
 
-        <ul className="mt-6 flex flex-wrap" style={{ gap: 14 }}>
-          <li><a href="/privacy" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>Политика конфиденциальности</a></li>
-          <li><a href="/terms" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>Условия использования</a></li>
-          <li><a href="/offer" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>Публичная оферта</a></li>
-        </ul>
-
-        <div className="mt-6" style={{ fontFamily: "Inter", fontSize: 12, color: "#555" }}>
-          © 2026 FITERA. Доставка рационов питания по Ростову-на-Дону
+        <div className="mt-10 pt-6 flex flex-wrap items-center justify-between" style={{ borderTop: "1px solid #1A1E1A", gap: 12 }}>
+          <div style={{ fontFamily: "Inter", fontSize: 12, color: "#555" }}>
+            © 2026 Fitera. Все права защищены
+          </div>
+          <div style={{ fontFamily: "Inter", fontSize: 12, color: "#555" }}>
+            Разработка — <a href="https://neeklo.ru" target="_blank" rel="noopener noreferrer" style={{ color: "#A0A89A", textDecoration: "underline" }}>neeklo.ru</a>
+          </div>
         </div>
       </div>
     </footer>

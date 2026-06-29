@@ -1321,7 +1321,7 @@ function CantDecideSection() {
     return out;
   }
 
-  function submit(e: React.FormEvent) {
+  function submit(e: FormEvent) {
     e.preventDefault();
     if (!agree) return;
     setSent(true);
@@ -1493,7 +1493,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
     return out;
   }
 
-  function submit(e: React.FormEvent) {
+  function submit(e: FormEvent) {
     e.preventDefault();
     setSent(true);
   }

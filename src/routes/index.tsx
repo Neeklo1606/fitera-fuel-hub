@@ -764,6 +764,7 @@ function getDishPhoto(line: Line, index: number) {
 function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; line: Line; day: number; onOpenDish: (d: Dish) => void }) {
   const dishesSignature = dishes.map((d) => d.name).join("|");
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const didDragRef = useRef(false);
   const selectedRef = useRef(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -853,6 +854,39 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
     }, 0);
   };
 
+  const handleTouchStart = (event: React.TouchEvent) => {
+    const touch = event.touches[0];
+    if (!touch) return;
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    didDragRef.current = false;
+  };
+
+  const handleTouchMove = (event: React.TouchEvent) => {
+    const touch = event.touches[0];
+    const start = touchStartRef.current;
+    if (!touch || !start) return;
+    if (Math.hypot(touch.clientX - start.x, touch.clientY - start.y) > 8) {
+      didDragRef.current = true;
+    }
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    const start = touchStartRef.current;
+    const touch = event.changedTouches[0];
+    if (start && touch) {
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+      if (Math.abs(dx) > 34 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        if (dx < 0) emblaApi?.scrollNext();
+        else emblaApi?.scrollPrev();
+      }
+    }
+    touchStartRef.current = null;
+    window.setTimeout(() => {
+      didDragRef.current = false;
+    }, 0);
+  };
+
   return (
     <div
       className="relative mt-5"
@@ -869,6 +903,10 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
         onPointerMoveCapture={handlePointerMove}
         onPointerUpCapture={handlePointerUp}
         onPointerCancelCapture={handlePointerCancel}
+        onTouchStartCapture={handleTouchStart}
+        onTouchMoveCapture={handleTouchMove}
+        onTouchEndCapture={handleTouchEnd}
+        onTouchCancelCapture={() => { touchStartRef.current = null; }}
         style={{ touchAction: "pan-y pinch-zoom" }}
       >
         <div className="flex" style={{ gap: 12, willChange: "transform" }}>

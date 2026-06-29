@@ -14,12 +14,15 @@ import linePower from "../assets/line-power.jpg";
 import lineMom from "../assets/line-mom.jpg";
 import linePro from "../assets/line-pro.jpg";
 import fiteraLogoAsset from "../assets/fitera-logo.png.asset.json";
+import heroDesktopAsset from "../assets/hero-desktop.png.asset.json";
+import heroMobileAsset from "../assets/hero-mobile.png.asset.json";
 
 const FITERA_LOGO = fiteraLogoAsset.url;
 
-// Real Unsplash food photo — dark, premium plate composition
-const HERO_BG =
-  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1800&q=80";
+const HERO_BG_DESKTOP = heroDesktopAsset.url;
+const HERO_BG_MOBILE = heroMobileAsset.url;
+const HERO_BG = HERO_BG_DESKTOP;
+
 
 const SITE_URL = "https://fitera-fuel-hub.lovable.app";
 const OG_IMAGE = "https://fitera-fuel-hub.lovable.app/og-image.jpg";

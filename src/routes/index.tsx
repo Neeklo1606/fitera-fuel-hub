@@ -1182,9 +1182,9 @@ function OrderModal({
                 />
                 <span>
                   Я согласен с{" "}
-                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#D4AF37", textDecoration: "underline" }}>обработкой персональных данных</a>{" "}
-                  и принимаю условия{" "}
-                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#D4AF37", textDecoration: "underline" }}>политики обработки персональных данных</a>
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#D4AF37", textDecoration: "underline" }}>политикой конфиденциальности</a>{" "}
+                  и даю{" "}
+                  <a href="/consent" target="_blank" rel="noopener noreferrer" style={{ color: "#D4AF37", textDecoration: "underline" }}>согласие на обработку персональных данных</a>
                 </span>
               </label>
 

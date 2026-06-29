@@ -536,12 +536,12 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
   );
 }
 
-/* ────────── Lines — vertical accordion (Level Kitchen style) ────────── */
+/* ────────── Lines — always-open pastel cards with photo slider ────────── */
 
-function LinesSection({ selected, openId, onOpen, onChoose }: {
+function LinesSection({ selected, onChoose }: {
   selected: LineId;
-  openId: LineId | null;
-  onOpen: (id: LineId) => void;
+  openId?: LineId | null;
+  onOpen?: (id: LineId) => void;
   onChoose: (id: LineId) => void;
 }) {
   return (
@@ -555,115 +555,143 @@ function LinesSection({ selected, openId, onOpen, onChoose }: {
           center
         />
 
-        <div className="reveal mt-8 mx-auto" style={{ maxWidth: 720, display: "flex", flexDirection: "column", gap: 10 }}>
+        <div className="reveal mt-8 mx-auto flex flex-col" style={{ maxWidth: 1040, gap: 20 }}>
           {LINES.map((line) => {
-            const isOpen = openId === line.id;
             const isSelected = selected === line.id;
             return (
-              <div
+              <article
                 key={line.id}
                 className="overflow-hidden tile-trans"
                 style={{
-                  background: line.tint,
-                  border: `1.5px solid ${isSelected ? line.accent : "transparent"}`,
-                  borderRadius: 20,
+                  background: line.pastel,
+                  border: `1.5px solid ${isSelected ? line.accent : "rgba(14,15,14,0.06)"}`,
+                  borderRadius: 24,
                   boxShadow: isSelected
-                    ? `0 12px 28px -14px ${line.accent}80`
-                    : "0 2px 8px rgba(0,0,0,0.04)",
+                    ? `0 18px 40px -18px ${line.accent}80`
+                    : "0 4px 14px rgba(0,0,0,0.05)",
                 }}
               >
-                <button
-                  onClick={() => onOpen(line.id)}
-                  className="press w-full flex items-center text-left"
-                  style={{ padding: "14px 16px", gap: 14 }}
-                  aria-expanded={isOpen}
-                >
-                  <div className="grid place-items-center rounded-2xl shrink-0"
-                    style={{ width: 44, height: 44, background: line.accent, color: "#FFFFFF" }}>
-                    <line.Icon size={20} />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, letterSpacing: "-0.01em", color: "#0E0F0E" }}>
-                        {line.id}
-                      </span>
-                      <span className="hidden sm:inline" style={{ fontFamily: "Inter", fontSize: 13, color: "#5A5F58" }}>
-                        · {line.title}
-                      </span>
-                      {line.popular && (
-                        <span style={{
-                          background: "#0E0F0E", color: "#D4AF37", borderRadius: 50, padding: "2px 8px",
-                          fontFamily: "Inter", fontWeight: 700, fontSize: 9, letterSpacing: "0.08em",
-                        }}>ХИТ</span>
-                      )}
-                    </div>
-                    <div className="tabular mt-1" style={{ fontFamily: "Inter", fontSize: 12.5, color: "#5A5F58" }}>
-                      {line.kcal} ккал · {line.desc}
-                    </div>
-                  </div>
-
-                  <div className="text-right shrink-0 hidden sm:block">
-                    <div className="tabular" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 14, color: "#0E0F0E" }}>
-                      {line.priceFrom}
-                    </div>
-                    <div style={{ fontFamily: "Inter", fontSize: 10.5, color: "#888", marginTop: 2 }}>за день</div>
-                  </div>
-
-                  <div
-                    className="grid place-items-center rounded-full shrink-0 tile-trans"
-                    style={{
-                      width: 32, height: 32, background: "rgba(14,15,14,0.06)", color: "#0E0F0E",
-                      transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
-                    }}
-                  >
-                    <Plus size={16} />
-                  </div>
-                </button>
-
-                <div
-                  style={{
-                    maxHeight: isOpen ? 420 : 0,
-                    overflow: "hidden",
-                    transition: "max-height 320ms cubic-bezier(.2,.7,.2,1)",
-                  }}
-                >
-                  <div className="grid md:grid-cols-[120px_1fr] gap-4" style={{ padding: "4px 16px 14px" }}>
+                <div className="grid md:grid-cols-[40%_60%]" style={{ gap: 0 }}>
+                  {/* Left photo */}
+                  <div className="relative" style={{ minHeight: 200 }}>
                     <SmartImage
                       src={line.image}
                       alt={line.title}
                       light
                       eager
-                      aspectRatio="1 / 1"
-                      style={{ borderRadius: 12, width: "100%", maxWidth: 120 }}
+                      style={{
+                        position: "absolute",
+                        inset: 12,
+                        width: "calc(100% - 24px)",
+                        height: "calc(100% - 24px)",
+                        objectFit: "cover",
+                        borderRadius: 18,
+                      }}
                     />
-                    <div className="flex flex-col">
-                      <div className="tabular sm:hidden mb-2" style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 14, color: "#0E0F0E" }}>
-                        {line.priceFrom} <span style={{ color: "#888", fontWeight: 500, fontSize: 11 }}>/ день</span>
+                    {line.popular && (
+                      <span
+                        className="absolute"
+                        style={{
+                          top: 22, left: 22,
+                          background: "#0E0F0E", color: "#D4AF37",
+                          borderRadius: 50, padding: "5px 11px",
+                          fontFamily: "Inter", fontWeight: 700, fontSize: 10, letterSpacing: "0.08em",
+                        }}
+                      >ХИТ</span>
+                    )}
+                  </div>
+
+                  {/* Right content */}
+                  <div className="flex flex-col" style={{ padding: "20px 22px 18px" }}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <div className="grid place-items-center rounded-xl shrink-0"
+                        style={{ width: 36, height: 36, background: line.accent, color: "#FFFFFF" }}>
+                        <line.Icon size={18} />
                       </div>
-                      <ul className="space-y-1.5">
-                        {line.features.map((f) => (
-                          <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13, color: "#2A2E2A" }}>
-                            <span className="grid place-items-center rounded-full shrink-0 mt-0.5"
-                              style={{ width: 14, height: 14, background: line.accent, color: "#FFFFFF" }}>
-                              <Check size={9} strokeWidth={3} />
-                            </span>
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                      <button onClick={() => onChoose(line.id)} className="press rounded-full mt-3 inline-flex items-center justify-center gap-2 self-start"
+                      <span style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
+                        {line.id}
+                      </span>
+                      <span style={{ fontFamily: "Inter", fontSize: 14, color: "#5A5F58" }}>
+                        · {line.title}
+                      </span>
+                    </div>
+
+                    <div className="tabular mt-2 flex flex-wrap items-center" style={{ gap: 8, fontFamily: "Inter", fontSize: 13, color: "#5A5F58" }}>
+                      <span style={{ fontWeight: 600, color: "#0E0F0E" }}>{line.kcal} ккал</span>
+                      <span>·</span>
+                      <span>{line.desc}</span>
+                      <span>·</span>
+                      <span>{line.dishesPerDay}</span>
+                    </div>
+
+                    <ul className="mt-3 space-y-1.5">
+                      {line.features.map((f) => (
+                        <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#2A2E2A" }}>
+                          <span className="grid place-items-center rounded-full shrink-0 mt-0.5"
+                            style={{ width: 16, height: 16, background: line.accent, color: "#FFFFFF" }}>
+                            <Check size={10} strokeWidth={3} />
+                          </span>
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-4 flex items-center justify-between flex-wrap" style={{ gap: 12 }}>
+                      <div className="tabular">
+                        <span style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, color: "#0E0F0E" }}>
+                          {line.priceFrom}
+                        </span>
+                        <span style={{ fontFamily: "Inter", fontSize: 12, color: "#5A5F58", marginLeft: 4 }}>/ день</span>
+                      </div>
+                      <button
+                        onClick={() => onChoose(line.id)}
+                        className="press inline-flex items-center justify-center gap-2"
                         style={{
                           background: "#0E0F0E", color: "#FFFFFF",
-                          height: 52, padding: "0 20px", borderRadius: 50,
-                          fontFamily: "Inter", fontWeight: 600, fontSize: 13,
-                        }}>
+                          height: 52, padding: "0 22px", borderRadius: 50,
+                          fontFamily: "Inter", fontWeight: 600, fontSize: 14,
+                        }}
+                      >
                         Выбрать рацион <ArrowRight size={16} />
                       </button>
                     </div>
                   </div>
                 </div>
-              </div>
+
+                {/* Horizontal dish photo slider */}
+                <div
+                  className="flex overflow-x-auto no-scrollbar"
+                  style={{
+                    gap: 10,
+                    padding: "0 16px 16px",
+                    scrollSnapType: "x mandatory",
+                    WebkitOverflowScrolling: "touch",
+                  }}
+                  aria-label={`Примеры блюд: ${line.title}`}
+                >
+                  {line.dishPhotos.map((src, i) => (
+                    <div
+                      key={i}
+                      className="shrink-0 overflow-hidden"
+                      style={{
+                        width: 132, height: 96, borderRadius: 14,
+                        background: "rgba(14,15,14,0.06)",
+                        scrollSnapAlign: "start",
+                      }}
+                    >
+                      <img
+                        src={src}
+                        alt={`Блюдо рациона ${line.title} ${i + 1}`}
+                        loading="lazy"
+                        decoding="async"
+                        width={264}
+                        height={192}
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </article>
             );
           })}
         </div>
@@ -671,6 +699,7 @@ function LinesSection({ selected, openId, onOpen, onChoose }: {
     </section>
   );
 }
+
 
 /* ────────── Menu (2×2 grid, day pills) ────────── */
 

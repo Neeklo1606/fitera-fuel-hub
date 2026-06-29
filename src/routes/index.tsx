@@ -683,6 +683,7 @@ function LinesSection({ selected, onChoose }: {
 /* ────────── Menu (swipeable slider, day pills) ────────── */
 
 function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Line; onOpenDish: (d: Dish) => void }) {
+  const dishesSignature = dishes.map((d) => d.name).join("|");
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: "start",
@@ -725,7 +726,7 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
       setCanPrev(emblaApi.canScrollPrev());
       setCanNext(emblaApi.canScrollNext());
     });
-  }, [emblaApi, dishes.length, line.id]);
+  }, [emblaApi, dishes.length, dishesSignature, line.id]);
 
   return (
     <div className="menu-anim relative mt-5">
@@ -748,6 +749,7 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
                   <img
                     src={photo}
                     alt={d.name}
+                    draggable={false}
                     loading={i === 0 ? "eager" : "lazy"}
                     decoding="async"
                     fetchPriority={i === 0 ? "high" : "low"}

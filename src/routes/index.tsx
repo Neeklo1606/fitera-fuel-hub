@@ -820,6 +820,7 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
   const handlePointerDown = (event: React.PointerEvent) => {
     pointerStartRef.current = { x: event.clientX, y: event.clientY };
     didDragRef.current = false;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
   };
 
   const handlePointerMove = (event: React.PointerEvent) => {
@@ -865,6 +866,10 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
         className="overflow-hidden"
         ref={emblaRef}
         aria-label={`Блюда рациона ${line.id}`}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerCancel}
         style={{ touchAction: "pan-y pinch-zoom" }}
       >
         <div className="flex" style={{ gap: 12, willChange: "transform" }}>
@@ -876,10 +881,6 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
                 type="button"
                 data-menu-slide
                 data-slide-index={i}
-                onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerUp}
-                onPointerCancel={handlePointerCancel}
                 onClick={(event) => {
                   if (didDragRef.current) {
                     event.preventDefault();

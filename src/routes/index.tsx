@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   X, Check, Phone, Leaf, Truck, Sparkles, Send, MapPin, Plus, ArrowRight,
   Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, FlaskConical, Target,
+  MessageCircle,
   type LucideIcon,
 } from "lucide-react";
 

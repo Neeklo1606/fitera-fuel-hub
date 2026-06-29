@@ -644,10 +644,10 @@ function LinesSection({ selected, openId, onOpen, onChoose }: {
                       <button onClick={() => onChoose(line.id)} className="press rounded-full mt-3 inline-flex items-center justify-center gap-2 self-start"
                         style={{
                           background: "#0E0F0E", color: "#FFFFFF",
-                          height: 40, padding: "0 18px",
+                          height: 52, padding: "0 20px", borderRadius: 50,
                           fontFamily: "Inter", fontWeight: 600, fontSize: 13,
                         }}>
-                        Выбрать рацион <ArrowRight size={14} />
+                        Выбрать рацион <ArrowRight size={16} />
                       </button>
                     </div>
                   </div>
@@ -778,7 +778,7 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
             </div>
           </div>
           <button onClick={onOrder} className="press rounded-full inline-flex items-center gap-2"
-            style={{ background: "#D4AF37", color: "#0E0F0E", height: 48, padding: "0 22px", fontFamily: "Inter", fontWeight: 700, fontSize: 14 }}>
+            style={{ background: "#D4AF37", color: "#0E0F0E", height: 52, padding: "0 22px", borderRadius: 50, fontFamily: "Inter", fontWeight: 700, fontSize: 14 }}>
             Заказать {line.id} <ArrowRight size={16} />
           </button>
         </div>
@@ -910,7 +910,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
           <button
             onClick={() => { onOrder(dish.line); onClose(); }}
             className="press w-full rounded-full inline-flex items-center justify-center gap-2"
-            style={{ height: 46, background: "linear-gradient(180deg,#E6C04A 0%,#D4AF37 100%)", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 14, boxShadow: "0 8px 24px rgba(212,175,55,0.28)" }}
+            style={{ height: 52, borderRadius: 50, background: "linear-gradient(180deg,#E6C04A 0%,#D4AF37 100%)", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 14, boxShadow: "0 8px 24px rgba(212,175,55,0.28)" }}
           >
             Заказать {dish.line} <ArrowRight size={16} />
           </button>
@@ -1045,7 +1045,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
 
             <button onClick={compute} className="press"
               style={{
-                width: "100%", height: 56, borderRadius: 50,
+                width: "100%", height: 52, borderRadius: 50,
                 background: "linear-gradient(135deg, #D4AF37 0%, #E9C75A 100%)",
                 color: "#0E0F0E",
                 fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, letterSpacing: "-0.01em",

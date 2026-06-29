@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   X, Check, Phone, Leaf, Truck, Sparkles, Send, MapPin, Plus, ArrowRight,
-  Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, type LucideIcon,
+  Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, FlaskConical, Target,
+  type LucideIcon,
 } from "lucide-react";
 
 import lineLight from "../assets/line-light.jpg";
@@ -407,10 +408,10 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
           </a>
           <button
             onClick={onOrder}
-            className="press rounded-full inline-flex items-center gap-1.5"
-            style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 13, padding: "9px 16px" }}
+            className="press rounded-full inline-flex items-center justify-center gap-1.5 shrink-0"
+            style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 13, height: 52, padding: "0 20px", borderRadius: 50 }}
           >
-            Заказать <ArrowRight size={13} />
+            Заказать <ArrowRight size={14} />
           </button>
         </div>
       </div>
@@ -465,11 +466,11 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
               color: "#FFFFFF",
             }}
           >
-            Ешь для<br />
+            Умное питание<br />
             <span style={{
               background: "linear-gradient(90deg, #D4AF37 0%, #F5E08F 100%)",
               WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent",
-            }}>результата.</span>
+            }}>под твою цель.</span>
           </h1>
 
           <p className="mt-5" style={{ color: "#C8CCC4", fontFamily: "Inter", fontSize: 16, lineHeight: 1.55, maxWidth: 480 }}>
@@ -480,7 +481,7 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
             <button onClick={onOrder} className="press rounded-full inline-flex items-center justify-center gap-2"
               style={{
                 background: "#D4AF37", color: "#0E0F0E",
-                height: 54, padding: "0 26px",
+                height: 52, padding: "0 26px", borderRadius: 50,
                 fontFamily: "Inter", fontWeight: 700, fontSize: 15,
                 boxShadow: "0 12px 32px -8px rgba(212,175,55,0.5)",
               }}>
@@ -489,25 +490,34 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
             <button onClick={onCalc} className="press rounded-full inline-flex items-center justify-center gap-2"
               style={{
                 background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(46,125,50,0.7)",
-                color: "#FFFFFF", height: 54, padding: "0 22px",
+                color: "#FFFFFF", height: 52, padding: "0 22px", borderRadius: 50,
                 fontFamily: "Inter", fontWeight: 600, fontSize: 15, backdropFilter: "blur(8px)",
               }}>
               <CalcIcon size={16} /> Рассчитать калории
             </button>
           </div>
 
-          <div className="mt-7 flex items-center gap-4 flex-wrap" style={{ fontFamily: "Inter", fontSize: 12.5, color: "#9AA197" }}>
-            <span className="inline-flex items-center gap-1.5">
-              <Check size={14} color="#7CB342" /> Бесплатная доставка
-            </span>
-            <span style={{ width: 3, height: 3, borderRadius: 99, background: "#444" }} />
-            <span className="inline-flex items-center gap-1.5">
-              <Check size={14} color="#7CB342" /> Первая неделя −15%
-            </span>
-            <span style={{ width: 3, height: 3, borderRadius: 99, background: "#444" }} />
-            <span className="inline-flex items-center gap-1.5">
-              <Check size={14} color="#7CB342" /> 5 линеек под цель
-            </span>
+          <div className="mt-7 flex flex-wrap gap-2">
+            {[
+              { Icon: FlaskConical, text: "Научный подход" },
+              { Icon: Target, text: "Индивидуальный рацион" },
+              { Icon: Sparkles, text: "Премиальные ингредиенты" },
+              { Icon: Truck, text: "Доставка каждый день" },
+            ].map((item) => (
+              <span key={item.text} className="inline-flex items-center gap-2 rounded-full"
+                style={{
+                  background: "rgba(14,15,14,0.55)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  backdropFilter: "blur(8px)",
+                  padding: "8px 14px",
+                  fontFamily: "Inter",
+                  fontSize: 12,
+                  color: "#E0E2DD",
+                }}>
+                <item.Icon size={14} color="#D4AF37" />
+                {item.text}
+              </span>
+            ))}
           </div>
         </div>
       </div>
@@ -634,10 +644,10 @@ function LinesSection({ selected, openId, onOpen, onChoose }: {
                       <button onClick={() => onChoose(line.id)} className="press rounded-full mt-3 inline-flex items-center justify-center gap-2 self-start"
                         style={{
                           background: "#0E0F0E", color: "#FFFFFF",
-                          height: 40, padding: "0 18px",
+                          height: 52, padding: "0 20px", borderRadius: 50,
                           fontFamily: "Inter", fontWeight: 600, fontSize: 13,
                         }}>
-                        Выбрать рацион <ArrowRight size={14} />
+                        Выбрать рацион <ArrowRight size={16} />
                       </button>
                     </div>
                   </div>
@@ -768,7 +778,7 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
             </div>
           </div>
           <button onClick={onOrder} className="press rounded-full inline-flex items-center gap-2"
-            style={{ background: "#D4AF37", color: "#0E0F0E", height: 48, padding: "0 22px", fontFamily: "Inter", fontWeight: 700, fontSize: 14 }}>
+            style={{ background: "#D4AF37", color: "#0E0F0E", height: 52, padding: "0 22px", borderRadius: 50, fontFamily: "Inter", fontWeight: 700, fontSize: 14 }}>
             Заказать {line.id} <ArrowRight size={16} />
           </button>
         </div>
@@ -900,7 +910,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
           <button
             onClick={() => { onOrder(dish.line); onClose(); }}
             className="press w-full rounded-full inline-flex items-center justify-center gap-2"
-            style={{ height: 46, background: "linear-gradient(180deg,#E6C04A 0%,#D4AF37 100%)", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 14, boxShadow: "0 8px 24px rgba(212,175,55,0.28)" }}
+            style={{ height: 52, borderRadius: 50, background: "linear-gradient(180deg,#E6C04A 0%,#D4AF37 100%)", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 14, boxShadow: "0 8px 24px rgba(212,175,55,0.28)" }}
           >
             Заказать {dish.line} <ArrowRight size={16} />
           </button>
@@ -1035,7 +1045,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
 
             <button onClick={compute} className="press"
               style={{
-                width: "100%", height: 56, borderRadius: 50,
+                width: "100%", height: 52, borderRadius: 50,
                 background: "linear-gradient(135deg, #D4AF37 0%, #E9C75A 100%)",
                 color: "#0E0F0E",
                 fontFamily: "Unbounded", fontWeight: 800, fontSize: 16, letterSpacing: "-0.01em",
@@ -1081,7 +1091,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
 
                 <button onClick={() => onOrder(result.line)} className="press mt-auto"
                   style={{
-                    width: "100%", height: 54, borderRadius: 50, marginTop: 24,
+                    width: "100%", height: 52, borderRadius: 50, marginTop: 24,
                     background: "#D4AF37", color: "#0E0F0E",
                     fontFamily: "Inter", fontWeight: 700, fontSize: 15,
                   }}>
@@ -1101,7 +1111,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 </div>
                 <button onClick={compute} className="press inline-flex items-center justify-center gap-2"
                   style={{
-                    height: 48, padding: "0 22px", borderRadius: 50,
+                    height: 52, padding: "0 22px", borderRadius: 50,
                     background: "linear-gradient(135deg, #D4AF37 0%, #E9C75A 100%)",
                     color: "#0E0F0E",
                     fontFamily: "Inter", fontWeight: 700, fontSize: 14,
@@ -1185,7 +1195,7 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
 
               <button onClick={() => onSelect(p.id)} className="press mt-6 w-full"
                 style={{
-                  height: 48, borderRadius: 50,
+                  height: 52, borderRadius: 50,
                   background: p.primary ? "#D4AF37" : "transparent",
                   border: p.primary ? "none" : "1.5px solid #2A2E2A",
                   color: p.primary ? "#0E0F0E" : "#FFFFFF",
@@ -1249,7 +1259,7 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
             <button onClick={onAsk} className="press mt-4 inline-flex items-center gap-1.5"
               style={{
                 background: "#0E0F0E", color: "#D4AF37", borderRadius: 50,
-                padding: "10px 18px", fontFamily: "Inter", fontWeight: 600, fontSize: 13,
+                height: 52, padding: "0 20px", fontFamily: "Inter", fontWeight: 600, fontSize: 13,
               }}>
               Уточнить <ArrowRight size={14} />
             </button>
@@ -1458,7 +1468,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
               onClick={() => setSent(false)}
               className="press mt-4 w-full"
               style={{
-                height: 50, borderRadius: 50,
+                height: 52, borderRadius: 50,
                 background: "transparent", border: "1px solid #2A2E2A",
                 color: "#FFFFFF", fontFamily: "Inter", fontWeight: 600, fontSize: 14,
               }}
@@ -1509,7 +1519,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
             <button type="submit" className="press"
               style={{
                 marginTop: 8,
-                width: "100%", height: 56, borderRadius: 50,
+                width: "100%", height: 52, borderRadius: 50,
                 background: "#D4AF37", color: "#0E0F0E",
                 fontFamily: "Unbounded", fontWeight: 700, fontSize: 15, letterSpacing: "-0.01em",
                 boxShadow: "0 14px 32px -10px rgba(212,175,55,0.55)",
@@ -1637,9 +1647,9 @@ function MobileBottomBar({
         })}
         <button
           onClick={onOrder}
-          className="press inline-flex items-center justify-center gap-1 rounded-xl shrink-0"
+          className="press inline-flex items-center justify-center gap-1 shrink-0"
           style={{
-            height: 52, paddingInline: 14,
+            height: 52, paddingInline: 14, borderRadius: 50,
             background: "#D4AF37",
             color: "#0E0F0E",
             fontFamily: "Inter",

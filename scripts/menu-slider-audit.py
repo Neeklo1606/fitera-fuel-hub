@@ -67,6 +67,9 @@ async def main():
 
                 next_button = slider.locator("[data-menu-next]")
                 if expected_count > 1:
+                    first_dot = slider.locator('[aria-label="Блюдо 1"]')
+                    await first_dot.click()
+                    await page.wait_for_timeout(120)
                     before = await slider.locator('[aria-current="true"]').get_attribute("aria-label")
                     await next_button.click()
                     await page.wait_for_timeout(180)

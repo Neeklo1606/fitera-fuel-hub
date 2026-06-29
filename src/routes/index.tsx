@@ -481,9 +481,11 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
             className="mt-5"
             style={{
               fontFamily: "Unbounded, 'Unbounded Fallback', sans-serif", fontWeight: 900,
-              fontSize: "clamp(38px, 8vw, 72px)", lineHeight: 0.98, letterSpacing: "-0.035em",
+              fontSize: "clamp(38px, 8vw, 72px)", lineHeight: 1.02, letterSpacing: "-0.035em",
               color: "#FFFFFF",
+              minHeight: "calc(2 * clamp(38px, 8vw, 72px) * 1.02)",
             }}
+          >
           >
             Умное питание<br />
             <span style={{

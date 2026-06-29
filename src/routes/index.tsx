@@ -1091,7 +1091,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
 
                 <button onClick={() => onOrder(result.line)} className="press mt-auto"
                   style={{
-                    width: "100%", height: 54, borderRadius: 50, marginTop: 24,
+                    width: "100%", height: 52, borderRadius: 50, marginTop: 24,
                     background: "#D4AF37", color: "#0E0F0E",
                     fontFamily: "Inter", fontWeight: 700, fontSize: 15,
                   }}>
@@ -1111,7 +1111,7 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                 </div>
                 <button onClick={compute} className="press inline-flex items-center justify-center gap-2"
                   style={{
-                    height: 48, padding: "0 22px", borderRadius: 50,
+                    height: 52, padding: "0 22px", borderRadius: 50,
                     background: "linear-gradient(135deg, #D4AF37 0%, #E9C75A 100%)",
                     color: "#0E0F0E",
                     fontFamily: "Inter", fontWeight: 700, fontSize: 14,
@@ -1195,7 +1195,7 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
 
               <button onClick={() => onSelect(p.id)} className="press mt-6 w-full"
                 style={{
-                  height: 48, borderRadius: 50,
+                  height: 52, borderRadius: 50,
                   background: p.primary ? "#D4AF37" : "transparent",
                   border: p.primary ? "none" : "1.5px solid #2A2E2A",
                   color: p.primary ? "#0E0F0E" : "#FFFFFF",
@@ -1259,7 +1259,7 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
             <button onClick={onAsk} className="press mt-4 inline-flex items-center gap-1.5"
               style={{
                 background: "#0E0F0E", color: "#D4AF37", borderRadius: 50,
-                padding: "10px 18px", fontFamily: "Inter", fontWeight: 600, fontSize: 13,
+                height: 52, padding: "0 20px", fontFamily: "Inter", fontWeight: 600, fontSize: 13,
               }}>
               Уточнить <ArrowRight size={14} />
             </button>

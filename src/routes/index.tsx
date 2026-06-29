@@ -480,7 +480,7 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
           <h1
             className="mt-5"
             style={{
-              fontFamily: "Unbounded", fontWeight: 900,
+              fontFamily: "Unbounded, 'Unbounded Fallback', sans-serif", fontWeight: 900,
               fontSize: "clamp(38px, 8vw, 72px)", lineHeight: 0.98, letterSpacing: "-0.035em",
               color: "#FFFFFF",
             }}

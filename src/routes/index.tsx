@@ -447,30 +447,30 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
 function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) {
   return (
     <section id="top" className="relative" style={{ background: "#0E0F0E", overflow: "hidden" }}>
-      <div className="absolute inset-0">
-        <picture>
-          <source media="(max-width: 767px)" srcSet={HERO_BG_MOBILE} />
-          <source media="(min-width: 768px)" srcSet={HERO_BG_DESKTOP} />
-          <img
-            src={HERO_BG_DESKTOP}
-            alt="Готовый рацион FITERA"
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-            className="w-full h-full object-cover"
-            style={{ objectPosition: "center" }}
-          />
-        </picture>
+      <picture className="absolute inset-0 block">
+        <source media="(max-width: 767px)" srcSet={HERO_BG_MOBILE} />
+        <img
+          src={HERO_BG_DESKTOP}
+          alt="Готовый рацион FITERA"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          width={1920}
+          height={1080}
+          className="absolute inset-0 w-full h-full"
+          style={{ objectFit: "cover", objectPosition: "center right" }}
+        />
+      </picture>
 
-        <div className="absolute inset-0" style={{
-          background:
-            "radial-gradient(ellipse at 70% 30%, rgba(14,15,14,0.35) 0%, rgba(14,15,14,0.8) 60%, rgba(14,15,14,0.98) 100%)",
-        }} />
-        <div className="absolute inset-0" style={{
-          background:
-            "linear-gradient(180deg, rgba(14,15,14,0.5) 0%, rgba(14,15,14,0) 30%, rgba(14,15,14,0) 60%, rgba(14,15,14,1) 100%)",
-        }} />
-      </div>
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background:
+          "radial-gradient(ellipse at 70% 30%, rgba(14,15,14,0.35) 0%, rgba(14,15,14,0.8) 60%, rgba(14,15,14,0.98) 100%)",
+      }} />
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background:
+          "linear-gradient(180deg, rgba(14,15,14,0.5) 0%, rgba(14,15,14,0) 30%, rgba(14,15,14,0) 60%, rgba(14,15,14,1) 100%)",
+      }} />
+
 
       <div className="relative mx-auto px-4 flex flex-col justify-end md:justify-center"
         style={{ maxWidth: 1200, minHeight: "min(640px, 86vh)", paddingTop: 32, paddingBottom: 44 }}>

@@ -661,38 +661,8 @@ function LinesSection({ selected, onChoose }: {
                 </div>
 
                 {/* Horizontal dish photo slider */}
-                <div
-                  className="flex overflow-x-auto hide-scrollbar"
-                  style={{
-                    gap: 10,
-                    padding: "0 16px 16px",
-                    scrollSnapType: "x mandatory",
-                    WebkitOverflowScrolling: "touch",
-                  }}
-                  aria-label={`Примеры блюд: ${line.title}`}
-                >
-                  {line.dishPhotos.map((src, i) => (
-                    <div
-                      key={i}
-                      className="shrink-0 overflow-hidden"
-                      style={{
-                        width: 132, height: 96, borderRadius: 14,
-                        background: "rgba(14,15,14,0.06)",
-                        scrollSnapAlign: "start",
-                      }}
-                    >
-                      <img
-                        src={src}
-                        alt={`Блюдо рациона ${line.title} ${i + 1}`}
-                        loading="lazy"
-                        decoding="async"
-                        width={264}
-                        height={192}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                      />
-                    </div>
-                  ))}
-                </div>
+                <DishSlider photos={line.dishPhotos} accent={line.accent} title={line.title} />
+
               </article>
             );
           })}

@@ -820,7 +820,6 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
   const handlePointerDown = (event: React.PointerEvent) => {
     pointerStartRef.current = { x: event.clientX, y: event.clientY };
     didDragRef.current = false;
-    event.currentTarget.setPointerCapture?.(event.pointerId);
   };
 
   const handlePointerMove = (event: React.PointerEvent) => {

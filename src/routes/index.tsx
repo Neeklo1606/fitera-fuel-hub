@@ -1260,8 +1260,8 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Доставка"
-          title="Привезём свежее"
-          desc="Ежедневно по Ростову, бесплатно — выберите удобный слот"
+          title="Доставка"
+          desc="По Ростову бесплатно, в пригороды — по согласованию"
           accent="#2E7D32"
           center
         />

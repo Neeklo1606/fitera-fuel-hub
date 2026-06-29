@@ -113,7 +113,7 @@ const LINES: Line[] = [
 
 type Dish = {
   name: string;
-  meal: "ЗАВТРАК" | "ПЕРЕКУС" | "ОБЕД" | "УЖИН";
+  meal: "ЗАВТРАК" | "ВТОРОЙ ЗАВТРАК" | "ПЕРЕКУС" | "ОБЕД" | "ПОЛДНИК" | "УЖИН";
   kcal: number;
   p: number; f: number; c: number;
   line: LineId;

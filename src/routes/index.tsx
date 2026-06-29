@@ -4,7 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import {
   X, Check, Phone, Leaf, Truck, Sparkles, Send, MapPin, Plus, ArrowRight,
   Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, FlaskConical, Target,
-  MessageCircle, ChevronLeft, ChevronRight,
+  MessageCircle, Instagram, ChevronLeft, ChevronRight,
   type LucideIcon,
 } from "lucide-react";
 

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   X, Check, Phone, Leaf, Truck, Sparkles, Send, MapPin, Plus, ArrowRight,
   Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, FlaskConical, Target,
@@ -199,11 +199,12 @@ const DAYS = ["ПН", "ВТ", "СР", "ЧТ", "ПТ", "СБ", "ВС"];
 const DAYS_FULL = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
 
 const FAQ = [
-  { q: "Как происходит доставка?", a: "Доставляем ежедневно по Ростову-на-Дону бесплатно. Выбираете удобный временной слот при оформлении заявки. Менеджер подтверждает заказ в Telegram." },
-  { q: "Сколько приёмов пищи в рационе?", a: "4 приёма пищи: завтрак, перекус, обед и ужин. Каждый день — разное меню без повторений." },
-  { q: "Можно ли попробовать один день?", a: "Да, начать можно с одного дня. Выберите любую из 5 линеек, оставьте заявку — привезём." },
-  { q: "Как считается калорийность?", a: "Меню разрабатывается с учётом КБЖУ каждой линейки. На упаковке и сайте — точный состав по белкам, жирам и углеводам." },
-  { q: "Как оформить заказ?", a: "Оставьте заявку на сайте — укажите имя, телефон и Telegram. Менеджер напишет вам в течение 30 минут для подтверждения." },
+  { q: "Время приема заказа?", a: "Заказы принимаем до 14:00 в день доставки." },
+  { q: "Как вы доставляете рационы?", a: "Доставка бесплатная по Ростову. Курьер привезёт с 17:00 до 21:00 и предварительно позвонит." },
+  { q: "Как оплатить заказ?", a: "Наличными, переводом на карту любого банка или безналичным расчётом." },
+  { q: "Что делать, если не могу получить рацион в этот день?", a: "Предупредите нас до 12:00 в день доставки — перенесём или отменим." },
+  { q: "Помогут ли мне с выбором рациона?", a: "Да, наш менеджер подберёт оптимальный рацион под ваши параметры и цели." },
+  { q: "Есть скидки для новых клиентов?", a: "Да — скидка 15% на первый пробный рацион. При подписке от 7 дней — бесплатные подарочные дни." },
 ];
 
 /* ────────── Helpers ────────── */
@@ -1259,8 +1260,8 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
       <div className="mx-auto" style={{ maxWidth: 1200 }}>
         <SectionHeader
           eyebrow="Доставка"
-          title="Привезём свежее"
-          desc="Ежедневно по Ростову, бесплатно — выберите удобный слот"
+          title="Доставка"
+          desc="По Ростову бесплатно, в пригороды — по согласованию"
           accent="#2E7D32"
           center
         />
@@ -1274,15 +1275,7 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
               Бесплатно по Ростову
             </div>
             <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 14, color: "#555", lineHeight: 1.5 }}>
-              Выбирайте удобный временной слот при оформлении
-            </div>
-            <div className="mt-3 flex flex-wrap" style={{ gap: 6 }}>
-              {["07:00–08:00", "09:00–10:00", "18:00–19:00", "20:00–21:00"].map((s) => (
-                <span key={s} className="tabular" style={{
-                  background: "#FFFFFF", color: "#0E0F0E", borderRadius: 50,
-                  padding: "5px 10px", fontFamily: "Inter", fontSize: 12, fontWeight: 600,
-                }}>{s}</span>
-              ))}
+              Доставка с 17:00 до 21:00, курьер предварительно позвонит
             </div>
           </div>
 
@@ -1311,6 +1304,96 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
 }
 
 /* ────────── FAQ ────────── */
+
+function CantDecideSection() {
+  const [phone, setPhone] = useState("+7 ");
+  const [agree, setAgree] = useState(true);
+  const [sent, setSent] = useState(false);
+
+  function maskPhone(v: string) {
+    const d = v.replace(/\D/g, "").replace(/^7?/, "");
+    const p = d.slice(0, 10);
+    let out = "+7";
+    if (p.length > 0) out += " " + p.slice(0, 3);
+    if (p.length >= 4) out += " " + p.slice(3, 6);
+    if (p.length >= 7) out += "-" + p.slice(6, 8);
+    if (p.length >= 9) out += "-" + p.slice(8, 10);
+    return out;
+  }
+
+  function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!agree) return;
+    setSent(true);
+  }
+
+  return (
+    <section id="cant-decide" style={{ background: "#0E0F0E", padding: "48px 16px" }}>
+      <div className="mx-auto" style={{ maxWidth: 560 }}>
+        <SectionHeader
+          eyebrow="Помощь с выбором"
+          title="Не смогли определиться с выбором?"
+          desc="Оставьте заявку — менеджер подберёт идеальный вариант для вас"
+          dark
+          accent="#D4AF37"
+          center
+        />
+
+        {sent ? (
+          <div className="reveal mt-7 text-center" style={{
+            background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)",
+            borderRadius: 22, padding: 28, color: "#FFFFFF", fontFamily: "Inter",
+          }}>
+            <div style={{ fontFamily: "Unbounded", fontSize: 20, fontWeight: 700, color: "#D4AF37" }}>Заявка принята</div>
+            <div className="mt-2" style={{ fontSize: 14, color: "#A0A89A" }}>Свяжемся в течение 30 минут</div>
+          </div>
+        ) : (
+          <form onSubmit={submit} className="reveal mt-7" style={{ display: "grid", gap: 14 }}>
+            <input
+              type="tel"
+              inputMode="tel"
+              value={phone}
+              onChange={(e) => setPhone(maskPhone(e.target.value))}
+              placeholder="+7 999 000-00-00"
+              style={{
+                height: 52, padding: "0 18px", borderRadius: 50,
+                background: "rgba(255,255,255,0.06)", color: "#FFFFFF",
+                border: "1px solid rgba(255,255,255,0.12)",
+                fontFamily: "Inter", fontSize: 15, fontWeight: 500, outline: "none",
+              }}
+            />
+            <label className="flex items-start" style={{ gap: 10, color: "#A0A89A", fontFamily: "Inter", fontSize: 13, lineHeight: 1.55 }}>
+              <input
+                type="checkbox"
+                checked={agree}
+                onChange={(e) => setAgree(e.target.checked)}
+                style={{ marginTop: 3, accentColor: "#D4AF37", width: 16, height: 16, flexShrink: 0 }}
+              />
+              <span>
+                Я согласен с{" "}
+                <a href="/privacy" style={{ color: "#D4AF37", textDecoration: "underline" }}>обработкой персональных данных</a>{" "}
+                и принимаю условия{" "}
+                <a href="/privacy" style={{ color: "#D4AF37", textDecoration: "underline" }}>политики обработки персональных данных</a>
+              </span>
+            </label>
+            <button
+              type="submit"
+              disabled={!agree}
+              className="press"
+              style={{
+                height: 52, borderRadius: 50, background: agree ? "#D4AF37" : "rgba(212,175,55,0.4)",
+                color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 15,
+                letterSpacing: "-0.01em", cursor: agree ? "pointer" : "not-allowed",
+              }}
+            >
+              Хочу получить
+            </button>
+          </form>
+        )}
+      </div>
+    </section>
+  );
+}
 
 function FAQSection() {
   const [open, setOpen] = useState<number | null>(0);
@@ -1410,7 +1493,7 @@ function OrderForm({ initial, onUpdate }: { initial: OrderState; onUpdate: (s: O
     return out;
   }
 
-  function submit(e: React.FormEvent) {
+  function submit(e: FormEvent) {
     e.preventDefault();
     setSent(true);
   }
@@ -1796,10 +1879,11 @@ function Landing() {
           onChoose={chooseLine}
         />
         <MenuSection lineId={selectedLine} onOpenDish={setDish} onOrder={() => scrollTo("order-form")} />
-        <Calculator onOrder={(line) => { setSelectedLine(line); setOpenLine(line); setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />
         <Subscription onSelect={choosePeriod} />
         <Delivery onAsk={askOutOfCity} />
+        <Calculator onOrder={(line) => { setSelectedLine(line); setOpenLine(line); setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />
         <FAQSection />
+        <CantDecideSection />
         <OrderForm initial={order} onUpdate={setOrder} />
       </main>
       <Footer />

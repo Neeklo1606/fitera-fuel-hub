@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   X, Check, Phone, Leaf, Truck, Sparkles, Send, MapPin, Plus, ArrowRight,
-  Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, type LucideIcon,
+  Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, FlaskConical, Target,
+  type LucideIcon,
 } from "lucide-react";
 
 import lineLight from "../assets/line-light.jpg";

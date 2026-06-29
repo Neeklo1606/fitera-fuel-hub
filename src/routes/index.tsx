@@ -854,6 +854,22 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
           onOpenDish={onOpenDish}
         />
 
+        {/* Totals + CTA */}
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl"
+          style={{ background: "#161816", border: "1px solid #2A2E2A", padding: 18 }}>
+          <div className="tabular" style={{ fontFamily: "Inter", color: "#A0A89A", fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            Итого за день
+            <div className="mt-1" style={{ color: "#FFFFFF", fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em" }}>
+              {totalKcal} <span style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A", fontWeight: 500, letterSpacing: 0, textTransform: "none" }}>ккал · Б {totalP} · Ж {totalF} · У {totalC}</span>
+            </div>
+          </div>
+          <button onClick={onOrder} className="press rounded-full inline-flex items-center gap-2"
+            style={{ background: "#D4AF37", color: "#0E0F0E", height: 52, padding: "0 22px", borderRadius: 50, fontFamily: "Inter", fontWeight: 700, fontSize: 14 }}>
+            Заказать {line.id} <ArrowRight size={16} />
+          </button>
+        </div>
+
+
       </div>
     </section>
   );

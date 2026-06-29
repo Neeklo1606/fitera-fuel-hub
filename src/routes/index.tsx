@@ -849,10 +849,9 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
               }}
             >
               <SmartImage
-                src={line.image}
+                src={line.dishPhotos[i % line.dishPhotos.length] || line.image}
                 alt={d.name}
                 aspectRatio="4 / 3"
-                eager
                 style={{ width: "100%", background: "#0E0F0E" }}
               />
               <div className="flex-1 flex flex-col" style={{ padding: 14 }}>

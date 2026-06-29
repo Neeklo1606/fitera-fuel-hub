@@ -486,7 +486,6 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
               minHeight: "calc(2 * clamp(38px, 8vw, 72px) * 1.02)",
             }}
           >
-          >
             Умное питание<br />
             <span style={{
               background: "linear-gradient(90deg, #D4AF37 0%, #F5E08F 100%)",

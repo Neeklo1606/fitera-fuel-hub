@@ -99,7 +99,7 @@ type Line = {
   dishPhotos: string[];
 };
 
-const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=420&q=70`;
+const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=640&q=70`;
 
 const LINES: Line[] = [
   { id: "LIGHT",   title: "Лёгкий",  kcal: "1200–1400", desc: "Снижение веса",     priceFrom: "от 750 ₽",   accent: "#7CB342", tint: "#EEF7E4", pastel: "#E8F5E9", image: lineLight,   Icon: Leaf,     features: ["Низкокалорийный профиль", "Овощи, рыба, белок", "Дефицит 300–500 ккал"], dishesPerDay: "4 блюда в день",
@@ -447,30 +447,30 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
 function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) {
   return (
     <section id="top" className="relative" style={{ background: "#0E0F0E", overflow: "hidden" }}>
-      <div className="absolute inset-0">
-        <picture>
-          <source media="(max-width: 767px)" srcSet={HERO_BG_MOBILE} />
-          <source media="(min-width: 768px)" srcSet={HERO_BG_DESKTOP} />
-          <img
-            src={HERO_BG_DESKTOP}
-            alt="Готовый рацион FITERA"
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-            className="w-full h-full object-cover"
-            style={{ objectPosition: "center" }}
-          />
-        </picture>
+      <picture className="absolute inset-0 block">
+        <source media="(max-width: 767px)" srcSet={HERO_BG_MOBILE} />
+        <img
+          src={HERO_BG_DESKTOP}
+          alt="Готовый рацион FITERA"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          width={1920}
+          height={1080}
+          className="absolute inset-0 w-full h-full"
+          style={{ objectFit: "cover", objectPosition: "center right" }}
+        />
+      </picture>
 
-        <div className="absolute inset-0" style={{
-          background:
-            "radial-gradient(ellipse at 70% 30%, rgba(14,15,14,0.35) 0%, rgba(14,15,14,0.8) 60%, rgba(14,15,14,0.98) 100%)",
-        }} />
-        <div className="absolute inset-0" style={{
-          background:
-            "linear-gradient(180deg, rgba(14,15,14,0.5) 0%, rgba(14,15,14,0) 30%, rgba(14,15,14,0) 60%, rgba(14,15,14,1) 100%)",
-        }} />
-      </div>
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background:
+          "radial-gradient(ellipse at 70% 30%, rgba(14,15,14,0.35) 0%, rgba(14,15,14,0.8) 60%, rgba(14,15,14,0.98) 100%)",
+      }} />
+      <div className="absolute inset-0 pointer-events-none" style={{
+        background:
+          "linear-gradient(180deg, rgba(14,15,14,0.5) 0%, rgba(14,15,14,0) 30%, rgba(14,15,14,0) 60%, rgba(14,15,14,1) 100%)",
+      }} />
+
 
       <div className="relative mx-auto px-4 flex flex-col justify-end md:justify-center"
         style={{ maxWidth: 1200, minHeight: "min(640px, 86vh)", paddingTop: 32, paddingBottom: 44 }}>
@@ -546,127 +546,8 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
 
 /* ────────── Lines — always-open pastel cards with photo slider ────────── */
 
-function DishSlider({ photos, accent, title }: { photos: string[]; accent: string; title: string }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: false,
-    align: "start",
-    containScroll: "trimSnaps",
-    dragFree: false,
-    skipSnaps: false,
-    dragThreshold: 14,
-    duration: 22,
-    watchDrag: (_api, e) => {
-      // Ignore drags that begin on interactive controls (dot buttons, arrows)
-      const t = e.target as HTMLElement | null;
-      if (t && t.closest('button[aria-label^="Слайд"], button[aria-label^="Блюдо"]')) return false;
-      return true;
-    },
-  });
-  const [selected, setSelected] = useState(0);
-  const [snaps, setSnaps] = useState<number[]>([]);
-  const [canPrev, setCanPrev] = useState(false);
-  const [canNext, setCanNext] = useState(false);
 
-  useEffect(() => {
-    if (!emblaApi) return;
-    const onSelect = () => {
-      setSelected(emblaApi.selectedScrollSnap());
-      setCanPrev(emblaApi.canScrollPrev());
-      setCanNext(emblaApi.canScrollNext());
-    };
-    setSnaps(emblaApi.scrollSnapList());
-    onSelect();
-    emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", () => { setSnaps(emblaApi.scrollSnapList()); onSelect(); });
-  }, [emblaApi]);
 
-  return (
-    <div className="relative" style={{ padding: "0 16px 16px" }}>
-      <div className="overflow-hidden" ref={emblaRef} aria-label={`Примеры блюд: ${title}`} style={{ borderRadius: 14 }}>
-        <div className="flex" style={{ gap: 10 }}>
-          {photos.map((src, i) => (
-            <div
-              key={i}
-              className="shrink-0 overflow-hidden"
-              style={{
-                flex: "0 0 calc(50% - 5px)",
-                aspectRatio: "4 / 3",
-                borderRadius: 14,
-                background: "rgba(14,15,14,0.06)",
-              }}
-            >
-              <img
-                src={src}
-                alt={`Блюдо рациона ${title} ${i + 1}`}
-                loading="lazy"
-                decoding="async"
-                width={400}
-                height={300}
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Arrows — desktop only */}
-      <button
-        type="button"
-        aria-label="Предыдущие блюда"
-        onClick={() => emblaApi?.scrollPrev()}
-        disabled={!canPrev}
-        className="hidden md:grid place-items-center press"
-        style={{
-          position: "absolute", top: "calc(50% - 14px)", left: 4, transform: "translateY(-50%)",
-          width: 36, height: 36, borderRadius: 999,
-          background: "rgba(255,255,255,0.95)", color: "#0E0F0E",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
-          opacity: canPrev ? 1 : 0.35, cursor: canPrev ? "pointer" : "default",
-        }}
-      >
-        <ChevronLeft size={18} />
-      </button>
-      <button
-        type="button"
-        aria-label="Следующие блюда"
-        onClick={() => emblaApi?.scrollNext()}
-        disabled={!canNext}
-        className="hidden md:grid place-items-center press"
-        style={{
-          position: "absolute", top: "calc(50% - 14px)", right: 4, transform: "translateY(-50%)",
-          width: 36, height: 36, borderRadius: 999,
-          background: "rgba(255,255,255,0.95)", color: "#0E0F0E",
-          boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
-          opacity: canNext ? 1 : 0.35, cursor: canNext ? "pointer" : "default",
-        }}
-      >
-        <ChevronRight size={18} />
-      </button>
-
-      {/* Dot indicators */}
-      <div className="flex items-center justify-center" style={{ gap: 6, marginTop: 10 }}>
-        {snaps.map((_, i) => {
-          const active = i === selected;
-          return (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Слайд ${i + 1}`}
-              aria-current={active}
-              onClick={() => emblaApi?.scrollTo(i)}
-              style={{
-                width: active ? 20 : 7, height: 7, borderRadius: 999,
-                background: active ? accent : "rgba(14,15,14,0.22)",
-                transition: "width 200ms ease, background 200ms ease",
-                padding: 0, border: "none", cursor: "pointer",
-              }}
-            />
-          );
-        })}
-      </div>
-    </div>
-  );
-}
 
 
 function LinesSection({ selected, onChoose }: {
@@ -716,6 +597,8 @@ function LinesSection({ selected, onChoose }: {
                     alt={`Пример блюд рациона ${line.id}`}
                     loading="lazy"
                     decoding="async"
+                    width={1280}
+                    height={800}
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   />
                 </div>
@@ -817,10 +700,15 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
       setCanPrev(emblaApi.canScrollPrev());
       setCanNext(emblaApi.canScrollNext());
     };
+    const onReInit = () => { setSnaps(emblaApi.scrollSnapList()); onSelect(); };
     setSnaps(emblaApi.scrollSnapList());
     onSelect();
     emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", () => { setSnaps(emblaApi.scrollSnapList()); onSelect(); });
+    emblaApi.on("reInit", onReInit);
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onReInit);
+    };
   }, [emblaApi]);
 
   return (
@@ -844,9 +732,11 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
                   <img
                     src={photo}
                     alt={d.name}
-                    loading={i < 2 ? "eager" : "lazy"}
+                    loading={i === 0 ? "eager" : "lazy"}
                     decoding="async"
-                    fetchPriority={i === 0 ? "high" : "auto"}
+                    fetchPriority={i === 0 ? "high" : "low"}
+                    width={640}
+                    height={480}
                     style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   />
                 </div>

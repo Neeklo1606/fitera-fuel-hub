@@ -475,16 +475,7 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
       <div className="relative mx-auto px-4 flex flex-col justify-end md:justify-center"
         style={{ maxWidth: 1200, minHeight: "min(640px, 86vh)", paddingTop: 32, paddingBottom: 44 }}>
         <div className="reveal in" style={{ maxWidth: 620 }}>
-          <span
-            className="inline-flex items-center gap-1.5 rounded-full backdrop-blur"
-            style={{
-              padding: "6px 14px", border: "1px solid rgba(212,175,55,0.4)",
-              background: "rgba(212,175,55,0.12)", color: "#E8C46B",
-              fontFamily: "Inter", fontSize: 12, fontWeight: 600, letterSpacing: "0.04em",
-            }}
-          >
-            <MapPin size={12} /> РОСТОВ-НА-ДОНУ · ЕЖЕДНЕВНО
-          </span>
+
 
           <h1
             className="mt-5"
@@ -711,23 +702,22 @@ function LinesSection({ selected, onChoose }: {
                     : "0 4px 14px rgba(0,0,0,0.05)",
                 }}
               >
-                <div style={{ padding: 14, paddingBottom: 0 }}>
-                  <div
-                    className="overflow-hidden"
-                    style={{
-                      borderRadius: 18,
-                      aspectRatio: "4 / 3",
-                      background: line.pastel,
-                    }}
-                  >
-                    <img
-                      src={line.image}
-                      alt={`Пример блюд рациона ${line.id}`}
-                      loading="lazy"
-                      decoding="async"
-                      style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
-                    />
-                  </div>
+                <div
+                  className="overflow-hidden"
+                  style={{
+                    borderTopLeftRadius: 22,
+                    borderTopRightRadius: 22,
+                    aspectRatio: "16 / 10",
+                    background: line.pastel,
+                  }}
+                >
+                  <img
+                    src={line.image}
+                    alt={`Пример блюд рациона ${line.id}`}
+                    loading="lazy"
+                    decoding="async"
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                  />
                 </div>
                 <div className="flex flex-col" style={{ padding: "18px 22px 20px" }}>
                   <div className="flex items-center gap-2 flex-wrap">
@@ -1610,21 +1600,11 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
                   <CalcIcon size={32} color="#2E7D32" />
                 </div>
                 <div style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, color: "#0E0F0E", letterSpacing: "-0.02em" }}>
-                  Готовы посчитать?
+                  Здесь появится подходящий вам рацион
                 </div>
-                <div className="mt-2 mb-5" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#777", maxWidth: 260, lineHeight: 1.5 }}>
-                  Заполните параметры слева — здесь появится ваша норма и подходящий рацион.
+                <div className="mt-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#777", maxWidth: 280, lineHeight: 1.5 }}>
+                  после использования калькулятора.
                 </div>
-                <button onClick={compute} className="press inline-flex items-center justify-center gap-2"
-                  style={{
-                    height: 52, padding: "0 22px", borderRadius: 50,
-                    background: "linear-gradient(135deg, #D4AF37 0%, #E9C75A 100%)",
-                    color: "#0E0F0E",
-                    fontFamily: "Inter", fontWeight: 700, fontSize: 14,
-                    boxShadow: "0 12px 26px -10px rgba(212,175,55,0.55)",
-                  }}>
-                  Посчитать сейчас <ArrowRight size={14} />
-                </button>
               </div>
             )}
           </div>

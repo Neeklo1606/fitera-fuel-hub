@@ -533,6 +533,7 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
                   fontFamily: "Inter",
                   fontSize: 12,
                   color: "#E0E2DD",
+                  whiteSpace: "nowrap",
                 }}>
                 <item.Icon size={14} color="#D4AF37" />
                 {item.text}

@@ -660,7 +660,7 @@ function LinesSection({ selected, onChoose }: {
 
                 {/* Horizontal dish photo slider */}
                 <div
-                  className="flex overflow-x-auto no-scrollbar"
+                  className="flex overflow-x-auto hide-scrollbar"
                   style={{
                     gap: 10,
                     padding: "0 16px 16px",

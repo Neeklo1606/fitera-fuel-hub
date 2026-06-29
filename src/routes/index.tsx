@@ -1262,6 +1262,7 @@ function OrderModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="order-modal-title"
+      tabIndex={-1}
     >
       <div
         onMouseDown={(e) => e.stopPropagation()}

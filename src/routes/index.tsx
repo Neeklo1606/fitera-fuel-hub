@@ -866,10 +866,10 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
         className="overflow-hidden"
         ref={emblaRef}
         aria-label={`Блюда рациона ${line.id}`}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerCancel}
+        onPointerDownCapture={handlePointerDown}
+        onPointerMoveCapture={handlePointerMove}
+        onPointerUpCapture={handlePointerUp}
+        onPointerCancelCapture={handlePointerCancel}
         style={{ touchAction: "pan-y pinch-zoom" }}
       >
         <div className="flex" style={{ gap: 12, willChange: "transform" }}>

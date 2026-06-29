@@ -711,28 +711,21 @@ function LinesSection({ selected, onChoose }: {
                     : "0 4px 14px rgba(0,0,0,0.05)",
                 }}
               >
-                <div className="grid md:grid-cols-[40%_60%]" style={{ gap: 0 }}>
-                  {/* Left photo */}
-                  <div className="relative" style={{ minHeight: 200 }}>
-                    <SmartImage
-                      src={line.image}
-                      alt={line.title}
-                      light
-                      eager
-                      style={{
-                        position: "absolute",
-                        inset: 12,
-                        width: "calc(100% - 24px)",
-                        height: "calc(100% - 24px)",
-                        objectFit: "cover",
-                        borderRadius: 18,
-                      }}
-                    />
+                <div className="flex flex-col" style={{ padding: "22px 22px 20px" }}>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="grid place-items-center rounded-xl shrink-0"
+                      style={{ width: 36, height: 36, background: line.accent, color: "#FFFFFF" }}>
+                      <line.Icon size={18} />
+                    </div>
+                    <span style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
+                      {line.id}
+                    </span>
+                    <span style={{ fontFamily: "Inter", fontSize: 14, color: "#5A5F58" }}>
+                      · {line.title}
+                    </span>
                     {line.popular && (
                       <span
-                        className="absolute"
                         style={{
-                          top: 22, left: 22,
                           background: "#0E0F0E", color: "#D4AF37",
                           borderRadius: 50, padding: "5px 11px",
                           fontFamily: "Inter", fontWeight: 700, fontSize: 10, letterSpacing: "0.08em",
@@ -741,65 +734,46 @@ function LinesSection({ selected, onChoose }: {
                     )}
                   </div>
 
-                  {/* Right content */}
-                  <div className="flex flex-col" style={{ padding: "20px 22px 18px" }}>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <div className="grid place-items-center rounded-xl shrink-0"
-                        style={{ width: 36, height: 36, background: line.accent, color: "#FFFFFF" }}>
-                        <line.Icon size={18} />
-                      </div>
-                      <span style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em", color: "#0E0F0E" }}>
-                        {line.id}
-                      </span>
-                      <span style={{ fontFamily: "Inter", fontSize: 14, color: "#5A5F58" }}>
-                        · {line.title}
-                      </span>
-                    </div>
+                  <div className="tabular mt-2 flex flex-wrap items-center" style={{ gap: 8, fontFamily: "Inter", fontSize: 13, color: "#5A5F58" }}>
+                    <span style={{ fontWeight: 600, color: "#0E0F0E" }}>{line.kcal} ккал</span>
+                    <span>·</span>
+                    <span>{line.desc}</span>
+                    <span>·</span>
+                    <span>{line.dishesPerDay}</span>
+                  </div>
 
-                    <div className="tabular mt-2 flex flex-wrap items-center" style={{ gap: 8, fontFamily: "Inter", fontSize: 13, color: "#5A5F58" }}>
-                      <span style={{ fontWeight: 600, color: "#0E0F0E" }}>{line.kcal} ккал</span>
-                      <span>·</span>
-                      <span>{line.desc}</span>
-                      <span>·</span>
-                      <span>{line.dishesPerDay}</span>
-                    </div>
-
-                    <ul className="mt-3 space-y-1.5">
-                      {line.features.map((f) => (
-                        <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#2A2E2A" }}>
-                          <span className="grid place-items-center rounded-full shrink-0 mt-0.5"
-                            style={{ width: 16, height: 16, background: line.accent, color: "#FFFFFF" }}>
-                            <Check size={10} strokeWidth={3} />
-                          </span>
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-
-                    <div className="mt-4 flex items-center justify-between flex-wrap" style={{ gap: 12 }}>
-                      <div className="tabular">
-                        <span style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, color: "#0E0F0E" }}>
-                          {line.priceFrom}
+                  <ul className="mt-3 space-y-1.5">
+                    {line.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#2A2E2A" }}>
+                        <span className="grid place-items-center rounded-full shrink-0 mt-0.5"
+                          style={{ width: 16, height: 16, background: line.accent, color: "#FFFFFF" }}>
+                          <Check size={10} strokeWidth={3} />
                         </span>
-                        <span style={{ fontFamily: "Inter", fontSize: 12, color: "#5A5F58", marginLeft: 4 }}>/ день</span>
-                      </div>
-                      <button
-                        onClick={() => onChoose(line.id)}
-                        className="press inline-flex items-center justify-center gap-2"
-                        style={{
-                          background: "#0E0F0E", color: "#FFFFFF",
-                          height: 52, padding: "0 22px", borderRadius: 50,
-                          fontFamily: "Inter", fontWeight: 600, fontSize: 14,
-                        }}
-                      >
-                        Выбрать рацион <ArrowRight size={16} />
-                      </button>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-4 flex items-center justify-between flex-wrap" style={{ gap: 12 }}>
+                    <div className="tabular">
+                      <span style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 18, color: "#0E0F0E" }}>
+                        {line.priceFrom}
+                      </span>
+                      <span style={{ fontFamily: "Inter", fontSize: 12, color: "#5A5F58", marginLeft: 4 }}>/ день</span>
                     </div>
+                    <button
+                      onClick={() => onChoose(line.id)}
+                      className="press inline-flex items-center justify-center gap-2"
+                      style={{
+                        background: "#0E0F0E", color: "#FFFFFF",
+                        height: 52, padding: "0 22px", borderRadius: 50,
+                        fontFamily: "Inter", fontWeight: 600, fontSize: 14,
+                      }}
+                    >
+                      Выбрать рацион <ArrowRight size={16} />
+                    </button>
                   </div>
                 </div>
-
-                {/* Horizontal dish photo slider */}
-                <DishSlider photos={line.dishPhotos} accent={line.accent} title={line.title} />
 
               </article>
             );

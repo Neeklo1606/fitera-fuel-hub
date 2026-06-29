@@ -22,6 +22,7 @@ async def main():
         page = await browser.new_page(viewport={"width": 1280, "height": 1800})
         page.set_default_timeout(10000)
         await page.goto(BASE_URL, wait_until="domcontentloaded")
+        await page.wait_for_timeout(1200)
 
         for ration, expected_count in RATIONS.items():
             select_button = page.locator(f'[data-ration-select="{ration}"]')

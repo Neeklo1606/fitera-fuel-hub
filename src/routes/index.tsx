@@ -388,14 +388,14 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
       className="sticky z-40 backdrop-blur-xl"
       style={{ top: 2, background: "rgba(14,15,14,0.78)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
     >
-      <div className="mx-auto px-4 flex items-center justify-between gap-2" style={{ maxWidth: 1200, height: 112 }}>
+      <div className="mx-auto px-4 flex items-center justify-between gap-3 h-20 md:h-28" style={{ maxWidth: 1200 }}>
         <Logo />
         <nav className="hidden lg:flex items-center gap-7">
           {items.map((i) => (
             <a key={i.h} href={i.h} className="text-sm text-[#A0A89A] hover:text-white transition-colors">{i.l}</a>
           ))}
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <a
             href="tel:+79991234567"
             aria-label="Позвонить"

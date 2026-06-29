@@ -548,7 +548,21 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
 /* ────────── Lines — always-open pastel cards with photo slider ────────── */
 
 function DishSlider({ photos, accent, title }: { photos: string[]; accent: string; title: string }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start", containScroll: "trimSnaps" });
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "start",
+    containScroll: "trimSnaps",
+    dragFree: false,
+    skipSnaps: false,
+    dragThreshold: 14,
+    duration: 22,
+    watchDrag: (_api, e) => {
+      // Ignore drags that begin on interactive controls (dot buttons, arrows)
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest('button[aria-label^="Слайд"], button[aria-label^="Блюдо"]')) return false;
+      return true;
+    },
+  });
   const [selected, setSelected] = useState(0);
   const [snaps, setSnaps] = useState<number[]>([]);
   const [canPrev, setCanPrev] = useState(false);
@@ -792,7 +806,15 @@ function LinesSection({ selected, onChoose }: {
 /* ────────── Menu (swipeable slider, day pills) ────────── */
 
 function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Line; onOpenDish: (d: Dish) => void }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start", containScroll: "trimSnaps" });
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "start",
+    containScroll: "trimSnaps",
+    dragFree: false,
+    skipSnaps: false,
+    dragThreshold: 14,
+    duration: 22,
+  });
   const [selected, setSelected] = useState(0);
   const [snaps, setSnaps] = useState<number[]>([]);
   const [canPrev, setCanPrev] = useState(false);
@@ -923,7 +945,8 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
 function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDish: (d: Dish) => void; onOrder: () => void }) {
   const [day, setDay] = useState(0);
   const line = LINES.find((l) => l.id === lineId)!;
-  const dayMeals = WEEK_MENU[lineId][day];
+  const dayMeals = (WEEK_MENU[lineId] && WEEK_MENU[lineId][day]) || [];
+  const hasMeals = dayMeals.length > 0;
 
   const totalKcal = dayMeals.reduce((s, d) => s + d.kcal, 0);
   const totalP = dayMeals.reduce((s, d) => s + d.p, 0);
@@ -975,28 +998,47 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
           {DAYS_FULL[day]}
         </div>
 
-        {/* Dishes — swipeable slider */}
-        <MenuDishSlider
-          key={`${lineId}-${day}`}
-          dishes={dayMeals}
-          line={line}
-          onOpenDish={onOpenDish}
-        />
+        {/* Dishes — swipeable slider or empty state */}
+        {hasMeals ? (
+          <MenuDishSlider
+            key={`${lineId}-${day}`}
+            dishes={dayMeals}
+            line={line}
+            onOpenDish={onOpenDish}
+          />
+        ) : (
+          <div
+            className="reveal mt-5 rounded-2xl text-center"
+            role="status"
+            aria-live="polite"
+            style={{
+              background: "#161816", border: "1px dashed #2A2E2A", padding: "28px 18px",
+              color: "#A0A89A", fontFamily: "Inter", fontSize: 14,
+            }}
+          >
+            <div style={{ color: "#FFFFFF", fontFamily: "Unbounded", fontWeight: 700, fontSize: 15, marginBottom: 6 }}>
+              Меню на этот день готовится
+            </div>
+            Загляните позже — мы обновляем рацион еженедельно.
+          </div>
+        )}
 
         {/* Totals + CTA */}
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl"
-          style={{ background: "#161816", border: "1px solid #2A2E2A", padding: 18 }}>
-          <div className="tabular" style={{ fontFamily: "Inter", color: "#A0A89A", fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-            Итого за день
-            <div className="mt-1" style={{ color: "#FFFFFF", fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em" }}>
-              {totalKcal} <span style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A", fontWeight: 500, letterSpacing: 0, textTransform: "none" }}>ккал · Б {totalP} · Ж {totalF} · У {totalC}</span>
+        {hasMeals && (
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl"
+            style={{ background: "#161816", border: "1px solid #2A2E2A", padding: 18 }}>
+            <div className="tabular" style={{ fontFamily: "Inter", color: "#A0A89A", fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+              Итого за день
+              <div className="mt-1" style={{ color: "#FFFFFF", fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em" }}>
+                {totalKcal} <span style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A", fontWeight: 500, letterSpacing: 0, textTransform: "none" }}>ккал · Б {totalP} · Ж {totalF} · У {totalC}</span>
+              </div>
             </div>
+            <button onClick={onOrder} className="press rounded-full inline-flex items-center gap-2"
+              style={{ background: "#D4AF37", color: "#0E0F0E", height: 52, padding: "0 22px", borderRadius: 50, fontFamily: "Inter", fontWeight: 700, fontSize: 14 }}>
+              Заказать {line.id} <ArrowRight size={16} />
+            </button>
           </div>
-          <button onClick={onOrder} className="press rounded-full inline-flex items-center gap-2"
-            style={{ background: "#D4AF37", color: "#0E0F0E", height: 52, padding: "0 22px", borderRadius: 50, fontFamily: "Inter", fontWeight: 700, fontSize: 14 }}>
-            Заказать {line.id} <ArrowRight size={16} />
-          </button>
-        </div>
+        )}
 
 
       </div>
@@ -1054,6 +1096,8 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
       role="dialog"
       aria-modal="true"
       aria-labelledby="dish-modal-title"
+      aria-describedby="dish-modal-desc"
+      tabIndex={-1}
     >
       <div
         onMouseDown={(e) => e.stopPropagation()}
@@ -1109,7 +1153,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
             ))}
           </div>
 
-          <p style={{ fontFamily: "Inter", fontSize: 12.5, lineHeight: 1.45, color: "#C5C9BD" }}>
+          <p id="dish-modal-desc" style={{ fontFamily: "Inter", fontSize: 12.5, lineHeight: 1.45, color: "#C5C9BD" }}>
             <span style={{ color: "#A0A89A", fontWeight: 600, textTransform: "uppercase", fontSize: 10, letterSpacing: "0.08em", marginRight: 6 }}>Состав:</span>
             {dish.ingredients}
           </p>
@@ -1218,6 +1262,7 @@ function OrderModal({
       role="dialog"
       aria-modal="true"
       aria-labelledby="order-modal-title"
+      tabIndex={-1}
     >
       <div
         onMouseDown={(e) => e.stopPropagation()}

@@ -60,7 +60,7 @@ export const Route = createFileRoute("/")({
           image: OG_IMAGE,
           servesCuisine: "Healthy",
           priceRange: "₽₽",
-          telephone: "+7 (999) 123-45-67",
+          telephone: "+7 (996) 610-00-06",
           address: {
             "@type": "PostalAddress",
             addressLocality: "Ростов-на-Дону",

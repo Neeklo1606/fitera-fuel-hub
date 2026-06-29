@@ -1275,15 +1275,7 @@ function Delivery({ onAsk }: { onAsk: () => void }) {
               Бесплатно по Ростову
             </div>
             <div className="mt-1" style={{ fontFamily: "Inter", fontSize: 14, color: "#555", lineHeight: 1.5 }}>
-              Выбирайте удобный временной слот при оформлении
-            </div>
-            <div className="mt-3 flex flex-wrap" style={{ gap: 6 }}>
-              {["07:00–08:00", "09:00–10:00", "18:00–19:00", "20:00–21:00"].map((s) => (
-                <span key={s} className="tabular" style={{
-                  background: "#FFFFFF", color: "#0E0F0E", borderRadius: 50,
-                  padding: "5px 10px", fontFamily: "Inter", fontSize: 12, fontWeight: 600,
-                }}>{s}</span>
-              ))}
+              Доставка с 17:00 до 21:00, курьер предварительно позвонит
             </div>
           </div>
 

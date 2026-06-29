@@ -1096,6 +1096,8 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
       role="dialog"
       aria-modal="true"
       aria-labelledby="dish-modal-title"
+      aria-describedby="dish-modal-desc"
+      tabIndex={-1}
     >
       <div
         onMouseDown={(e) => e.stopPropagation()}

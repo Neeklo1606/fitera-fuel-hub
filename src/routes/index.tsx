@@ -718,7 +718,7 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
 
   useEffect(() => {
     if (!emblaApi) return;
-    requestAnimationFrame(() => {
+    const frame = requestAnimationFrame(() => {
       emblaApi.reInit();
       emblaApi.scrollTo(0, true);
       setSelected(0);
@@ -726,6 +726,7 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
       setCanPrev(emblaApi.canScrollPrev());
       setCanNext(emblaApi.canScrollNext());
     });
+    return () => cancelAnimationFrame(frame);
   }, [emblaApi, dishes.length, dishesSignature, line.id]);
 
   return (

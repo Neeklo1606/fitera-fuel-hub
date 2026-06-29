@@ -474,7 +474,7 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
 
       <div className="relative mx-auto px-4 flex flex-col justify-end md:justify-center"
         style={{ maxWidth: 1200, minHeight: "min(640px, 86vh)", paddingTop: 32, paddingBottom: 44 }}>
-        <div className="reveal in" style={{ maxWidth: 620, minHeight: 560 }}>
+        <div className="reveal in" style={{ maxWidth: 620, minHeight: 580 }}>
 
 
           <h1

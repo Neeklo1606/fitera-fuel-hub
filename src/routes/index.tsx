@@ -1797,10 +1797,11 @@ function Landing() {
           onChoose={chooseLine}
         />
         <MenuSection lineId={selectedLine} onOpenDish={setDish} onOrder={() => scrollTo("order-form")} />
-        <Calculator onOrder={(line) => { setSelectedLine(line); setOpenLine(line); setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />
         <Subscription onSelect={choosePeriod} />
         <Delivery onAsk={askOutOfCity} />
+        <Calculator onOrder={(line) => { setSelectedLine(line); setOpenLine(line); setOrder((s) => ({ ...s, line })); scrollTo("order-form"); }} />
         <FAQSection />
+        <CantDecideSection />
         <OrderForm initial={order} onUpdate={setOrder} />
       </main>
       <Footer />

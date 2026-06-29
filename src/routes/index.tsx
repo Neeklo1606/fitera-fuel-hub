@@ -830,7 +830,23 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
     }
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (event: React.PointerEvent) => {
+    const start = pointerStartRef.current;
+    if (start) {
+      const dx = event.clientX - start.x;
+      const dy = event.clientY - start.y;
+      if (Math.abs(dx) > 34 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        if (dx < 0) emblaApi?.scrollNext();
+        else emblaApi?.scrollPrev();
+      }
+    }
+    pointerStartRef.current = null;
+    window.setTimeout(() => {
+      didDragRef.current = false;
+    }, 0);
+  };
+
+  const handlePointerCancel = () => {
     pointerStartRef.current = null;
     window.setTimeout(() => {
       didDragRef.current = false;
@@ -863,7 +879,7 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
-                onPointerCancel={handlePointerUp}
+                onPointerCancel={handlePointerCancel}
                 onClick={(event) => {
                   if (didDragRef.current) {
                     event.preventDefault();

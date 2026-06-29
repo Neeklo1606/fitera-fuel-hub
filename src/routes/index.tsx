@@ -846,70 +846,14 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
           {DAYS_FULL[day]}
         </div>
 
-        {/* 2×2 grid of meal cards */}
-        <div
+        {/* Dishes — swipeable slider */}
+        <MenuDishSlider
           key={`${lineId}-${day}`}
-          className="mt-5 grid menu-anim grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-          style={{
-            gap: 12,
-          }}
-        >
+          dishes={dayMeals}
+          line={line}
+          onOpenDish={onOpenDish}
+        />
 
-          {dayMeals.map((d) => (
-            <button
-              key={d.meal + d.name}
-              onClick={() => onOpenDish(d)}
-              className="press text-left flex flex-col overflow-hidden tile-trans"
-              style={{
-                background: "#161816", border: "1px solid #2A2E2A",
-                borderRadius: 18,
-              }}
-            >
-              <SmartImage
-                src={line.image}
-                alt={d.name}
-                aspectRatio="4 / 3"
-                eager
-                style={{ width: "100%", background: "#0E0F0E" }}
-              />
-              <div className="flex-1 flex flex-col" style={{ padding: 12 }}>
-                <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 9, color: line.accent, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                  {d.meal}
-                </div>
-                <div
-                  className="mt-1"
-                  style={{
-                    fontFamily: "Inter", fontWeight: 700, fontSize: 13.5, color: "#FFFFFF", lineHeight: 1.25,
-                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
-                    overflow: "hidden", wordBreak: "break-word", minHeight: 34,
-                  }}
-                >
-                  {d.name}
-                </div>
-                <div className="mt-2 tabular flex items-center flex-wrap" style={{ fontFamily: "Inter", fontSize: 10.5, color: "#A0A89A", gap: 6 }}>
-                  <span style={{ color: "#D4AF37", fontWeight: 700 }}>{d.kcal} ккал</span>
-                  <span style={{ opacity: 0.4 }}>·</span>
-                  <span>Б{d.p} Ж{d.f} У{d.c}</span>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* Totals + CTA */}
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl"
-          style={{ background: "#161816", border: "1px solid #2A2E2A", padding: 18 }}>
-          <div className="tabular" style={{ fontFamily: "Inter", color: "#A0A89A", fontSize: 12, letterSpacing: "0.1em", textTransform: "uppercase" }}>
-            Итого за день
-            <div className="mt-1" style={{ color: "#FFFFFF", fontFamily: "Unbounded", fontWeight: 800, fontSize: 22, letterSpacing: "-0.02em" }}>
-              {totalKcal} <span style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A", fontWeight: 500, letterSpacing: 0, textTransform: "none" }}>ккал · Б {totalP} · Ж {totalF} · У {totalC}</span>
-            </div>
-          </div>
-          <button onClick={onOrder} className="press rounded-full inline-flex items-center gap-2"
-            style={{ background: "#D4AF37", color: "#0E0F0E", height: 52, padding: "0 22px", borderRadius: 50, fontFamily: "Inter", fontWeight: 700, fontSize: 14 }}>
-            Заказать {line.id} <ArrowRight size={16} />
-          </button>
-        </div>
       </div>
     </section>
   );

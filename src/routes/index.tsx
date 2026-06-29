@@ -597,6 +597,8 @@ function LinesSection({ selected, onChoose }: {
                     alt={`Пример блюд рациона ${line.id}`}
                     loading="lazy"
                     decoding="async"
+                    width={1280}
+                    height={800}
                     style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   />
                 </div>

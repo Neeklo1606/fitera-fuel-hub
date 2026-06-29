@@ -789,7 +789,136 @@ function LinesSection({ selected, onChoose }: {
 }
 
 
-/* ────────── Menu (2×2 grid, day pills) ────────── */
+/* ────────── Menu (swipeable slider, day pills) ────────── */
+
+function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Line; onOpenDish: (d: Dish) => void }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start", containScroll: "trimSnaps" });
+  const [selected, setSelected] = useState(0);
+  const [snaps, setSnaps] = useState<number[]>([]);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => {
+      setSelected(emblaApi.selectedScrollSnap());
+      setCanPrev(emblaApi.canScrollPrev());
+      setCanNext(emblaApi.canScrollNext());
+    };
+    setSnaps(emblaApi.scrollSnapList());
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", () => { setSnaps(emblaApi.scrollSnapList()); onSelect(); });
+  }, [emblaApi]);
+
+  return (
+    <div className="reveal relative mt-5">
+      <div className="overflow-hidden" ref={emblaRef} aria-label={`Блюда рациона ${line.id}`}>
+        <div className="flex" style={{ gap: 12 }}>
+          {dishes.map((d, i) => (
+            <button
+              key={d.meal + d.name + i}
+              type="button"
+              onClick={() => onOpenDish(d)}
+              className="press text-left flex flex-col overflow-hidden tile-trans shrink-0"
+              style={{
+                flex: "0 0 calc(80% - 6px)",
+                background: "#161816", border: "1px solid #2A2E2A", borderRadius: 18,
+              }}
+            >
+              <SmartImage
+                src={line.image}
+                alt={d.name}
+                aspectRatio="4 / 3"
+                eager
+                style={{ width: "100%", background: "#0E0F0E" }}
+              />
+              <div className="flex-1 flex flex-col" style={{ padding: 14 }}>
+                <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 10, color: line.accent, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                  {d.meal}
+                </div>
+                <div
+                  className="mt-1"
+                  style={{
+                    fontFamily: "Inter", fontWeight: 700, fontSize: 15, color: "#FFFFFF", lineHeight: 1.25,
+                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                    overflow: "hidden", wordBreak: "break-word", minHeight: 38,
+                  }}
+                >
+                  {d.name}
+                </div>
+                <div className="mt-2 tabular flex items-center flex-wrap" style={{ fontFamily: "Inter", fontSize: 11.5, color: "#A0A89A", gap: 8 }}>
+                  <span style={{ color: "#D4AF37", fontWeight: 700 }}>{d.kcal} ккал</span>
+                  <span style={{ opacity: 0.4 }}>·</span>
+                  <span>Б {d.p} · Ж {d.f} · У {d.c}</span>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Arrows — desktop */}
+      <button
+        type="button"
+        aria-label="Предыдущее блюдо"
+        onClick={() => emblaApi?.scrollPrev()}
+        disabled={!canPrev}
+        className="hidden md:grid place-items-center press"
+        style={{
+          position: "absolute", top: "40%", left: -6, transform: "translateY(-50%)",
+          width: 40, height: 40, borderRadius: 999,
+          background: "rgba(255,255,255,0.95)", color: "#0E0F0E",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.35)",
+          opacity: canPrev ? 1 : 0.3, cursor: canPrev ? "pointer" : "default",
+          zIndex: 2,
+        }}
+      >
+        <ChevronLeft size={20} />
+      </button>
+      <button
+        type="button"
+        aria-label="Следующее блюдо"
+        onClick={() => emblaApi?.scrollNext()}
+        disabled={!canNext}
+        className="hidden md:grid place-items-center press"
+        style={{
+          position: "absolute", top: "40%", right: -6, transform: "translateY(-50%)",
+          width: 40, height: 40, borderRadius: 999,
+          background: "rgba(255,255,255,0.95)", color: "#0E0F0E",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.35)",
+          opacity: canNext ? 1 : 0.3, cursor: canNext ? "pointer" : "default",
+          zIndex: 2,
+        }}
+      >
+        <ChevronRight size={20} />
+      </button>
+
+      {/* Dot indicators */}
+      <div className="flex items-center justify-center" style={{ gap: 6, marginTop: 14 }}>
+        {snaps.map((_, i) => {
+          const active = i === selected;
+          return (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Блюдо ${i + 1}`}
+              aria-current={active}
+              onClick={() => emblaApi?.scrollTo(i)}
+              style={{
+                width: active ? 22 : 7, height: 7, borderRadius: 999,
+                background: active ? "#D4AF37" : "rgba(255,255,255,0.22)",
+                transition: "width 200ms ease, background 200ms ease",
+                padding: 0, border: "none", cursor: "pointer",
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 
 function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDish: (d: Dish) => void; onOrder: () => void }) {
   const [day, setDay] = useState(0);

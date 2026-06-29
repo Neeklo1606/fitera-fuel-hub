@@ -448,15 +448,20 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
   return (
     <section id="top" className="relative" style={{ background: "#0E0F0E", overflow: "hidden" }}>
       <div className="absolute inset-0">
-        <img
-          src={HERO_BG}
-          alt="Готовый рацион FITERA"
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-          className="w-full h-full object-cover"
-          style={{ objectPosition: "center" }}
-        />
+        <picture>
+          <source media="(max-width: 767px)" srcSet={HERO_BG_MOBILE} />
+          <source media="(min-width: 768px)" srcSet={HERO_BG_DESKTOP} />
+          <img
+            src={HERO_BG_DESKTOP}
+            alt="Готовый рацион FITERA"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: "center" }}
+          />
+        </picture>
+
         <div className="absolute inset-0" style={{
           background:
             "radial-gradient(ellipse at 70% 30%, rgba(14,15,14,0.35) 0%, rgba(14,15,14,0.8) 60%, rgba(14,15,14,0.98) 100%)",

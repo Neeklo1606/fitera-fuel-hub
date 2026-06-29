@@ -962,8 +962,256 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
 }
 
 
+/* ────────── Order Modal ────────── */
+
+type PaymentMethod = "Наличными" | "Перевод на карту" | "Безналичный расчёт";
+
+function OrderModal({
+  initialLine,
+  initialPeriod,
+  onClose,
+}: {
+  initialLine: LineId | null;
+  initialPeriod?: string;
+  onClose: () => void;
+}) {
+  const modalRef = useFocusTrap<HTMLDivElement>(true);
+  const mouseDownOnBackdropRef = useRef(false);
+  const line = initialLine ? LINES.find((l) => l.id === initialLine) ?? null : null;
+
+  const [period, setPeriod] = useState<string>(initialPeriod ?? "1 неделя");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("+7 (");
+  const [payment, setPayment] = useState<PaymentMethod>("Наличными");
+  const [agree, setAgree] = useState(true);
+  const [sent, setSent] = useState(false);
+
+  function maskPhone(v: string) {
+    const d = v.replace(/\D/g, "").replace(/^7?/, "");
+    const p = d.slice(0, 10);
+    let out = "+7";
+    if (p.length > 0) out += " (" + p.slice(0, 3);
+    if (p.length >= 4) out += ") " + p.slice(3, 6);
+    if (p.length >= 7) out += "-" + p.slice(6, 8);
+    if (p.length >= 9) out += "-" + p.slice(8, 10);
+    return out;
+  }
+
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", h);
+    const body = document.body;
+    const html = document.documentElement;
+    const scrollY = window.scrollY;
+    const prev = {
+      bodyOverflow: body.style.overflow, bodyTouch: body.style.touchAction,
+      bodyPosition: body.style.position, bodyTop: body.style.top, bodyWidth: body.style.width,
+      htmlOverflow: html.style.overflow,
+    };
+    body.style.overflow = "hidden"; body.style.touchAction = "none";
+    body.style.position = "fixed"; body.style.top = `-${scrollY}px`; body.style.width = "100%";
+    html.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", h);
+      body.style.overflow = prev.bodyOverflow; body.style.touchAction = prev.bodyTouch;
+      body.style.position = prev.bodyPosition; body.style.top = prev.bodyTop; body.style.width = prev.bodyWidth;
+      html.style.overflow = prev.htmlOverflow;
+      window.scrollTo(0, scrollY);
+    };
+  }, [onClose]);
+
+  const onBackdropMouseDown = (e: React.MouseEvent) => {
+    mouseDownOnBackdropRef.current = e.target === e.currentTarget;
+  };
+  const onBackdropMouseUp = (e: React.MouseEvent) => {
+    if (mouseDownOnBackdropRef.current && e.target === e.currentTarget) onClose();
+    mouseDownOnBackdropRef.current = false;
+  };
+
+  function submit(e: FormEvent) {
+    e.preventDefault();
+    if (!agree || !name.trim() || phone.replace(/\D/g, "").length < 11) return;
+    setSent(true);
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", height: 52, padding: "0 18px", borderRadius: 50,
+    background: "#1C1E1C", color: "#FFFFFF", border: "1px solid #2A2E2A",
+    fontFamily: "Inter", fontSize: 15, fontWeight: 500, outline: "none",
+  };
+
+  const canSubmit = agree && name.trim().length > 0 && phone.replace(/\D/g, "").length >= 11;
+
+  return (
+    <div
+      ref={modalRef}
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in"
+      style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+      onMouseDown={onBackdropMouseDown}
+      onMouseUp={onBackdropMouseUp}
+      onTouchEnd={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="order-modal-title"
+    >
+      <div
+        onMouseDown={(e) => e.stopPropagation()}
+        onMouseUp={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+        className="relative w-full sm:max-w-[460px] animate-slide-up flex flex-col"
+        style={{
+          background: "#161816",
+          borderRadius: "24px 24px 0 0",
+          border: "1px solid #2A2E2A",
+          maxHeight: "92dvh",
+          overflowY: "auto",
+        }}
+      >
+        <div className="mx-auto mt-2 rounded-full sm:hidden shrink-0" style={{ width: 36, height: 4, background: "#2A2E2A" }} />
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 z-10 h-9 w-9 grid place-items-center rounded-full"
+          style={{ background: "rgba(0,0,0,0.6)", color: "#FFFFFF" }}
+          aria-label="Закрыть"
+        >
+          <X size={18} />
+        </button>
+
+        <div className="p-5 sm:p-6">
+          <h3 id="order-modal-title" style={{
+            fontFamily: "Unbounded", fontWeight: 800, fontSize: 22,
+            letterSpacing: "-0.02em", color: "#FFFFFF", paddingRight: 36,
+          }}>
+            Оформление заказа
+          </h3>
+
+          {line && (
+            <div className="mt-3" style={{ fontFamily: "Inter", fontSize: 13, color: "#A0A89A" }}>
+              Рацион <span style={{ color: line.accent, fontWeight: 700 }}>«{line.title}»</span> × выберите период
+            </div>
+          )}
+          {line && (
+            <div className="mt-2 flex flex-wrap" style={{ gap: 8 }}>
+              {["1 день", "1 неделя", "1 месяц"].map((p) => {
+                const on = period === p;
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPeriod(p)}
+                    className="press"
+                    style={{
+                      height: 36, padding: "0 14px", borderRadius: 50,
+                      background: on ? "#D4AF37" : "rgba(255,255,255,0.06)",
+                      color: on ? "#0E0F0E" : "#FFFFFF",
+                      border: `1px solid ${on ? "#D4AF37" : "#2A2E2A"}`,
+                      fontFamily: "Inter", fontSize: 13, fontWeight: 600,
+                    }}
+                  >
+                    {p}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {sent ? (
+            <div className="mt-5 text-center" style={{
+              background: "rgba(212,175,55,0.10)", border: "1px solid rgba(212,175,55,0.3)",
+              borderRadius: 18, padding: 22, color: "#FFFFFF", fontFamily: "Inter",
+            }}>
+              <div style={{ fontFamily: "Unbounded", fontSize: 18, fontWeight: 700, color: "#D4AF37" }}>Заявка принята</div>
+              <div className="mt-1.5" style={{ fontSize: 13, color: "#A0A89A" }}>Свяжемся в течение 30 минут</div>
+              <button onClick={onClose} className="press mt-4" style={{
+                height: 44, padding: "0 22px", borderRadius: 50, background: "#1C1E1C",
+                color: "#FFFFFF", fontFamily: "Inter", fontWeight: 600, fontSize: 13,
+                border: "1px solid #2A2E2A",
+              }}>Закрыть</button>
+            </div>
+          ) : (
+            <form onSubmit={submit} className="mt-5" style={{ display: "grid", gap: 12 }}>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ваше имя"
+                style={inputStyle}
+              />
+              <input
+                type="tel"
+                inputMode="tel"
+                value={phone}
+                onChange={(e) => setPhone(maskPhone(e.target.value))}
+                placeholder="+7 (___) ___-__-__"
+                style={inputStyle}
+              />
+              <div style={{ position: "relative" }}>
+                <select
+                  value={payment}
+                  onChange={(e) => setPayment(e.target.value as PaymentMethod)}
+                  style={{
+                    ...inputStyle,
+                    appearance: "none",
+                    WebkitAppearance: "none",
+                    paddingRight: 40,
+                    cursor: "pointer",
+                  }}
+                  aria-label="Способ оплаты"
+                >
+                  <option value="Наличными">Наличными</option>
+                  <option value="Перевод на карту">Перевод на карту</option>
+                  <option value="Безналичный расчёт">Безналичный расчёт</option>
+                </select>
+                <span style={{
+                  position: "absolute", right: 18, top: "50%", transform: "translateY(-50%)",
+                  color: "#A0A89A", pointerEvents: "none", fontSize: 12,
+                }}>▾</span>
+              </div>
+
+              <label className="flex items-start" style={{
+                gap: 10, color: "#A0A89A", fontFamily: "Inter", fontSize: 12.5, lineHeight: 1.55,
+                marginTop: 2,
+              }}>
+                <input
+                  type="checkbox"
+                  checked={agree}
+                  onChange={(e) => setAgree(e.target.checked)}
+                  style={{ marginTop: 3, accentColor: "#D4AF37", width: 16, height: 16, flexShrink: 0 }}
+                />
+                <span>
+                  Я согласен с{" "}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#D4AF37", textDecoration: "underline" }}>обработкой персональных данных</a>{" "}
+                  и принимаю условия{" "}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" style={{ color: "#D4AF37", textDecoration: "underline" }}>политики обработки персональных данных</a>
+                </span>
+              </label>
+
+              <button
+                type="submit"
+                disabled={!canSubmit}
+                className="press w-full inline-flex items-center justify-center gap-2"
+                style={{
+                  height: 52, borderRadius: 50,
+                  background: canSubmit ? "linear-gradient(180deg,#E6C04A 0%,#D4AF37 100%)" : "rgba(212,175,55,0.4)",
+                  color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 15,
+                  letterSpacing: "-0.01em", cursor: canSubmit ? "pointer" : "not-allowed",
+                  boxShadow: canSubmit ? "0 8px 24px rgba(212,175,55,0.28)" : "none",
+                }}
+              >
+                Заказать <ArrowRight size={16} />
+              </button>
+            </form>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 /* ────────── Calculator ────────── */
+
 
 function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
   const [sex, setSex] = useState<"M" | "F">("M");

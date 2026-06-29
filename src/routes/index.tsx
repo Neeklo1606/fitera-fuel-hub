@@ -113,7 +113,7 @@ const LINES: Line[] = [
 
 type Dish = {
   name: string;
-  meal: "ЗАВТРАК" | "ПЕРЕКУС" | "ОБЕД" | "УЖИН";
+  meal: "ЗАВТРАК" | "ВТОРОЙ ЗАВТРАК" | "ПЕРЕКУС" | "ОБЕД" | "ПОЛДНИК" | "УЖИН";
   kcal: number;
   p: number; f: number; c: number;
   line: LineId;
@@ -169,24 +169,30 @@ const WEEK_MENU: Record<LineId, Dish[][]> = {
     { name: "Сырники со сметаной", meal: "ЗАВТРАК", kcal: 420, p: 24, f: 14, c: 48, line: "BALANCE", ingredients: "Творог 5%, яйцо, мука рисовая, сметана, ягодный соус" },
     { name: "Орехи и сухофрукты", meal: "ПЕРЕКУС", kcal: 240, p: 8, f: 14, c: 22, line: "BALANCE", ingredients: "Миндаль, грецкий орех, курага, чернослив" },
     { name: "Паста с курицей и песто", meal: "ОБЕД", kcal: 560, p: 34, f: 18, c: 64, line: "BALANCE", ingredients: "Паста дурум, куриное филе, песто, пармезан, томаты черри" },
+    { name: "Греческий йогурт с гранолой", meal: "ПОЛДНИК", kcal: 260, p: 14, f: 6, c: 36, line: "BALANCE", ingredients: "Греческий йогурт, гранола, мёд, ягоды" },
     { name: "Лосось с киноа и шпинатом", meal: "УЖИН", kcal: 480, p: 36, f: 20, c: 38, line: "BALANCE", ingredients: "Лосось, киноа, шпинат, лимон, оливковое масло" },
   ]),
   POWER: makeWeekFromBase([
     { name: "Омлет с индейкой и сыром", meal: "ЗАВТРАК", kcal: 540, p: 38, f: 28, c: 22, line: "POWER", ingredients: "3 яйца, индейка, сыр чеддер, шпинат, цельнозерновой хлеб" },
+    { name: "Творог с орехами и мёдом", meal: "ВТОРОЙ ЗАВТРАК", kcal: 340, p: 28, f: 14, c: 22, line: "POWER", ingredients: "Творог 5%, грецкий орех, мёд, банан" },
     { name: "Протеиновый шейк + банан", meal: "ПЕРЕКУС", kcal: 360, p: 32, f: 6, c: 48, line: "POWER", ingredients: "Whey-протеин, молоко, банан, арахисовая паста" },
     { name: "Говядина с гречкой и овощами", meal: "ОБЕД", kcal: 720, p: 52, f: 22, c: 68, line: "POWER", ingredients: "Говяжья вырезка, гречка, морковь, лук, чесночный соус" },
+    { name: "Сэндвич с курицей и авокадо", meal: "ПОЛДНИК", kcal: 420, p: 32, f: 16, c: 38, line: "POWER", ingredients: "Цельнозерновой хлеб, курица, авокадо, салат" },
     { name: "Курица с рисом басмати", meal: "УЖИН", kcal: 620, p: 48, f: 18, c: 62, line: "POWER", ingredients: "Куриное филе, рис басмати, спаржа, оливковое масло" },
   ]),
   MOM: makeWeekFromBase([
     { name: "Творожная запеканка с изюмом", meal: "ЗАВТРАК", kcal: 380, p: 26, f: 10, c: 42, line: "MOM", ingredients: "Творог 5%, яйцо, манная крупа, изюм, ваниль" },
     { name: "Печёное яблоко с орехами", meal: "ПЕРЕКУС", kcal: 200, p: 4, f: 8, c: 30, line: "MOM", ingredients: "Яблоко, грецкий орех, мёд, корица" },
     { name: "Куриные котлеты с пюре", meal: "ОБЕД", kcal: 520, p: 36, f: 16, c: 52, line: "MOM", ingredients: "Куриный фарш, картофель, молоко, сливочное масло, зелень" },
+    { name: "Кефир с овсяным печеньем", meal: "ПОЛДНИК", kcal: 240, p: 10, f: 6, c: 38, line: "MOM", ingredients: "Кефир 1%, овсяное печенье, банан" },
     { name: "Рыбные тефтели с овощами", meal: "УЖИН", kcal: 400, p: 30, f: 12, c: 38, line: "MOM", ingredients: "Хек, рис, морковь, лук, томатный соус" },
   ]),
   PRO: makeWeekFromBase([
     { name: "Гранола с йогуртом и манго", meal: "ЗАВТРАК", kcal: 580, p: 22, f: 18, c: 78, line: "PRO", ingredients: "Гранола, греческий йогурт, манго, кокосовая стружка, мёд" },
+    { name: "Смузи-боул с ягодами", meal: "ВТОРОЙ ЗАВТРАК", kcal: 320, p: 14, f: 8, c: 48, line: "PRO", ingredients: "Банан, ягоды, йогурт, чиа, гранола" },
     { name: "Сэндвич с индейкой и авокадо", meal: "ПЕРЕКУС", kcal: 380, p: 26, f: 16, c: 36, line: "PRO", ingredients: "Цельнозерновой хлеб, индейка, авокадо, салат, томат" },
     { name: "Стейк с печёным картофелем", meal: "ОБЕД", kcal: 780, p: 54, f: 28, c: 72, line: "PRO", ingredients: "Говяжий стейк, картофель, розмарин, чесночное масло, салат" },
+    { name: "Сырная тарелка с фруктами", meal: "ПОЛДНИК", kcal: 420, p: 22, f: 26, c: 22, line: "PRO", ingredients: "Бри, чеддер, виноград, инжир, мёд" },
     { name: "Утиная грудка с овощами", meal: "УЖИН", kcal: 660, p: 44, f: 32, c: 42, line: "PRO", ingredients: "Утиная грудка, батат, брюссельская капуста, бальзамик" },
   ]),
 };
@@ -783,7 +789,136 @@ function LinesSection({ selected, onChoose }: {
 }
 
 
-/* ────────── Menu (2×2 grid, day pills) ────────── */
+/* ────────── Menu (swipeable slider, day pills) ────────── */
+
+function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Line; onOpenDish: (d: Dish) => void }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start", containScroll: "trimSnaps" });
+  const [selected, setSelected] = useState(0);
+  const [snaps, setSnaps] = useState<number[]>([]);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => {
+      setSelected(emblaApi.selectedScrollSnap());
+      setCanPrev(emblaApi.canScrollPrev());
+      setCanNext(emblaApi.canScrollNext());
+    };
+    setSnaps(emblaApi.scrollSnapList());
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", () => { setSnaps(emblaApi.scrollSnapList()); onSelect(); });
+  }, [emblaApi]);
+
+  return (
+    <div className="reveal relative mt-5">
+      <div className="overflow-hidden" ref={emblaRef} aria-label={`Блюда рациона ${line.id}`}>
+        <div className="flex" style={{ gap: 12 }}>
+          {dishes.map((d, i) => (
+            <button
+              key={d.meal + d.name + i}
+              type="button"
+              onClick={() => onOpenDish(d)}
+              className="press text-left flex flex-col overflow-hidden tile-trans shrink-0"
+              style={{
+                flex: "0 0 calc(80% - 6px)",
+                background: "#161816", border: "1px solid #2A2E2A", borderRadius: 18,
+              }}
+            >
+              <SmartImage
+                src={line.image}
+                alt={d.name}
+                aspectRatio="4 / 3"
+                eager
+                style={{ width: "100%", background: "#0E0F0E" }}
+              />
+              <div className="flex-1 flex flex-col" style={{ padding: 14 }}>
+                <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 10, color: line.accent, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                  {d.meal}
+                </div>
+                <div
+                  className="mt-1"
+                  style={{
+                    fontFamily: "Inter", fontWeight: 700, fontSize: 15, color: "#FFFFFF", lineHeight: 1.25,
+                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                    overflow: "hidden", wordBreak: "break-word", minHeight: 38,
+                  }}
+                >
+                  {d.name}
+                </div>
+                <div className="mt-2 tabular flex items-center flex-wrap" style={{ fontFamily: "Inter", fontSize: 11.5, color: "#A0A89A", gap: 8 }}>
+                  <span style={{ color: "#D4AF37", fontWeight: 700 }}>{d.kcal} ккал</span>
+                  <span style={{ opacity: 0.4 }}>·</span>
+                  <span>Б {d.p} · Ж {d.f} · У {d.c}</span>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Arrows — desktop */}
+      <button
+        type="button"
+        aria-label="Предыдущее блюдо"
+        onClick={() => emblaApi?.scrollPrev()}
+        disabled={!canPrev}
+        className="hidden md:grid place-items-center press"
+        style={{
+          position: "absolute", top: "40%", left: -6, transform: "translateY(-50%)",
+          width: 40, height: 40, borderRadius: 999,
+          background: "rgba(255,255,255,0.95)", color: "#0E0F0E",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.35)",
+          opacity: canPrev ? 1 : 0.3, cursor: canPrev ? "pointer" : "default",
+          zIndex: 2,
+        }}
+      >
+        <ChevronLeft size={20} />
+      </button>
+      <button
+        type="button"
+        aria-label="Следующее блюдо"
+        onClick={() => emblaApi?.scrollNext()}
+        disabled={!canNext}
+        className="hidden md:grid place-items-center press"
+        style={{
+          position: "absolute", top: "40%", right: -6, transform: "translateY(-50%)",
+          width: 40, height: 40, borderRadius: 999,
+          background: "rgba(255,255,255,0.95)", color: "#0E0F0E",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.35)",
+          opacity: canNext ? 1 : 0.3, cursor: canNext ? "pointer" : "default",
+          zIndex: 2,
+        }}
+      >
+        <ChevronRight size={20} />
+      </button>
+
+      {/* Dot indicators */}
+      <div className="flex items-center justify-center" style={{ gap: 6, marginTop: 14 }}>
+        {snaps.map((_, i) => {
+          const active = i === selected;
+          return (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Блюдо ${i + 1}`}
+              aria-current={active}
+              onClick={() => emblaApi?.scrollTo(i)}
+              style={{
+                width: active ? 22 : 7, height: 7, borderRadius: 999,
+                background: active ? "#D4AF37" : "rgba(255,255,255,0.22)",
+                transition: "width 200ms ease, background 200ms ease",
+                padding: 0, border: "none", cursor: "pointer",
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 
 function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDish: (d: Dish) => void; onOrder: () => void }) {
   const [day, setDay] = useState(0);
@@ -840,55 +975,13 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
           {DAYS_FULL[day]}
         </div>
 
-        {/* 2×2 grid of meal cards */}
-        <div
+        {/* Dishes — swipeable slider */}
+        <MenuDishSlider
           key={`${lineId}-${day}`}
-          className="mt-5 grid menu-anim grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-          style={{
-            gap: 12,
-          }}
-        >
-
-          {dayMeals.map((d) => (
-            <button
-              key={d.meal + d.name}
-              onClick={() => onOpenDish(d)}
-              className="press text-left flex flex-col overflow-hidden tile-trans"
-              style={{
-                background: "#161816", border: "1px solid #2A2E2A",
-                borderRadius: 18,
-              }}
-            >
-              <SmartImage
-                src={line.image}
-                alt={d.name}
-                aspectRatio="4 / 3"
-                eager
-                style={{ width: "100%", background: "#0E0F0E" }}
-              />
-              <div className="flex-1 flex flex-col" style={{ padding: 12 }}>
-                <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 9, color: line.accent, letterSpacing: "0.12em", textTransform: "uppercase" }}>
-                  {d.meal}
-                </div>
-                <div
-                  className="mt-1"
-                  style={{
-                    fontFamily: "Inter", fontWeight: 700, fontSize: 13.5, color: "#FFFFFF", lineHeight: 1.25,
-                    display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
-                    overflow: "hidden", wordBreak: "break-word", minHeight: 34,
-                  }}
-                >
-                  {d.name}
-                </div>
-                <div className="mt-2 tabular flex items-center flex-wrap" style={{ fontFamily: "Inter", fontSize: 10.5, color: "#A0A89A", gap: 6 }}>
-                  <span style={{ color: "#D4AF37", fontWeight: 700 }}>{d.kcal} ккал</span>
-                  <span style={{ opacity: 0.4 }}>·</span>
-                  <span>Б{d.p} Ж{d.f} У{d.c}</span>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
+          dishes={dayMeals}
+          line={line}
+          onOpenDish={onOpenDish}
+        />
 
         {/* Totals + CTA */}
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl"
@@ -904,6 +997,8 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
             Заказать {line.id} <ArrowRight size={16} />
           </button>
         </div>
+
+
       </div>
     </section>
   );
@@ -921,30 +1016,20 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
     document.addEventListener("keydown", h);
     const body = document.body;
     const html = document.documentElement;
-    const scrollY = window.scrollY;
+    const sbw = window.innerWidth - html.clientWidth;
     const prev = {
       bodyOverflow: body.style.overflow,
-      bodyTouch: body.style.touchAction,
-      bodyPosition: body.style.position,
-      bodyTop: body.style.top,
-      bodyWidth: body.style.width,
+      bodyPaddingRight: body.style.paddingRight,
       htmlOverflow: html.style.overflow,
     };
     body.style.overflow = "hidden";
-    body.style.touchAction = "none";
-    body.style.position = "fixed";
-    body.style.top = `-${scrollY}px`;
-    body.style.width = "100%";
     html.style.overflow = "hidden";
+    if (sbw > 0) body.style.paddingRight = `${sbw}px`;
     return () => {
       document.removeEventListener("keydown", h);
       body.style.overflow = prev.bodyOverflow;
-      body.style.touchAction = prev.bodyTouch;
-      body.style.position = prev.bodyPosition;
-      body.style.top = prev.bodyTop;
-      body.style.width = prev.bodyWidth;
+      body.style.paddingRight = prev.bodyPaddingRight;
       html.style.overflow = prev.htmlOverflow;
-      window.scrollTo(0, scrollY);
     };
   }, [onClose]);
 
@@ -1083,21 +1168,20 @@ function OrderModal({
     document.addEventListener("keydown", h);
     const body = document.body;
     const html = document.documentElement;
-    const scrollY = window.scrollY;
+    const sbw = window.innerWidth - html.clientWidth;
     const prev = {
-      bodyOverflow: body.style.overflow, bodyTouch: body.style.touchAction,
-      bodyPosition: body.style.position, bodyTop: body.style.top, bodyWidth: body.style.width,
+      bodyOverflow: body.style.overflow,
+      bodyPaddingRight: body.style.paddingRight,
       htmlOverflow: html.style.overflow,
     };
-    body.style.overflow = "hidden"; body.style.touchAction = "none";
-    body.style.position = "fixed"; body.style.top = `-${scrollY}px`; body.style.width = "100%";
+    body.style.overflow = "hidden";
     html.style.overflow = "hidden";
+    if (sbw > 0) body.style.paddingRight = `${sbw}px`;
     return () => {
       document.removeEventListener("keydown", h);
-      body.style.overflow = prev.bodyOverflow; body.style.touchAction = prev.bodyTouch;
-      body.style.position = prev.bodyPosition; body.style.top = prev.bodyTop; body.style.width = prev.bodyWidth;
+      body.style.overflow = prev.bodyOverflow;
+      body.style.paddingRight = prev.bodyPaddingRight;
       html.style.overflow = prev.htmlOverflow;
-      window.scrollTo(0, scrollY);
     };
   }, [onClose]);
 

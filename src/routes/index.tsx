@@ -876,11 +876,12 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
           {dishes.map((d, i) => {
             const photo = getDishPhoto(line, i);
             return (
-              <button
+              <article
                 key={`menu-slide-${i}`}
-                type="button"
                 data-menu-slide
                 data-slide-index={i}
+                role="button"
+                tabIndex={0}
                 onClick={(event) => {
                   if (didDragRef.current) {
                     event.preventDefault();
@@ -888,10 +889,17 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
                   }
                   onOpenDish(d);
                 }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onOpenDish(d);
+                  }
+                }}
                 className="press text-left flex flex-col overflow-hidden tile-trans shrink-0"
                 style={{
                   flex: "0 0 calc(80% - 6px)",
                   background: "#161816", border: "1px solid #2A2E2A", borderRadius: 18,
+                  cursor: "pointer",
                 }}
               >
                 <SliderDishPhoto src={photo} alt={d.name} line={line} />
@@ -915,7 +923,7 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
                     <span>Б {d.p} · Ж {d.f} · У {d.c}</span>
                   </div>
                 </div>
-              </button>
+              </article>
             );
           })}
         </div>

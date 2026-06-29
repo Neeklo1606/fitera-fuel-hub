@@ -167,7 +167,9 @@
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: #0E0F0E;
+  background: linear-gradient(110deg, #121412 8%, #202420 18%, #121412 33%);
+  background-size: 200% 100%;
+  animation: shimmer 1.15s linear infinite;
   isolation: isolate;
 }
 
@@ -178,7 +180,8 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  opacity: 0;
+  z-index: 1;
+  opacity: 1;
   transform: scale(1.015);
   transition: opacity 260ms ease, transform 520ms ease;
   user-select: none;
@@ -193,7 +196,7 @@
 .slider-photo-skeleton {
   position: absolute;
   inset: 0;
-  z-index: 2;
+  z-index: 0;
   display: grid;
   place-items: center;
   background: linear-gradient(110deg, #121412 8%, #202420 18%, #121412 33%);

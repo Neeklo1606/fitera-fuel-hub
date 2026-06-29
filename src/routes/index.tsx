@@ -360,20 +360,21 @@ function ScrollProgress() {
 
 /* ────────── Logo / Navbar ────────── */
 
-function Logo({ size = 96 }: { size?: number }) {
+function Logo({ className = "" }: { className?: string }) {
   return (
-    <a href="#top" aria-label="FITERA — Ешь для результата" className="flex items-center select-none shrink-0">
+    <a href="#top" aria-label="FITERA — Ешь для результата" className={`flex items-center select-none shrink-0 ${className}`}>
       <img
         src={FITERA_LOGO}
         alt="FITERA — Ешь для результата"
-        width={size * 3.2}
-        height={size}
-        style={{ height: size, width: "auto", display: "block" }}
+        width={320}
+        height={96}
+        className="block w-auto h-[64px] md:h-[96px]"
         decoding="async"
       />
     </a>
   );
 }
+
 
 
 function Navbar({ onOrder }: { onOrder: () => void }) {

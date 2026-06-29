@@ -711,7 +711,25 @@ function LinesSection({ selected, onChoose }: {
                     : "0 4px 14px rgba(0,0,0,0.05)",
                 }}
               >
-                <div className="flex flex-col" style={{ padding: "22px 22px 20px" }}>
+                <div style={{ padding: 14, paddingBottom: 0 }}>
+                  <div
+                    className="overflow-hidden"
+                    style={{
+                      borderRadius: 18,
+                      aspectRatio: "16 / 10",
+                      background: "rgba(14,15,14,0.06)",
+                    }}
+                  >
+                    <img
+                      src={line.image}
+                      alt={`Пример блюд рациона ${line.id}`}
+                      loading="lazy"
+                      decoding="async"
+                      style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col" style={{ padding: "18px 22px 20px" }}>
                   <div className="flex items-center gap-2 flex-wrap">
                     <div className="grid place-items-center rounded-xl shrink-0"
                       style={{ width: 36, height: 36, background: line.accent, color: "#FFFFFF" }}>

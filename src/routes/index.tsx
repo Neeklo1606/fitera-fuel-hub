@@ -4,7 +4,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import {
   X, Check, Phone, Leaf, Truck, Sparkles, Send, MapPin, Plus, ArrowRight,
   Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, FlaskConical, Target,
-  MessageCircle, ChevronLeft, ChevronRight,
+  MessageCircle, Instagram, ChevronLeft, ChevronRight,
   type LucideIcon,
 } from "lucide-react";
 
@@ -2140,14 +2140,17 @@ function Footer() {
               +7 (996) 610-00-06
             </a>
             <div className="mt-5 flex" style={{ gap: 10 }}>
-              <a href="https://vk.com/fitera" aria-label="VK" style={socialStyle}>
-                <span style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 14 }}>VK</span>
+              <a href="#" aria-label="MAX" target="_blank" rel="noopener noreferrer" style={socialStyle}>
+                <span style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 13, color: "#D4AF37" }}>М</span>
               </a>
-              <a href="https://t.me/fitera_rstv" aria-label="Telegram" style={socialStyle}>
+              <a href="#" aria-label="Telegram" target="_blank" rel="noopener noreferrer" style={socialStyle}>
                 <Send size={18} />
               </a>
-              <a href="https://wa.me/79966100006" aria-label="WhatsApp" style={socialStyle}>
+              <a href="#" aria-label="WhatsApp" target="_blank" rel="noopener noreferrer" style={socialStyle}>
                 <MessageCircle size={18} />
+              </a>
+              <a href="#" aria-label="Instagram" target="_blank" rel="noopener noreferrer" style={socialStyle}>
+                <Instagram size={18} />
               </a>
             </div>
           </div>

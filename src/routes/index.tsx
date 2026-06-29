@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import useEmblaCarousel from "embla-carousel-react";
 import {
   X, Check, Phone, Leaf, Truck, Sparkles, Send, MapPin, Plus, ArrowRight,
   Flame, Heart, Crown, Home, UtensilsCrossed, Calculator as CalcIcon, FlaskConical, Target,
-  MessageCircle,
+  MessageCircle, ChevronLeft, ChevronRight,
   type LucideIcon,
 } from "lucide-react";
 
@@ -99,15 +100,15 @@ const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&f
 
 const LINES: Line[] = [
   { id: "LIGHT",   title: "Лёгкий",  kcal: "1200–1400", desc: "Снижение веса",     priceFrom: "от 750 ₽",   accent: "#7CB342", tint: "#EEF7E4", pastel: "#E8F5E9", image: lineLight,   Icon: Leaf,     features: ["Низкокалорийный профиль", "Овощи, рыба, белок", "Дефицит 300–500 ккал"], dishesPerDay: "4 блюда в день",
-    dishPhotos: [U("1512621776951-a57141f2eefd"), U("1490645935967-10de6ba17061"), U("1540420773420-3366772f4999"), U("1467003909585-2f8a72700288"), U("1565958011703-44f9829ba187")] },
+    dishPhotos: [U("1512621776951-a57141f2eefd"), U("1490645935967-10de6ba17061"), U("1540420773420-3366772f4999"), U("1467003909585-2f8a72700288")] },
   { id: "BALANCE", title: "Баланс",  kcal: "1500–1800", desc: "Поддержание формы", priceFrom: "от 850 ₽",   accent: "#42A5F5", tint: "#E5F1FB", pastel: "#E3F2FD", image: lineBalance, Icon: Sparkles, features: ["Сбалансированный КБЖУ", "Разнообразное меню", "Без переедания"], dishesPerDay: "5 блюд в день",
     dishPhotos: [U("1546069901-ba9599a7e63c"), U("1565299624946-b28f40a0ae38"), U("1494390248081-4e521a5940db"), U("1567620905732-2d1ec7ab7445"), U("1565958011703-44f9829ba187")] },
   { id: "POWER",   title: "Сила",    kcal: "2000–2500", desc: "Набор массы",       priceFrom: "от 950 ₽",   popular: true, accent: "#D4AF37", tint: "#FBF3DC", pastel: "#FFF8E1", image: linePower, Icon: Flame, features: ["Профицит +300–500 ккал", "Больше белка и сложных углей", "Для силовых тренировок"], dishesPerDay: "6 блюд в день",
-    dishPhotos: [U("1544025162-d76694265947"), U("1607330289024-1535c6b4e1c1"), U("1432139509613-5c4255815697"), U("1546833999-b9f581a1996d"), U("1559339352-11d035aa65de")] },
+    dishPhotos: [U("1544025162-d76694265947"), U("1607330289024-1535c6b4e1c1"), U("1432139509613-5c4255815697"), U("1546833999-b9f581a1996d"), U("1559339352-11d035aa65de"), U("1551782450-a2132b4ba21d")] },
   { id: "MOM",     title: "Мама",    kcal: "1600–1900", desc: "Для молодых мам",   priceFrom: "от 900 ₽",   accent: "#EC8DA5", tint: "#FBEAF0", pastel: "#FCE4EC", image: lineMom,     Icon: Heart,    features: ["Без острого и аллергенов", "Кальций и железо", "Поддержка лактации"], dishesPerDay: "5 блюд в день",
     dishPhotos: [U("1565895405137-61a3d8d3da9c"), U("1495546968767-f0573cca821e"), U("1567620905732-2d1ec7ab7445"), U("1490645935967-10de6ba17061"), U("1494390248081-4e521a5940db")] },
   { id: "PRO",     title: "Премиум", kcal: "2200–2800", desc: "Для занятых людей", priceFrom: "от 1 100 ₽", accent: "#8E7CC3", tint: "#EFEAF8", pastel: "#F3E5F5", image: linePro,     Icon: Crown,    features: ["Премиум-ингредиенты", "Авторские блюда", "Идеально для офиса"], dishesPerDay: "6 блюд в день",
-    dishPhotos: [U("1559339352-11d035aa65de"), U("1414235077428-338989a2e8c0"), U("1551183053-bf91a1d81141"), U("1432139509613-5c4255815697"), U("1546069901-ba9599a7e63c")] },
+    dishPhotos: [U("1559339352-11d035aa65de"), U("1414235077428-338989a2e8c0"), U("1551183053-bf91a1d81141"), U("1432139509613-5c4255815697"), U("1546069901-ba9599a7e63c"), U("1504674900247-0877df9cc836")] },
 ];
 
 type Dish = {
@@ -540,6 +541,115 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
 
 /* ────────── Lines — always-open pastel cards with photo slider ────────── */
 
+function DishSlider({ photos, accent, title }: { photos: string[]; accent: string; title: string }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start", containScroll: "trimSnaps" });
+  const [selected, setSelected] = useState(0);
+  const [snaps, setSnaps] = useState<number[]>([]);
+  const [canPrev, setCanPrev] = useState(false);
+  const [canNext, setCanNext] = useState(false);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => {
+      setSelected(emblaApi.selectedScrollSnap());
+      setCanPrev(emblaApi.canScrollPrev());
+      setCanNext(emblaApi.canScrollNext());
+    };
+    setSnaps(emblaApi.scrollSnapList());
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", () => { setSnaps(emblaApi.scrollSnapList()); onSelect(); });
+  }, [emblaApi]);
+
+  return (
+    <div className="relative" style={{ padding: "0 16px 16px" }}>
+      <div className="overflow-hidden" ref={emblaRef} aria-label={`Примеры блюд: ${title}`} style={{ borderRadius: 14 }}>
+        <div className="flex" style={{ gap: 10 }}>
+          {photos.map((src, i) => (
+            <div
+              key={i}
+              className="shrink-0 overflow-hidden"
+              style={{
+                flex: "0 0 calc(50% - 5px)",
+                aspectRatio: "4 / 3",
+                borderRadius: 14,
+                background: "rgba(14,15,14,0.06)",
+              }}
+            >
+              <img
+                src={src}
+                alt={`Блюдо рациона ${title} ${i + 1}`}
+                loading="lazy"
+                decoding="async"
+                width={400}
+                height={300}
+                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Arrows — desktop only */}
+      <button
+        type="button"
+        aria-label="Предыдущие блюда"
+        onClick={() => emblaApi?.scrollPrev()}
+        disabled={!canPrev}
+        className="hidden md:grid place-items-center press"
+        style={{
+          position: "absolute", top: "calc(50% - 14px)", left: 4, transform: "translateY(-50%)",
+          width: 36, height: 36, borderRadius: 999,
+          background: "rgba(255,255,255,0.95)", color: "#0E0F0E",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
+          opacity: canPrev ? 1 : 0.35, cursor: canPrev ? "pointer" : "default",
+        }}
+      >
+        <ChevronLeft size={18} />
+      </button>
+      <button
+        type="button"
+        aria-label="Следующие блюда"
+        onClick={() => emblaApi?.scrollNext()}
+        disabled={!canNext}
+        className="hidden md:grid place-items-center press"
+        style={{
+          position: "absolute", top: "calc(50% - 14px)", right: 4, transform: "translateY(-50%)",
+          width: 36, height: 36, borderRadius: 999,
+          background: "rgba(255,255,255,0.95)", color: "#0E0F0E",
+          boxShadow: "0 4px 14px rgba(0,0,0,0.12)",
+          opacity: canNext ? 1 : 0.35, cursor: canNext ? "pointer" : "default",
+        }}
+      >
+        <ChevronRight size={18} />
+      </button>
+
+      {/* Dot indicators */}
+      <div className="flex items-center justify-center" style={{ gap: 6, marginTop: 10 }}>
+        {snaps.map((_, i) => {
+          const active = i === selected;
+          return (
+            <button
+              key={i}
+              type="button"
+              aria-label={`Слайд ${i + 1}`}
+              aria-current={active}
+              onClick={() => emblaApi?.scrollTo(i)}
+              style={{
+                width: active ? 20 : 7, height: 7, borderRadius: 999,
+                background: active ? accent : "rgba(14,15,14,0.22)",
+                transition: "width 200ms ease, background 200ms ease",
+                padding: 0, border: "none", cursor: "pointer",
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+
 function LinesSection({ selected, onChoose }: {
   selected: LineId;
   openId?: LineId | null;
@@ -661,38 +771,8 @@ function LinesSection({ selected, onChoose }: {
                 </div>
 
                 {/* Horizontal dish photo slider */}
-                <div
-                  className="flex overflow-x-auto hide-scrollbar"
-                  style={{
-                    gap: 10,
-                    padding: "0 16px 16px",
-                    scrollSnapType: "x mandatory",
-                    WebkitOverflowScrolling: "touch",
-                  }}
-                  aria-label={`Примеры блюд: ${line.title}`}
-                >
-                  {line.dishPhotos.map((src, i) => (
-                    <div
-                      key={i}
-                      className="shrink-0 overflow-hidden"
-                      style={{
-                        width: 132, height: 96, borderRadius: 14,
-                        background: "rgba(14,15,14,0.06)",
-                        scrollSnapAlign: "start",
-                      }}
-                    >
-                      <img
-                        src={src}
-                        alt={`Блюдо рациона ${line.title} ${i + 1}`}
-                        loading="lazy"
-                        decoding="async"
-                        width={264}
-                        height={192}
-                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                      />
-                    </div>
-                  ))}
-                </div>
+                <DishSlider photos={line.dishPhotos} accent={line.accent} title={line.title} />
+
               </article>
             );
           })}

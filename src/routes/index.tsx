@@ -548,7 +548,21 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
 /* ────────── Lines — always-open pastel cards with photo slider ────────── */
 
 function DishSlider({ photos, accent, title }: { photos: string[]; accent: string; title: string }) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "start", containScroll: "trimSnaps" });
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: false,
+    align: "start",
+    containScroll: "trimSnaps",
+    dragFree: false,
+    skipSnaps: false,
+    dragThreshold: 14,
+    duration: 22,
+    watchDrag: (_api, e) => {
+      // Ignore drags that begin on interactive controls (dot buttons, arrows)
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest('button[aria-label^="Слайд"], button[aria-label^="Блюдо"]')) return false;
+      return true;
+    },
+  });
   const [selected, setSelected] = useState(0);
   const [snaps, setSnaps] = useState<number[]>([]);
   const [canPrev, setCanPrev] = useState(false);

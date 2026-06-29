@@ -99,19 +99,21 @@ type Line = {
   dishPhotos: string[];
 };
 
-const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=640&q=70`;
+const LINE_PHOTO_SET = [lineLight, lineBalance, linePower, lineMom, linePro];
+const dishPhotoSet = (start: number, count: number) =>
+  Array.from({ length: count }, (_, i) => LINE_PHOTO_SET[(start + i) % LINE_PHOTO_SET.length]);
 
 const LINES: Line[] = [
   { id: "LIGHT",   title: "Лёгкий",  kcal: "1200–1400", desc: "Снижение веса",     priceFrom: "от 750 ₽",   accent: "#7CB342", tint: "#EEF7E4", pastel: "#E8F5E9", image: lineLight,   Icon: Leaf,     features: ["Низкокалорийный профиль", "Овощи, рыба, белок", "Дефицит 300–500 ккал"], dishesPerDay: "4 блюда в день",
-    dishPhotos: [U("1512621776951-a57141f2eefd"), U("1490645935967-10de6ba17061"), U("1540420773420-3366772f4999"), U("1467003909585-2f8a72700288")] },
+    dishPhotos: dishPhotoSet(0, 4) },
   { id: "BALANCE", title: "Баланс",  kcal: "1500–1800", desc: "Поддержание формы", priceFrom: "от 850 ₽",   accent: "#42A5F5", tint: "#E5F1FB", pastel: "#E3F2FD", image: lineBalance, Icon: Sparkles, features: ["Сбалансированный КБЖУ", "Разнообразное меню", "Без переедания"], dishesPerDay: "5 блюд в день",
-    dishPhotos: [U("1546069901-ba9599a7e63c"), U("1565299624946-b28f40a0ae38"), U("1494390248081-4e521a5940db"), U("1567620905732-2d1ec7ab7445"), U("1565958011703-44f9829ba187")] },
+    dishPhotos: dishPhotoSet(1, 5) },
   { id: "POWER",   title: "Сила",    kcal: "2000–2500", desc: "Набор массы",       priceFrom: "от 950 ₽",   popular: true, accent: "#D4AF37", tint: "#FBF3DC", pastel: "#FFF8E1", image: linePower, Icon: Flame, features: ["Профицит +300–500 ккал", "Больше белка и сложных углей", "Для силовых тренировок"], dishesPerDay: "6 блюд в день",
-    dishPhotos: [U("1544025162-d76694265947"), U("1607330289024-1535c6b4e1c1"), U("1432139509613-5c4255815697"), U("1546833999-b9f581a1996d"), U("1559339352-11d035aa65de"), U("1551782450-a2132b4ba21d")] },
+    dishPhotos: dishPhotoSet(2, 6) },
   { id: "MOM",     title: "Мама",    kcal: "1600–1900", desc: "Для молодых мам",   priceFrom: "от 900 ₽",   accent: "#EC8DA5", tint: "#FBEAF0", pastel: "#FCE4EC", image: lineMom,     Icon: Heart,    features: ["Без острого и аллергенов", "Кальций и железо", "Поддержка лактации"], dishesPerDay: "5 блюд в день",
-    dishPhotos: [U("1565895405137-61a3d8d3da9c"), U("1495546968767-f0573cca821e"), U("1567620905732-2d1ec7ab7445"), U("1490645935967-10de6ba17061"), U("1494390248081-4e521a5940db")] },
+    dishPhotos: dishPhotoSet(3, 5) },
   { id: "PRO",     title: "Премиум", kcal: "2200–2800", desc: "Для занятых людей", priceFrom: "от 1 100 ₽", accent: "#8E7CC3", tint: "#EFEAF8", pastel: "#F3E5F5", image: linePro,     Icon: Crown,    features: ["Премиум-ингредиенты", "Авторские блюда", "Идеально для офиса"], dishesPerDay: "6 блюд в день",
-    dishPhotos: [U("1559339352-11d035aa65de"), U("1414235077428-338989a2e8c0"), U("1551183053-bf91a1d81141"), U("1432139509613-5c4255815697"), U("1546069901-ba9599a7e63c"), U("1504674900247-0877df9cc836")] },
+    dishPhotos: dishPhotoSet(4, 6) },
 ];
 
 type Dish = {

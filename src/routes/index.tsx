@@ -1073,21 +1073,20 @@ function OrderModal({
     document.addEventListener("keydown", h);
     const body = document.body;
     const html = document.documentElement;
-    const scrollY = window.scrollY;
+    const sbw = window.innerWidth - html.clientWidth;
     const prev = {
-      bodyOverflow: body.style.overflow, bodyTouch: body.style.touchAction,
-      bodyPosition: body.style.position, bodyTop: body.style.top, bodyWidth: body.style.width,
+      bodyOverflow: body.style.overflow,
+      bodyPaddingRight: body.style.paddingRight,
       htmlOverflow: html.style.overflow,
     };
-    body.style.overflow = "hidden"; body.style.touchAction = "none";
-    body.style.position = "fixed"; body.style.top = `-${scrollY}px`; body.style.width = "100%";
+    body.style.overflow = "hidden";
     html.style.overflow = "hidden";
+    if (sbw > 0) body.style.paddingRight = `${sbw}px`;
     return () => {
       document.removeEventListener("keydown", h);
-      body.style.overflow = prev.bodyOverflow; body.style.touchAction = prev.bodyTouch;
-      body.style.position = prev.bodyPosition; body.style.top = prev.bodyTop; body.style.width = prev.bodyWidth;
+      body.style.overflow = prev.bodyOverflow;
+      body.style.paddingRight = prev.bodyPaddingRight;
       html.style.overflow = prev.htmlOverflow;
-      window.scrollTo(0, scrollY);
     };
   }, [onClose]);
 

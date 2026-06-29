@@ -408,10 +408,10 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
           </a>
           <button
             onClick={onOrder}
-            className="press rounded-full inline-flex items-center gap-1.5"
-            style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 13, padding: "9px 16px" }}
+            className="press rounded-full inline-flex items-center justify-center gap-1.5 shrink-0"
+            style={{ background: "#D4AF37", color: "#0E0F0E", fontFamily: "Inter", fontWeight: 700, fontSize: 13, height: 52, padding: "0 20px", borderRadius: 50 }}
           >
-            Заказать <ArrowRight size={13} />
+            Заказать <ArrowRight size={14} />
           </button>
         </div>
       </div>
@@ -466,11 +466,11 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
               color: "#FFFFFF",
             }}
           >
-            Ешь для<br />
+            Умное питание<br />
             <span style={{
               background: "linear-gradient(90deg, #D4AF37 0%, #F5E08F 100%)",
               WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent",
-            }}>результата.</span>
+            }}>под твою цель.</span>
           </h1>
 
           <p className="mt-5" style={{ color: "#C8CCC4", fontFamily: "Inter", fontSize: 16, lineHeight: 1.55, maxWidth: 480 }}>
@@ -481,7 +481,7 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
             <button onClick={onOrder} className="press rounded-full inline-flex items-center justify-center gap-2"
               style={{
                 background: "#D4AF37", color: "#0E0F0E",
-                height: 54, padding: "0 26px",
+                height: 52, padding: "0 26px", borderRadius: 50,
                 fontFamily: "Inter", fontWeight: 700, fontSize: 15,
                 boxShadow: "0 12px 32px -8px rgba(212,175,55,0.5)",
               }}>
@@ -490,25 +490,34 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
             <button onClick={onCalc} className="press rounded-full inline-flex items-center justify-center gap-2"
               style={{
                 background: "rgba(255,255,255,0.04)", border: "1.5px solid rgba(46,125,50,0.7)",
-                color: "#FFFFFF", height: 54, padding: "0 22px",
+                color: "#FFFFFF", height: 52, padding: "0 22px", borderRadius: 50,
                 fontFamily: "Inter", fontWeight: 600, fontSize: 15, backdropFilter: "blur(8px)",
               }}>
               <CalcIcon size={16} /> Рассчитать калории
             </button>
           </div>
 
-          <div className="mt-7 flex items-center gap-4 flex-wrap" style={{ fontFamily: "Inter", fontSize: 12.5, color: "#9AA197" }}>
-            <span className="inline-flex items-center gap-1.5">
-              <Check size={14} color="#7CB342" /> Бесплатная доставка
-            </span>
-            <span style={{ width: 3, height: 3, borderRadius: 99, background: "#444" }} />
-            <span className="inline-flex items-center gap-1.5">
-              <Check size={14} color="#7CB342" /> Первая неделя −15%
-            </span>
-            <span style={{ width: 3, height: 3, borderRadius: 99, background: "#444" }} />
-            <span className="inline-flex items-center gap-1.5">
-              <Check size={14} color="#7CB342" /> 5 линеек под цель
-            </span>
+          <div className="mt-7 flex flex-wrap gap-2">
+            {[
+              { Icon: FlaskConical, text: "Научный подход" },
+              { Icon: Target, text: "Индивидуальный рацион" },
+              { Icon: Sparkles, text: "Премиальные ингредиенты" },
+              { Icon: Truck, text: "Доставка каждый день" },
+            ].map((item) => (
+              <span key={item.text} className="inline-flex items-center gap-2 rounded-full"
+                style={{
+                  background: "rgba(14,15,14,0.55)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  backdropFilter: "blur(8px)",
+                  padding: "8px 14px",
+                  fontFamily: "Inter",
+                  fontSize: 12,
+                  color: "#E0E2DD",
+                }}>
+                <item.Icon size={14} color="#D4AF37" />
+                {item.text}
+              </span>
+            ))}
           </div>
         </div>
       </div>

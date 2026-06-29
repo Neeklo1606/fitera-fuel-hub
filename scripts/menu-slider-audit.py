@@ -31,7 +31,7 @@ async def main():
 
             await page.wait_for_function(
                 "line => document.querySelector('[data-menu-slider]')?.dataset.line === line",
-                ration,
+                arg=ration,
             )
 
             for day in DAYS:
@@ -41,7 +41,7 @@ async def main():
 
                 await page.wait_for_function(
                     "([line, day]) => { const s = document.querySelector('[data-menu-slider]'); return s && s.dataset.line === line && s.dataset.day === String(day); }",
-                    [ration, day],
+                    arg=[ration, day],
                 )
 
                 slider = page.locator("[data-menu-slider]")

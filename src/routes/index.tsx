@@ -1153,7 +1153,7 @@ function DishModal({ dish, onClose, onOrder }: { dish: Dish; onClose: () => void
             ))}
           </div>
 
-          <p style={{ fontFamily: "Inter", fontSize: 12.5, lineHeight: 1.45, color: "#C5C9BD" }}>
+          <p id="dish-modal-desc" style={{ fontFamily: "Inter", fontSize: 12.5, lineHeight: 1.45, color: "#C5C9BD" }}>
             <span style={{ color: "#A0A89A", fontWeight: 600, textTransform: "uppercase", fontSize: 10, letterSpacing: "0.08em", marginRight: 6 }}>Состав:</span>
             {dish.ingredients}
           </p>

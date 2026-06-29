@@ -409,15 +409,15 @@ function Navbar({ onOrder }: { onOrder: () => void }) {
         </nav>
         <div className="flex items-center gap-2 shrink-0">
           <a
-            href="tel:+79991234567"
+            href="tel:+79966100006"
             aria-label="Позвонить"
             className="press lg:hidden grid place-items-center rounded-full"
             style={{ width: 40, height: 40, background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.35)", color: "#D4AF37" }}
           >
             <Phone size={17} />
           </a>
-          <a href="tel:+79991234567" className="hidden lg:inline-block text-sm font-semibold" style={{ color: "#FFFFFF" }}>
-            +7 (999) 123-45-67
+          <a href="tel:+79966100006" className="hidden lg:inline-block text-sm font-semibold" style={{ color: "#FFFFFF" }}>
+            +7 (996) 610-00-06
           </a>
           <button
             onClick={onOrder}

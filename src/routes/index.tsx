@@ -99,7 +99,7 @@ type Line = {
   dishPhotos: string[];
 };
 
-const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=420&q=70`;
+const U = (id: string) => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=640&q=70`;
 
 const LINES: Line[] = [
   { id: "LIGHT",   title: "Лёгкий",  kcal: "1200–1400", desc: "Снижение веса",     priceFrom: "от 750 ₽",   accent: "#7CB342", tint: "#EEF7E4", pastel: "#E8F5E9", image: lineLight,   Icon: Leaf,     features: ["Низкокалорийный профиль", "Овощи, рыба, белок", "Дефицит 300–500 ккал"], dishesPerDay: "4 блюда в день",
@@ -698,10 +698,15 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
       setCanPrev(emblaApi.canScrollPrev());
       setCanNext(emblaApi.canScrollNext());
     };
+    const onReInit = () => { setSnaps(emblaApi.scrollSnapList()); onSelect(); };
     setSnaps(emblaApi.scrollSnapList());
     onSelect();
     emblaApi.on("select", onSelect);
-    emblaApi.on("reInit", () => { setSnaps(emblaApi.scrollSnapList()); onSelect(); });
+    emblaApi.on("reInit", onReInit);
+    return () => {
+      emblaApi.off("select", onSelect);
+      emblaApi.off("reInit", onReInit);
+    };
   }, [emblaApi]);
 
   return (
@@ -725,9 +730,11 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
                   <img
                     src={photo}
                     alt={d.name}
-                    loading={i < 2 ? "eager" : "lazy"}
+                    loading={i === 0 ? "eager" : "lazy"}
                     decoding="async"
-                    fetchPriority={i === 0 ? "high" : "auto"}
+                    fetchPriority={i === 0 ? "high" : "low"}
+                    width={640}
+                    height={480}
                     style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                   />
                 </div>

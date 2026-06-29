@@ -945,7 +945,8 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
 function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDish: (d: Dish) => void; onOrder: () => void }) {
   const [day, setDay] = useState(0);
   const line = LINES.find((l) => l.id === lineId)!;
-  const dayMeals = WEEK_MENU[lineId][day];
+  const dayMeals = (WEEK_MENU[lineId] && WEEK_MENU[lineId][day]) || [];
+  const hasMeals = dayMeals.length > 0;
 
   const totalKcal = dayMeals.reduce((s, d) => s + d.kcal, 0);
   const totalP = dayMeals.reduce((s, d) => s + d.p, 0);

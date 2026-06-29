@@ -102,6 +102,7 @@ type Line = {
 const LINE_PHOTO_SET = [lineLight, lineBalance, linePower, lineMom, linePro];
 const dishPhotoSet = (start: number, count: number) =>
   Array.from({ length: count }, (_, i) => LINE_PHOTO_SET[(start + i) % LINE_PHOTO_SET.length]);
+const loadedDishPhotoCache = new Set<string>();
 
 const LINES: Line[] = [
   { id: "LIGHT",   title: "Лёгкий",  kcal: "1200–1400", desc: "Снижение веса",     priceFrom: "от 750 ₽",   accent: "#7CB342", tint: "#EEF7E4", pastel: "#E8F5E9", image: lineLight,   Icon: Leaf,     features: ["Низкокалорийный профиль", "Овощи, рыба, белок", "Дефицит 300–500 ккал"], dishesPerDay: "4 блюда в день",
@@ -658,6 +659,7 @@ function LinesSection({ selected, onChoose }: {
                     </div>
                     <button
                       onClick={() => onChoose(line.id)}
+                      data-ration-select={line.id}
                       className="press inline-flex items-center justify-center gap-2"
                       style={{
                         background: "#0E0F0E", color: "#FFFFFF",
@@ -682,16 +684,97 @@ function LinesSection({ selected, onChoose }: {
 
 /* ────────── Menu (swipeable slider, day pills) ────────── */
 
-function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Line; onOpenDish: (d: Dish) => void }) {
+function DishPhotoPlaceholder({ line }: { line: Line }) {
+  return (
+    <div
+      className="slider-photo-fallback"
+      role="img"
+      aria-label={`Фото блюда ${line.id} скоро появится`}
+      style={{ "--line-accent": line.accent } as React.CSSProperties}
+    >
+      <UtensilsCrossed size={30} strokeWidth={1.8} />
+      <span>Фото блюда скоро появится</span>
+    </div>
+  );
+}
+
+function SliderDishPhoto({ src, alt, line }: { src?: string; alt: string; line: Line }) {
+  const hasSource = Boolean(src && src.trim());
+  const [loaded, setLoaded] = useState(() => Boolean(src && loadedDishPhotoCache.has(src)));
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    setFailed(false);
+    setLoaded(Boolean(src && loadedDishPhotoCache.has(src)));
+  }, [src]);
+
+  if (!hasSource || failed) {
+    return (
+      <div
+        className="slider-photo-shell"
+        data-menu-photo
+        data-photo-state="fallback"
+        style={{ "--line-accent": line.accent } as React.CSSProperties}
+      >
+        <DishPhotoPlaceholder line={line} />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="slider-photo-shell"
+      data-menu-photo
+      data-photo-state={loaded ? "loaded" : "loading"}
+      style={{ "--line-accent": line.accent } as React.CSSProperties}
+    >
+      {!loaded && (
+        <div className="slider-photo-skeleton" aria-hidden="true">
+          <span className="slider-photo-spinner" />
+        </div>
+      )}
+      <img
+        src={src}
+        alt={alt}
+        draggable={false}
+        loading="eager"
+        decoding="async"
+        fetchPriority="auto"
+        width={1280}
+        height={800}
+        onLoad={() => {
+          loadedDishPhotoCache.add(src!);
+          setLoaded(true);
+        }}
+        onError={() => {
+          setFailed(true);
+          setLoaded(true);
+        }}
+        className={`slider-photo-img ${loaded ? "is-loaded" : ""}`}
+      />
+    </div>
+  );
+}
+
+function getDishPhoto(line: Line, index: number) {
+  if (!line.dishPhotos.length) return "";
+  return line.dishPhotos[index % line.dishPhotos.length] || "";
+}
+
+function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; line: Line; day: number; onOpenDish: (d: Dish) => void }) {
   const dishesSignature = dishes.map((d) => d.name).join("|");
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+  const didDragRef = useRef(false);
+  const selectedRef = useRef(0);
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: false,
     align: "start",
     containScroll: "trimSnaps",
     dragFree: false,
     skipSnaps: false,
-    dragThreshold: 14,
-    duration: 22,
+    dragThreshold: 6,
+    duration: 18,
   });
   const [selected, setSelected] = useState(0);
   const [snaps, setSnaps] = useState<number[]>([]);
@@ -701,7 +784,9 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
   useEffect(() => {
     if (!emblaApi) return;
     const onSelect = () => {
-      setSelected(emblaApi.selectedScrollSnap());
+      const next = emblaApi.selectedScrollSnap();
+      selectedRef.current = next;
+      setSelected(next);
       setCanPrev(emblaApi.canScrollPrev());
       setCanNext(emblaApi.canScrollNext());
     };
@@ -719,9 +804,13 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
   useEffect(() => {
     if (!emblaApi) return;
     const frame = requestAnimationFrame(() => {
+      const desiredSnap = selectedRef.current;
       emblaApi.reInit();
-      emblaApi.scrollTo(0, true);
-      setSelected(0);
+      const maxSnap = Math.max(0, emblaApi.scrollSnapList().length - 1);
+      const nextSnap = Math.min(desiredSnap, maxSnap);
+      emblaApi.scrollTo(nextSnap, true);
+      selectedRef.current = nextSnap;
+      setSelected(nextSnap);
       setSnaps(emblaApi.scrollSnapList());
       setCanPrev(emblaApi.canScrollPrev());
       setCanNext(emblaApi.canScrollNext());
@@ -729,36 +818,128 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
     return () => cancelAnimationFrame(frame);
   }, [emblaApi, dishes.length, dishesSignature, line.id]);
 
+  const handlePointerDown = (event: React.PointerEvent) => {
+    pointerStartRef.current = { x: event.clientX, y: event.clientY };
+    didDragRef.current = false;
+  };
+
+  const handlePointerMove = (event: React.PointerEvent) => {
+    const start = pointerStartRef.current;
+    if (!start) return;
+    if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 8) {
+      didDragRef.current = true;
+    }
+  };
+
+  const handlePointerUp = (event: React.PointerEvent) => {
+    const start = pointerStartRef.current;
+    if (start) {
+      const dx = event.clientX - start.x;
+      const dy = event.clientY - start.y;
+      if (Math.abs(dx) > 34 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        if (dx < 0) emblaApi?.scrollNext();
+        else emblaApi?.scrollPrev();
+      }
+    }
+    pointerStartRef.current = null;
+    window.setTimeout(() => {
+      didDragRef.current = false;
+    }, 0);
+  };
+
+  const handlePointerCancel = () => {
+    pointerStartRef.current = null;
+    window.setTimeout(() => {
+      didDragRef.current = false;
+    }, 0);
+  };
+
+  const handleTouchStart = (event: React.TouchEvent) => {
+    const touch = event.touches[0];
+    if (!touch) return;
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    didDragRef.current = false;
+  };
+
+  const handleTouchMove = (event: React.TouchEvent) => {
+    const touch = event.touches[0];
+    const start = touchStartRef.current;
+    if (!touch || !start) return;
+    if (Math.hypot(touch.clientX - start.x, touch.clientY - start.y) > 8) {
+      didDragRef.current = true;
+    }
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    const start = touchStartRef.current;
+    const touch = event.changedTouches[0];
+    if (start && touch) {
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
+      if (Math.abs(dx) > 34 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+        if (dx < 0) emblaApi?.scrollNext();
+        else emblaApi?.scrollPrev();
+      }
+    }
+    touchStartRef.current = null;
+    window.setTimeout(() => {
+      didDragRef.current = false;
+    }, 0);
+  };
+
   return (
-    <div className="menu-anim relative mt-5">
-      <div className="overflow-hidden" ref={emblaRef} aria-label={`Блюда рациона ${line.id}`}>
-        <div className="flex" style={{ gap: 12, willChange: "transform", touchAction: "pan-y pinch-zoom" }}>
+    <div
+      className="relative mt-5"
+      data-menu-slider
+      data-line={line.id}
+      data-day={day}
+      data-expected-dishes={dishes.length}
+    >
+      <div
+        className="overflow-hidden"
+        ref={emblaRef}
+        aria-label={`Блюда рациона ${line.id}`}
+        onPointerDownCapture={handlePointerDown}
+        onPointerMoveCapture={handlePointerMove}
+        onPointerUpCapture={handlePointerUp}
+        onPointerCancelCapture={handlePointerCancel}
+        onTouchStartCapture={handleTouchStart}
+        onTouchMoveCapture={handleTouchMove}
+        onTouchEndCapture={handleTouchEnd}
+        onTouchCancelCapture={() => { touchStartRef.current = null; }}
+        style={{ touchAction: "pan-y pinch-zoom" }}
+      >
+        <div className="flex" style={{ gap: 12, willChange: "transform" }}>
           {dishes.map((d, i) => {
-            const photo = line.dishPhotos[i % line.dishPhotos.length] || line.image;
+            const photo = getDishPhoto(line, i);
             return (
-              <button
-                key={d.meal + d.name + i}
-                type="button"
-                onClick={() => onOpenDish(d)}
+              <article
+                key={`menu-slide-${i}`}
+                data-menu-slide
+                data-slide-index={i}
+                role="button"
+                tabIndex={0}
+                onClick={(event) => {
+                  if (didDragRef.current) {
+                    event.preventDefault();
+                    return;
+                  }
+                  onOpenDish(d);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onOpenDish(d);
+                  }
+                }}
                 className="press text-left flex flex-col overflow-hidden tile-trans shrink-0"
                 style={{
                   flex: "0 0 calc(80% - 6px)",
                   background: "#161816", border: "1px solid #2A2E2A", borderRadius: 18,
+                  cursor: "pointer",
                 }}
               >
-                <div style={{ position: "relative", width: "100%", aspectRatio: "4 / 3", background: "#0E0F0E", overflow: "hidden" }}>
-                  <img
-                    src={photo}
-                    alt={d.name}
-                    draggable={false}
-                    loading={i === 0 ? "eager" : "lazy"}
-                    decoding="async"
-                    fetchPriority={i === 0 ? "high" : "low"}
-                    width={1280}
-                    height={800}
-                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                  />
-                </div>
+                <SliderDishPhoto src={photo} alt={d.name} line={line} />
                 <div className="flex-1 flex flex-col" style={{ padding: 14 }}>
                   <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 10, color: line.accent, letterSpacing: "0.12em", textTransform: "uppercase" }}>
                     {d.meal}
@@ -779,7 +960,7 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
                     <span>Б {d.p} · Ж {d.f} · У {d.c}</span>
                   </div>
                 </div>
-              </button>
+              </article>
             );
           })}
         </div>
@@ -792,10 +973,11 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
         aria-label="Предыдущее блюдо"
         onClick={() => emblaApi?.scrollPrev()}
         disabled={!canPrev}
-        className="hidden md:grid place-items-center press"
+        data-menu-prev
+        className="grid place-items-center press"
         style={{
-          position: "absolute", top: "40%", left: -6, transform: "translateY(-50%)",
-          width: 40, height: 40, borderRadius: 999,
+          position: "absolute", top: "40%", left: 6, transform: "translateY(-50%)",
+          width: 38, height: 38, borderRadius: 999,
           background: "rgba(255,255,255,0.95)", color: "#0E0F0E",
           boxShadow: "0 4px 14px rgba(0,0,0,0.35)",
           opacity: canPrev ? 1 : 0.3, cursor: canPrev ? "pointer" : "default",
@@ -809,10 +991,11 @@ function MenuDishSlider({ dishes, line, onOpenDish }: { dishes: Dish[]; line: Li
         aria-label="Следующее блюдо"
         onClick={() => emblaApi?.scrollNext()}
         disabled={!canNext}
-        className="hidden md:grid place-items-center press"
+        data-menu-next
+        className="grid place-items-center press"
         style={{
-          position: "absolute", top: "40%", right: -6, transform: "translateY(-50%)",
-          width: 40, height: 40, borderRadius: 999,
+          position: "absolute", top: "40%", right: 6, transform: "translateY(-50%)",
+          width: 38, height: 38, borderRadius: 999,
           background: "rgba(255,255,255,0.95)", color: "#0E0F0E",
           boxShadow: "0 4px 14px rgba(0,0,0,0.35)",
           opacity: canNext ? 1 : 0.3, cursor: canNext ? "pointer" : "default",
@@ -878,6 +1061,7 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
             return (
               <button
                 key={d}
+                data-menu-day={i}
                 onClick={() => setDay(i)}
                 aria-pressed={active}
                 aria-label={DAYS_FULL[i]}
@@ -909,6 +1093,7 @@ function MenuSection({ lineId, onOpenDish, onOrder }: { lineId: LineId; onOpenDi
           <MenuDishSlider
             dishes={dayMeals}
             line={line}
+            day={day}
             onOpenDish={onOpenDish}
           />
         ) : (

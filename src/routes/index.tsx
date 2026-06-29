@@ -474,15 +474,16 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
 
       <div className="relative mx-auto px-4 flex flex-col justify-end md:justify-center"
         style={{ maxWidth: 1200, minHeight: "min(640px, 86vh)", paddingTop: 32, paddingBottom: 44 }}>
-        <div className="reveal in" style={{ maxWidth: 620 }}>
+        <div className="reveal in" style={{ maxWidth: 620, minHeight: 580 }}>
 
 
           <h1
             className="mt-5"
             style={{
-              fontFamily: "Unbounded", fontWeight: 900,
-              fontSize: "clamp(38px, 8vw, 72px)", lineHeight: 0.98, letterSpacing: "-0.035em",
+              fontFamily: "Unbounded, 'Unbounded Fallback', sans-serif", fontWeight: 900,
+              fontSize: "clamp(38px, 8vw, 72px)", lineHeight: 1.02, letterSpacing: "-0.035em",
               color: "#FFFFFF",
+              minHeight: "calc(2 * clamp(38px, 8vw, 72px) * 1.02)",
             }}
           >
             Умное питание<br />
@@ -516,7 +517,7 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
             </button>
           </div>
 
-          <div className="mt-7 flex flex-wrap gap-2">
+          <div className="mt-7 flex flex-wrap gap-2" style={{ minHeight: 168 }}>
             {[
               { Icon: FlaskConical, text: "Научный подход" },
               { Icon: Target, text: "Индивидуальный рацион" },
@@ -532,6 +533,7 @@ function Hero({ onOrder, onCalc }: { onOrder: () => void; onCalc: () => void }) 
                   fontFamily: "Inter",
                   fontSize: 12,
                   color: "#E0E2DD",
+                  whiteSpace: "nowrap",
                 }}>
                 <item.Icon size={14} color="#D4AF37" />
                 {item.text}

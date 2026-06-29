@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import {
   X, Check, Phone, Leaf, Truck, Sparkles, Send, Plus, ArrowRight,
@@ -103,6 +103,48 @@ const LINE_PHOTO_SET = [lineLight, lineBalance, linePower, lineMom, linePro];
 const dishPhotoSet = (start: number, count: number) =>
   Array.from({ length: count }, (_, i) => LINE_PHOTO_SET[(start + i) % LINE_PHOTO_SET.length]);
 const loadedDishPhotoCache = new Set<string>();
+const failedDishPhotoCache = new Set<string>();
+const preloadingDishPhotoCache = new Map<string, Promise<boolean>>();
+
+function preloadDishPhoto(src?: string) {
+  if (!src || typeof window === "undefined") return Promise.resolve(false);
+  if (loadedDishPhotoCache.has(src)) return Promise.resolve(true);
+  if (failedDishPhotoCache.has(src)) return Promise.resolve(false);
+
+  const cached = preloadingDishPhotoCache.get(src);
+  if (cached) return cached;
+
+  const preload = new Promise<boolean>((resolve) => {
+    const img = new Image();
+    img.decoding = "async";
+    img.loading = "eager";
+    img.onload = async () => {
+      try {
+        await img.decode?.();
+      } catch {
+        // The image is still usable after onload even if decode() rejects on some mobile browsers.
+      }
+      loadedDishPhotoCache.add(src);
+      preloadingDishPhotoCache.delete(src);
+      resolve(true);
+    };
+    img.onerror = () => {
+      failedDishPhotoCache.add(src);
+      preloadingDishPhotoCache.delete(src);
+      resolve(false);
+    };
+    img.src = src;
+  });
+
+  preloadingDishPhotoCache.set(src, preload);
+  return preload;
+}
+
+function preloadDishPhotos(sources: Array<string | undefined>) {
+  Array.from(new Set(sources.filter(Boolean) as string[])).forEach((src) => {
+    void preloadDishPhoto(src);
+  });
+}
 
 const LINES: Line[] = [
   { id: "LIGHT",   title: "Лёгкий",  kcal: "1200–1400", desc: "Снижение веса",     priceFrom: "от 750 ₽",   accent: "#7CB342", tint: "#EEF7E4", pastel: "#E8F5E9", image: lineLight,   Icon: Leaf,     features: ["Низкокалорийный профиль", "Овощи, рыба, белок", "Дефицит 300–500 ккал"], dishesPerDay: "4 блюда в день",
@@ -700,12 +742,52 @@ function DishPhotoPlaceholder({ line }: { line: Line }) {
 
 function SliderDishPhoto({ src, alt, line }: { src?: string; alt: string; line: Line }) {
   const hasSource = Boolean(src && src.trim());
+  const imgRef = useRef<HTMLImageElement | null>(null);
   const [loaded, setLoaded] = useState(() => Boolean(src && loadedDishPhotoCache.has(src)));
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState(() => Boolean(src && failedDishPhotoCache.has(src)));
 
   useEffect(() => {
+    if (!src) {
+      setFailed(false);
+      setLoaded(false);
+      return;
+    }
+
+    if (loadedDishPhotoCache.has(src)) {
+      setFailed(false);
+      setLoaded(true);
+      return;
+    }
+
+    if (failedDishPhotoCache.has(src)) {
+      setFailed(true);
+      setLoaded(false);
+      return;
+    }
+
+    let cancelled = false;
     setFailed(false);
-    setLoaded(Boolean(src && loadedDishPhotoCache.has(src)));
+    setLoaded(false);
+
+    const markLoadedIfReady = () => {
+      const img = imgRef.current;
+      if (!cancelled && img?.complete && img.naturalWidth > 0) {
+        loadedDishPhotoCache.add(src);
+        setLoaded(true);
+      }
+    };
+
+    const frame = requestAnimationFrame(markLoadedIfReady);
+    void preloadDishPhoto(src).then((ok) => {
+      if (cancelled) return;
+      if (ok) setLoaded(true);
+      else setFailed(true);
+    });
+
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
   }, [src]);
 
   if (!hasSource || failed) {
@@ -734,21 +816,23 @@ function SliderDishPhoto({ src, alt, line }: { src?: string; alt: string; line: 
         </div>
       )}
       <img
+        ref={imgRef}
         src={src}
         alt={alt}
         draggable={false}
         loading="eager"
         decoding="async"
-        fetchPriority="auto"
-        width={1280}
+        fetchPriority="high"
+        width={800}
         height={800}
         onLoad={() => {
           loadedDishPhotoCache.add(src!);
           setLoaded(true);
         }}
         onError={() => {
+          failedDishPhotoCache.add(src!);
           setFailed(true);
-          setLoaded(true);
+          setLoaded(false);
         }}
         className={`slider-photo-img ${loaded ? "is-loaded" : ""}`}
       />
@@ -761,8 +845,22 @@ function getDishPhoto(line: Line, index: number) {
   return line.dishPhotos[index % line.dishPhotos.length] || "";
 }
 
+function getNearbyDishPhotos(line: Line, day: number, selectedIndex: number, dishesCount: number) {
+  const current = Array.from({ length: dishesCount }, (_, i) => getDishPhoto(line, i));
+  const previous = getDishPhoto(line, Math.max(0, selectedIndex - 1));
+  const selected = getDishPhoto(line, selectedIndex);
+  const next = getDishPhoto(line, Math.min(Math.max(0, dishesCount - 1), selectedIndex + 1));
+  const nextDaySeed = getDishPhoto(line, day + 1);
+  const prevDaySeed = getDishPhoto(line, Math.max(0, day - 1));
+  return [selected, next, previous, ...current, nextDaySeed, prevDaySeed];
+}
+
 function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; line: Line; day: number; onOpenDish: (d: Dish) => void }) {
   const dishesSignature = dishes.map((d) => d.name).join("|");
+  const photoSignature = useMemo(
+    () => Array.from({ length: dishes.length }, (_, i) => getDishPhoto(line, i)).join("|"),
+    [dishes.length, line],
+  );
   const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const didDragRef = useRef(false);
@@ -817,6 +915,24 @@ function MenuDishSlider({ dishes, line, day, onOpenDish }: { dishes: Dish[]; lin
     });
     return () => cancelAnimationFrame(frame);
   }, [emblaApi, dishes.length, dishesSignature, line.id]);
+
+  useEffect(() => {
+    preloadDishPhotos(getNearbyDishPhotos(line, day, selectedRef.current, dishes.length));
+  }, [day, dishes.length, line, photoSignature]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const preloadAroundSelection = () => {
+      preloadDishPhotos(getNearbyDishPhotos(line, day, emblaApi.selectedScrollSnap(), dishes.length));
+    };
+    preloadAroundSelection();
+    emblaApi.on("select", preloadAroundSelection);
+    emblaApi.on("settle", preloadAroundSelection);
+    return () => {
+      emblaApi.off("select", preloadAroundSelection);
+      emblaApi.off("settle", preloadAroundSelection);
+    };
+  }, [emblaApi, day, dishes.length, line, photoSignature]);
 
   const handlePointerDown = (event: React.PointerEvent) => {
     pointerStartRef.current = { x: event.clientX, y: event.clientY };

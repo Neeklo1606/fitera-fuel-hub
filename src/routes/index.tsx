@@ -2649,7 +2649,7 @@ function Landing() {
           onChoose={chooseLine}
         />
         <MenuSection lineId={selectedLine} onOpenDish={setDish} onOrder={() => openOrder(selectedLine)} />
-        <Subscription onSelect={(period) => openOrder(selectedLine, period)} />
+        <Subscription selectedLine={selectedLine} onSelect={(line, period) => openOrder(line, period)} />
         <Delivery onAsk={() => openOrder()} />
         <Calculator onOrder={(line) => openOrder(line)} />
         <FAQSection />

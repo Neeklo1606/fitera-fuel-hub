@@ -1825,19 +1825,46 @@ function Calculator({ onOrder }: { onOrder: (line: LineId) => void }) {
 
 /* ────────── Subscriptions ────────── */
 
-function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
-  const plans = [
-    { id: "1 день", price: "от 750 ₽", per: "за день", old: null as string | null, badge: null as string | null,
-      features: ["4 приёма пищи", "Доставка сегодня", "Без подписки"], primary: false },
-    { id: "1 неделя", price: "от 4 900 ₽", per: "−15%", old: "5 770 ₽", badge: "ПОПУЛЯРНО",
-      features: ["28 приёмов пищи", "Выбор линейки", "Скидка 15%"], primary: true },
-    { id: "1 месяц", price: "от 19 500 ₽", per: "−20%", old: "24 000 ₽", badge: null,
-      features: ["Заморозка дней", "Приоритет", "Скидка 20%"], primary: false },
+const LINE_DAY_PRICE: Record<LineId, number> = {
+  LIGHT: 750, BALANCE: 850, POWER: 950, MOM: 900, PRO: 1100,
+};
+
+function formatRub(n: number) {
+  return n.toLocaleString("ru-RU").replace(/,/g, " ") + " ₽";
+}
+
+function Subscription({
+  selectedLine,
+  onSelect,
+}: {
+  selectedLine: LineId;
+  onSelect: (line: LineId, period: string) => void;
+}) {
+  const [period, setPeriod] = useState<"1 день" | "1 неделя" | "1 месяц">("1 день");
+
+  const periods: { id: "1 день" | "1 неделя" | "1 месяц"; label: string; suffix: string; mult: number; discount: number; hot?: boolean }[] = [
+    { id: "1 день",   label: "1 день", suffix: "× 1 день",  mult: 1,  discount: 0    },
+    { id: "1 неделя", label: "Неделя", suffix: "× 7 дней",  mult: 7,  discount: 0.12, hot: true },
+    { id: "1 месяц",  label: "Месяц",  suffix: "× 30 дней", mult: 30, discount: 0.20, hot: true },
   ];
+
+  const line = LINES.find((l) => l.id === selectedLine)!;
+  const cur = periods.find((p) => p.id === period)!;
+  const dayPrice = LINE_DAY_PRICE[selectedLine];
+  const total = Math.round((dayPrice * cur.mult * (1 - cur.discount)) / 10) * 10;
+  const oldTotal = cur.discount > 0 ? dayPrice * cur.mult : null;
+
+  const features = [
+    "Блюда не повторяются в течение недели",
+    "Возможно внесение новых блюд от шеф-повара",
+    "На внешний вид блюдо может отличаться от фото, представленных на сайте",
+  ];
+
+  const dashed = "repeating-linear-gradient(to right, #C9A84C 0 8px, transparent 8px 16px)";
 
   return (
     <section id="subs" style={{ background: "#0E0F0E", padding: "48px 16px" }}>
-      <div className="mx-auto" style={{ maxWidth: 1200 }}>
+      <div className="mx-auto" style={{ maxWidth: 560 }}>
         <SectionHeader
           eyebrow="Подписки"
           title="Выбери формат"
@@ -1847,59 +1874,137 @@ function Subscription({ onSelect }: { onSelect: (period: string) => void }) {
           center
         />
 
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-3" style={{ gap: 12 }}>
-          {plans.map((p) => (
-            <div key={p.id} className="reveal relative flex flex-col tile-trans"
-              style={{
-                background: p.primary ? "linear-gradient(180deg, #1C2A1C 0%, #162016 100%)" : "#161816",
-                border: p.primary ? "1.5px solid #2E7D32" : "1px solid #2A2E2A",
-                borderRadius: 22, padding: 22,
-                boxShadow: p.primary ? "0 20px 50px -20px rgba(46,125,50,0.45)" : "none",
-              }}>
-              {p.badge && (
-                <span className="absolute" style={{
-                  top: -11, left: "50%", transform: "translateX(-50%)",
-                  background: "#D4AF37", color: "#0E0F0E",
-                  borderRadius: 50, padding: "5px 14px",
-                  fontFamily: "Inter", fontWeight: 700, fontSize: 10, letterSpacing: "0.08em",
-                  boxShadow: "0 6px 16px -4px rgba(212,175,55,0.5)",
-                }}>
-                  {p.badge}
-                </span>
-              )}
-              <div style={{ fontFamily: "Unbounded", fontWeight: 700, fontSize: 17, letterSpacing: "-0.02em", color: "#FFFFFF", textTransform: "uppercase" }}>
-                {p.id}
-              </div>
-
-              <div className="mt-2 flex items-baseline gap-2 flex-wrap">
-                <span className="tabular" style={{ fontFamily: "Inter", fontWeight: 800, fontSize: 26, color: "#D4AF37" }}>{p.price}</span>
-                {p.old && (
-                  <span className="tabular" style={{ fontFamily: "Inter", fontSize: 13, color: "#777", textDecoration: "line-through" }}>{p.old}</span>
-                )}
-              </div>
-              <div style={{ fontFamily: "Inter", fontSize: 12, color: p.primary ? "#9FD89F" : "#A0A89A", marginTop: 2 }}>{p.per}</div>
-
-              <ul className="mt-5 space-y-2 flex-1">
-                {p.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2" style={{ fontFamily: "Inter", fontSize: 13.5, color: "#C8CCC4" }}>
-                    <Check size={14} color={p.primary ? "#9FD89F" : "#7CB342"} style={{ marginTop: 3, flexShrink: 0 }} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-
-              <button onClick={() => onSelect(p.id)} className="press mt-6 w-full"
+        {/* Period switcher */}
+        <div className="mt-8 grid grid-cols-3" style={{ gap: 10 }}>
+          {periods.map((p) => {
+            const active = p.id === period;
+            return (
+              <button
+                key={p.id}
+                onClick={() => setPeriod(p.id)}
+                className="press relative flex flex-col items-center justify-center"
                 style={{
                   height: 52, borderRadius: 50,
-                  background: p.primary ? "#D4AF37" : "transparent",
-                  border: p.primary ? "none" : "1.5px solid #2A2E2A",
-                  color: p.primary ? "#0E0F0E" : "#FFFFFF",
-                  fontFamily: "Inter", fontWeight: p.primary ? 700 : 600, fontSize: 14,
-                }}>
-                Выбрать
+                  background: "transparent",
+                  border: active ? "1.5px solid #2E7D32" : "1px solid #2A2E2A",
+                  color: active ? "#FFFFFF" : "#A0A89A",
+                  fontFamily: "Inter", fontWeight: 600, fontSize: 14,
+                  transition: "all .25s ease",
+                }}
+              >
+                {p.hot && (
+                  <span className="absolute" style={{
+                    top: -10, left: "50%", transform: "translateX(-50%)",
+                    display: "inline-flex", alignItems: "center", gap: 3,
+                    background: "#0E0F0E", padding: "0 6px",
+                    fontFamily: "Inter", fontWeight: 800, fontSize: 9,
+                    letterSpacing: "0.08em", color: "#EF4444",
+                  }}>
+                    <Flame size={10} color="#EF4444" /> HOT!
+                  </span>
+                )}
+                {p.label}
               </button>
+            );
+          })}
+        </div>
+
+        {/* Single dynamic card */}
+        <div
+          key={`${selectedLine}-${period}`}
+          className="reveal mt-5"
+          style={{
+            background: "#141614",
+            border: "1.5px solid #C9A84C",
+            borderRadius: 28,
+            padding: 24,
+            boxShadow: "0 30px 60px -30px rgba(201,168,76,0.25)",
+            animation: "fadeInUp .35s ease both",
+          }}
+        >
+          <div style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 28, letterSpacing: "-0.02em", color: "#FFFFFF", textTransform: "uppercase" }}>
+            {line.title}
+          </div>
+          <div className="mt-2 flex items-center flex-wrap" style={{ gap: 10 }}>
+            <span style={{ fontFamily: "Inter", fontWeight: 500, fontSize: 15, color: "#C5C9BD" }}>
+              {line.kcal} ккал
+            </span>
+            <span style={{ fontFamily: "Inter", fontWeight: 600, fontSize: 15, color: "#7CB342" }}>
+              {cur.suffix}
+            </span>
+          </div>
+
+          <div style={{ height: 1, background: dashed, marginBlock: 20 }} />
+
+          <ul className="space-y-3">
+            {features.map((f) => (
+              <li key={f} className="flex items-start" style={{ gap: 12 }}>
+                <span className="grid place-items-center shrink-0" style={{
+                  width: 22, height: 22, borderRadius: "50%",
+                  border: "1.5px solid #2E7D32", color: "#7CB342",
+                  marginTop: 1,
+                }}>
+                  <Check size={13} strokeWidth={3} />
+                </span>
+                <span style={{ fontFamily: "Inter", fontSize: 14.5, color: "#D4D7CC", lineHeight: 1.5 }}>{f}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div style={{ height: 1, background: dashed, marginBlock: 22 }} />
+
+          <div className="text-center">
+            <div className="tabular" style={{ fontFamily: "Unbounded", fontWeight: 800, fontSize: 44, letterSpacing: "-0.03em", color: "#D4AF37", lineHeight: 1 }}>
+              {formatRub(total)}
             </div>
-          ))}
+            {oldTotal && (
+              <div className="tabular mt-1.5" style={{ fontFamily: "Inter", fontSize: 14, color: "#777", textDecoration: "line-through" }}>
+                {formatRub(oldTotal)}
+              </div>
+            )}
+          </div>
+
+          <button onClick={() => onSelect(selectedLine, period)} className="press mt-5 w-full"
+            style={{
+              height: 52, borderRadius: 50, background: "#D4AF37", color: "#0E0F0E", border: "none",
+              fontFamily: "Inter", fontWeight: 700, fontSize: 15,
+            }}>
+            Заказать
+          </button>
+
+          <a href="https://max.ru" target="_blank" rel="noopener noreferrer"
+            className="press mt-3 w-full inline-flex items-center justify-center"
+            style={{
+              gap: 10, height: 52, borderRadius: 50, background: "transparent",
+              border: "1.5px solid #2E7D32", color: "#FFFFFF",
+              fontFamily: "Inter", fontWeight: 600, fontSize: 14,
+            }}>
+            <span className="grid place-items-center" style={{ width: 22, height: 22, borderRadius: "50%", border: "1.5px solid #2E7D32", color: "#7CB342" }}>
+              <MessageCircle size={12} />
+            </span>
+            Написать в MAX
+          </a>
+
+          <a href="https://wa.me/79966100006" target="_blank" rel="noopener noreferrer"
+            className="press mt-3 w-full inline-flex items-center justify-center"
+            style={{
+              gap: 10, height: 52, borderRadius: 50, background: "transparent",
+              border: "1.5px solid #2E7D32", color: "#FFFFFF",
+              fontFamily: "Inter", fontWeight: 600, fontSize: 14,
+            }}>
+            <span className="grid place-items-center" style={{ width: 22, height: 22, borderRadius: "50%", border: "1.5px solid #2E7D32", color: "#7CB342" }}>
+              <Phone size={12} />
+            </span>
+            Написать в WhatsApp
+          </a>
+
+          <div className="mt-6 flex items-center" style={{ gap: 12 }}>
+            <Truck size={36} color="#7CB342" strokeWidth={1.5} />
+            <div>
+              <div style={{ fontFamily: "Inter", fontWeight: 700, fontSize: 14, color: "#FFFFFF" }}>Бесплатная доставка</div>
+              <div style={{ fontFamily: "Inter", fontSize: 13, color: "#7A8278" }}>с 17:00 до 21:00</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
